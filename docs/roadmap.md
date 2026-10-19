@@ -285,10 +285,10 @@ But : maîtriser la logique scènes/nœuds/signaux de Godot et avoir un projet C
 
 - [x] Installer la dernière version stable de Godot 4 en **édition .NET** (4.7.x en juillet 2026) + le SDK .NET demandé par cette version
 - [x] Choisir un IDE : VS Code + extension C# Dev Kit + Claude Code et les 5 agents du projet
-- [ ] Installer l'éditeur de cartes **Tiled** et l'addon d'import Tiled pour Godot (YATI), avec l'accord explicite avant installation
+- [x] Installer l'éditeur de cartes **Tiled** et l'addon d'import Tiled pour Godot (YATI), avec l'accord explicite avant installation
 - [ ] Créer une carte Tiled de test (une salle de 16×14 tuiles avec les calques de `CLAUDE.md`) et vérifier qu'elle s'importe dans Godot
-- [ ] Créer un dépôt Git (GitHub/GitLab), avec un `.gitignore` qui exclut le dossier `.godot/`
-- [ ] Décider des plateformes : PC (Windows/Linux/Mac) en priorité. Un projet Godot en C# ne s'exporte pas officiellement vers le web en 2026, donc pas de démo navigateur sur itch.io : prévoir un build PC téléchargeable.
+- [x] Créer un dépôt Git (GitHub/GitLab), avec un `.gitignore` qui exclut le dossier `.godot/`
+- [x] Décider des plateformes : PC (Windows/Linux/Mac) en priorité. Un projet Godot en C# ne s'exporte pas officiellement vers le web en 2026, donc pas de démo navigateur sur itch.io : prévoir un build PC téléchargeable.
 
 **Apprentissage**
 

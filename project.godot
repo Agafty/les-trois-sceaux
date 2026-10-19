@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Les Trois Sceaux"
-config/features=PackedStringArray("4.7", "Forward Plus")
+config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]
@@ -26,6 +26,10 @@ window/stretch/scale_mode="integer"
 [dotnet]
 
 project/assembly_name="Les Trois Sceaux"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/YATI/plugin.cfg")
 
 [physics]
 
