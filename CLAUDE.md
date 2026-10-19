@@ -44,6 +44,8 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 
 **Format** : orientation orthogonale, tuiles de 16×16, cartes non infinies, données de calque en **CSV**.
 
+**Réglage d'import YATI important** : dans le panneau Import de Godot, l'option **« Add Class As Metadata »** doit être cochée (et enregistrée comme valeur par défaut pour le type « Tiled Map ») pour que la classe Tiled d'un objet (`Spawn`, `Sortie`, `Ennemi`...) soit lisible en jeu via les metadata du nœud. Sans ça, seules les propriétés personnalisées (comme `id`) sont importées, pas la classe elle-même.
+
 **Fichiers**
 - Cartes : `maps/` — une carte par salle de donjon (`maps/donjon1/salle_01.tmx`, 16×14 tuiles), une carte par zone d'overworld (`maps/overworld/foret.tmx`), une par intérieur (`maps/interieurs/forge.tmx`)
 - Tilesets : `maps/tilesets/*.tsx`, qui pointent vers les PNG de `art/tilesets/`

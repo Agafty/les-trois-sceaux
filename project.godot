@@ -27,6 +27,10 @@ window/stretch/scale_mode="integer"
 
 project/assembly_name="Les Trois Sceaux"
 
+[editor]
+
+import/use_multiple_threads=false
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/YATI/plugin.cfg")
