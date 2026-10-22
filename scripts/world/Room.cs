@@ -5,8 +5,9 @@ public partial class Room : Node2D
 {
     public override void _Ready()
     {
-        var player = GetNodeOrNull<Player>("Player");
-        var spawn = FindFirstByClass(this, "Spawn");
+        var player = FindPlayer(this);
+        var sceneManager = GetNode<SceneManager>("/root/SceneManager");
+        var spawn = FindSpawnById(this, sceneManager.ConsumeSpawnId());
         if (player != null && spawn != null)
             player.GlobalPosition = spawn.GlobalPosition;
 
@@ -37,6 +38,19 @@ public partial class Room : Node2D
         camera.PositionSmoothingEnabled = true;
     }
 
+    private static Player FindPlayer(Node root)
+    {
+        foreach (var child in root.GetChildren())
+        {
+            if (child is Player player)
+                return player;
+            var found = FindPlayer(child);
+            if (found != null)
+                return found;
+        }
+        return null;
+    }
+
     private static Node FindNodeByName(Node root, string name)
     {
         foreach (var child in root.GetChildren())
@@ -56,20 +70,21 @@ public partial class Room : Node2D
         if (!sortie.HasMeta("cible_carte")) return;
 
         var cibleCarte = (string)sortie.GetMeta("cible_carte");
-        GetTree().CallDeferred(SceneTree.MethodName.ChangeSceneToFile, cibleCarte);
+        var cibleSpawn = sortie.HasMeta("cible_spawn") ? (string)sortie.GetMeta("cible_spawn") : "";
+        GetNode<SceneManager>("/root/SceneManager").GoToScene(cibleCarte, cibleSpawn);
     }
 
-    private static Node2D FindFirstByClass(Node root, string className)
+    private static Node2D FindSpawnById(Node root, string spawnId)
     {
-        foreach (var child in root.GetChildren())
+        Node2D firstSpawn = null;
+        foreach (var node in FindAllByClass(root, "Spawn"))
         {
-            if (child is Node2D node2D && HasClass(child, className))
+            if (node is not Node2D node2D) continue;
+            firstSpawn ??= node2D;
+            if (!string.IsNullOrEmpty(spawnId) && node.HasMeta("id") && (string)node.GetMeta("id") == spawnId)
                 return node2D;
-            var found = FindFirstByClass(child, className);
-            if (found != null)
-                return found;
         }
-        return null;
+        return firstSpawn;
     }
 
     private static List<Node> FindAllByClass(Node root, string className)

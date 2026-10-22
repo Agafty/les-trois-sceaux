@@ -314,8 +314,8 @@ But : un personnage qui se déplace dans 2 ou 3 écrans reliés, avec des formes
 - [x] 3 cartes Tiled de test avec collisions (murs, eau, buissons), objets `Spawn` et `Sortie` lus par le code
 - [x] Caméra façon SNES : décider entre **défilement par écran** (transition glissée en salle de donjon) et **caméra qui suit** (overworld). Zelda SNES fait les deux : coder les deux modes.
 - [x] Transitions entre zones : `Area2D` en bord d'écran → chargement de la scène suivante + point d'apparition
-- [ ] Gestionnaire de scènes en autoload (`SceneManager`) avec fondu au noir
-- [ ] Tri en profondeur : `YSortEnabled` pour que le joueur passe devant/derrière les objets
+- [x] Gestionnaire de scènes en autoload (`SceneManager`) avec fondu au noir
+- [x] Tri en profondeur : `YSortEnabled` pour que le joueur passe devant/derrière les objets
 
 **Livrable** : on se balade entre 3 écrans avec transitions et collisions correctes. Le déplacement doit déjà être agréable : c'est ce que le joueur ressentira pendant tout le jeu.
 

@@ -1,12 +1,30 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="PackedScene" path="res://maps/donjon_test/salle_test2.tmx" id="map2"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
 [ext_resource type="Script" path="res://scripts/world/Room.cs" id="room_script"]
+[ext_resource type="Texture2D" path="res://art/tilesets/obstacle_test.png" id="obstacle_tex"]
+
+[sub_resource type="RectangleShape2D" id="obstacle_trunk_shape"]
+size = Vector2(10, 14)
 
 [node name="SalleTest2" type="Node2D"]
 script = ExtResource("room_script")
 
 [node name="Map" parent="." instance=ExtResource("map2")]
 
-[node name="Player" parent="." instance=ExtResource("player")]
+[node name="Entites" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Player" parent="Entites" instance=ExtResource("player")]
+
+[node name="Obstacle" type="StaticBody2D" parent="Entites"]
+position = Vector2(320, 140)
+
+[node name="Sprite2D" type="Sprite2D" parent="Entites/Obstacle"]
+texture = ExtResource("obstacle_tex")
+offset = Vector2(0, -24)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Entites/Obstacle"]
+position = Vector2(0, -8)
+shape = SubResource("obstacle_trunk_shape")
