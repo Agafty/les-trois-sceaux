@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="2">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="3">
  <tileset firstgid="1" source="../tilesets/placeholder_test.tsx"/>
  <layer id="1" name="Sol" width="20" height="11">
   <data encoding="csv">
@@ -38,7 +38,7 @@
 4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,
 4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,
 4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,
-4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,
+4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,
 4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,
 4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,
@@ -52,6 +52,13 @@
     <property name="id" value="depuis_village"/>
    </properties>
    <point/>
+  </object>
+  <object id="2" type="Sortie" x="608" y="160" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/salle_test2_room.tscn"/>
+    <property name="cible_spawn" value="depuis_salle1"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
   </object>
  </objectgroup>
  <layer id="5" name="Dessus" width="20" height="11">

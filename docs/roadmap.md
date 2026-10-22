@@ -308,12 +308,12 @@ But : maîtriser la logique scènes/nœuds/signaux de Godot et avoir un projet C
 
 But : un personnage qui se déplace dans 2 ou 3 écrans reliés, avec des formes placeholder (carrés de couleur suffisent).
 
-- [ ] Personnage `CharacterBody2D` : déplacement 8 directions, vitesse constante, `MoveAndSlide()`
-- [ ] Orientation sur 4 directions (haut/bas/gauche/droite) gardée en mémoire pour les animations et l'attaque
-- [ ] Input Map : actions `move_*`, `attack`, `use_item`, `interact`, `pause` (clavier + manette dès maintenant)
-- [ ] 3 cartes Tiled de test avec collisions (murs, eau, buissons), objets `Spawn` et `Sortie` lus par le code
-- [ ] Caméra façon SNES : décider entre **défilement par écran** (transition glissée en salle de donjon) et **caméra qui suit** (overworld). Zelda SNES fait les deux : coder les deux modes.
-- [ ] Transitions entre zones : `Area2D` en bord d'écran → chargement de la scène suivante + point d'apparition
+- [x] Personnage `CharacterBody2D` : déplacement 8 directions, vitesse constante, `MoveAndSlide()`
+- [x] Orientation sur 4 directions (haut/bas/gauche/droite) gardée en mémoire pour les animations et l'attaque
+- [x] Input Map : actions `move_*`, `attack`, `use_item`, `interact`, `pause` (clavier + manette dès maintenant)
+- [x] 3 cartes Tiled de test avec collisions (murs, eau, buissons), objets `Spawn` et `Sortie` lus par le code
+- [x] Caméra façon SNES : décider entre **défilement par écran** (transition glissée en salle de donjon) et **caméra qui suit** (overworld). Zelda SNES fait les deux : coder les deux modes.
+- [x] Transitions entre zones : `Area2D` en bord d'écran → chargement de la scène suivante + point d'apparition
 - [ ] Gestionnaire de scènes en autoload (`SceneManager`) avec fondu au noir
 - [ ] Tri en profondeur : `YSortEnabled` pour que le joueur passe devant/derrière les objets
 

@@ -14,7 +14,7 @@ La conception complète (scénario, personnages, carte, bestiaire, économie, ph
 
 ## Phase en cours
 
-**Phase 0 — Apprendre Godot et s'outiller.** (Mettre à jour cette ligne à chaque changement de phase.)
+**Phase 1 — Prototype de déplacement.** (Mettre à jour cette ligne à chaque changement de phase.)
 
 ## Comment travailler avec moi
 
@@ -44,6 +44,12 @@ Aucun agent n'installe ni ne télécharge quoi que ce soit sans mon accord.
 Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un addon d'import (YATI, à installer en phase 0 avec mon accord). Le fichier Tiled est la source de vérité : on ne modifie jamais à la main la scène générée par l'import.
 
 **Format** : orientation orthogonale, tuiles de 32×32, cartes non infinies, données de calque en **CSV**.
+
+**Réglage d'import YATI important** : dans le panneau Import de Godot, l'option **« Add Class As Metadata »** doit être cochée (et enregistrée comme valeur par défaut pour le type « Tiled Map ») pour que la classe Tiled d'un objet (`Spawn`, `Sortie`, `Ennemi`...) soit lisible en jeu via les metadata du nœud (`node.GetMeta("class")`). Sans ça, seules les propriétés personnalisées (comme `id`) sont importées, pas la classe elle-même.
+
+**Objets rectangle qui doivent être une zone de détection (`Sortie`, futurs interrupteurs...)** : par défaut, YATI transforme un objet rectangle sans type Godot reconnu en `StaticBody2D` (solide, bloque le joueur), pas en zone traversable. Pour obtenir une `Area2D` (qui détecte le passage sans bloquer), ajouter une propriété personnalisée **string** nommée `godot_node_type` avec la valeur `area` sur l'objet, en plus de sa `class` Tiled (`Sortie`). La `class` sert à nos metadata de gameplay, `godot_node_type` ne sert qu'à dire à YATI quel nœud Godot générer — les deux coexistent sans conflit.
+
+**Cache d'import à surveiller** : modifier un `.tsx` externe ne déclenche pas toujours le réimport des `.tmx` qui le référencent (bug de cache observé avec YATI). Si un changement du tileset (nouvelle collision, etc.) ne se reflète pas en jeu malgré un rechargement du projet, supprimer les fichiers correspondants dans `.godot/imported/` force une réimportation complète.
 
 **Fichiers**
 - Cartes : `maps/` — une carte par salle de donjon (`maps/donjon1/salle_01.tmx`, 20×11 tuiles), une carte par zone d'overworld (`maps/overworld/foret.tmx`), une par intérieur (`maps/interieurs/forge.tmx`)

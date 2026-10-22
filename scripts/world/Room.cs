@@ -1,0 +1,96 @@
+using Godot;
+using System.Collections.Generic;
+
+public partial class Room : Node2D
+{
+    public override void _Ready()
+    {
+        var player = GetNodeOrNull<Player>("Player");
+        var spawn = FindFirstByClass(this, "Spawn");
+        if (player != null && spawn != null)
+            player.GlobalPosition = spawn.GlobalPosition;
+
+        foreach (var sortie in FindAllByClass(this, "Sortie"))
+        {
+            if (sortie is Area2D area)
+                area.BodyEntered += body => OnSortieEntered(area, body);
+        }
+
+        if (player != null)
+            ConfigureCamera(player);
+    }
+
+    private void ConfigureCamera(Player player)
+    {
+        var camera = player.GetNodeOrNull<Camera2D>("Camera2D");
+        var tileMapLayer = FindNodeByName(this, "Sol") as TileMapLayer;
+        if (camera == null || tileMapLayer?.TileSet == null)
+            return;
+
+        var usedRect = tileMapLayer.GetUsedRect();
+        var tileSize = tileMapLayer.TileSet.TileSize;
+
+        camera.LimitLeft = usedRect.Position.X * tileSize.X;
+        camera.LimitTop = usedRect.Position.Y * tileSize.Y;
+        camera.LimitRight = (usedRect.Position.X + usedRect.Size.X) * tileSize.X;
+        camera.LimitBottom = (usedRect.Position.Y + usedRect.Size.Y) * tileSize.Y;
+        camera.PositionSmoothingEnabled = true;
+    }
+
+    private static Node FindNodeByName(Node root, string name)
+    {
+        foreach (var child in root.GetChildren())
+        {
+            if (child.Name == name)
+                return child;
+            var found = FindNodeByName(child, name);
+            if (found != null)
+                return found;
+        }
+        return null;
+    }
+
+    private void OnSortieEntered(Node sortie, Node body)
+    {
+        if (body is not Player) return;
+        if (!sortie.HasMeta("cible_carte")) return;
+
+        var cibleCarte = (string)sortie.GetMeta("cible_carte");
+        GetTree().CallDeferred(SceneTree.MethodName.ChangeSceneToFile, cibleCarte);
+    }
+
+    private static Node2D FindFirstByClass(Node root, string className)
+    {
+        foreach (var child in root.GetChildren())
+        {
+            if (child is Node2D node2D && HasClass(child, className))
+                return node2D;
+            var found = FindFirstByClass(child, className);
+            if (found != null)
+                return found;
+        }
+        return null;
+    }
+
+    private static List<Node> FindAllByClass(Node root, string className)
+    {
+        var results = new List<Node>();
+        CollectByClass(root, className, results);
+        return results;
+    }
+
+    private static void CollectByClass(Node root, string className, List<Node> results)
+    {
+        foreach (var child in root.GetChildren())
+        {
+            if (HasClass(child, className))
+                results.Add(child);
+            CollectByClass(child, className, results);
+        }
+    }
+
+    private static bool HasClass(Node node, string className)
+    {
+        return node.HasMeta("class") && (string)node.GetMeta("class") == className;
+    }
+}
