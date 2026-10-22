@@ -21,9 +21,10 @@ Tu ne reproduis jamais un personnage, une mascotte ou un sprite existant d'un au
 1. Regarde les sprites déjà présents dans le projet (par exemple `res://assets/`, `res://sprites/`, `res://art/`) : taille des personnages, palette, épaisseur et couleur des contours, direction de la lumière, nombre d'images par animation. Un nouveau personnage doit avoir l'air du même jeu.
 2. S'il n'existe encore rien, utilise ces valeurs par défaut, fixées pour le projet, et rappelle-les dans ton résumé :
    - **Vue de dessus 3/4** : on voit le haut de la tête et la face avant ; jamais de vue de côté type plateforme.
-   - **Tuiles de 16×16 px** ; personnages de **16×16 px** (Brann, PNJ, petits ennemis), case de 16×24 seulement si un personnage grand l'exige (Corvan) ; **boss en 32×32 ou 48×48**.
+   - **Tuiles de 32×32 px** ; personnages dans une case de **32×32 px** (Brann, PNJ, ennemis), le personnage lui-même faisant environ 24×32 ; case de 32×48 seulement si un personnage grand l'exige (Corvan) ; **boss en 64×64 à 96×96**.
+   - **Proportions trapues** : tête grosse (environ un tiers de la hauteur), yeux et détails du costume lisibles à 1:1 dans le jeu (résolution 640×360). Vérifie la lisibilité sur l'aperçu à la taille réelle du jeu (×3) et pas seulement sur l'agrandissement ×8.
+   - Animations volontairement courtes pour limiter le travail : idle 1 à 2 images, marche 4 images, attaque 3 images, dégâts 1 image.
    - **4 directions** pour chaque animation de déplacement ou d'attaque : bas, haut, gauche, droite. La droite peut être le miroir de la gauche si le personnage est symétrique (dis-le dans le résumé).
-   - Animations de base d'un personnage jouable ou d'un ennemi : idle (1 à 2 images), marche (2 à 4 images), attaque (3 à 4 images), dégâts (1 image).
    - **Palette commune de 24 à 32 couleurs** pour tout le jeu, enregistrée dans `art/palette.png` (une case par couleur) dès qu'elle existe ; tous les sprites et tuiles la réutilisent.
    - Contour sombre d'un pixel, lumière venant d'en haut à gauche, ombre portée simple (ellipse sombre sous les pieds) sur un calque ou une image séparée si l'animation le permet.
    - La corruption de Morvath (ronces, taches, armure noires) est un détail récurrent ; pour les boss, dessine-la sur une image séparée qu'on peut faire clignoter.
@@ -61,7 +62,7 @@ Garde toujours le script générateur à côté de l'image (par exemple `tools/s
 ## Compatibilité avec Tiled
 Les cartes du jeu sont faites dans l'éditeur Tiled.
 - Lis les fichiers de carte et de tileset existants (`.tmx`/`.tmj`, `.tsx`/`.tsj`) pour connaître la taille des tuiles (attributs `tilewidth` / `tileheight`), la marge et l'espacement des tilesets.
-- Taille des personnages cohérente avec la grille de 16×16 : un personnage fait 1 tuile (16×16), pieds alignés sur le bas de la case.
+- Taille des personnages cohérente avec la grille de 32×32 : un personnage fait 1 tuile (32×32), pieds alignés sur le bas de la case.
 - Tuiles de décor en vue de dessus : sol, murs avec leur face avant visible, bords d'eau et de falaise prévus pour les terrains (autotiling) de Tiled.
 - Pour une planche de tuiles (tileset) : toutes les tuiles exactement à la taille de la grille, sans marge ni espacement sauf si le projet en utilise déjà, bords qui se raccordent quand les tuiles sont posées côte à côte, et même palette que les personnages.
 - Tu peux créer le fichier de tileset `.tsx` qui référence le PNG (chemin relatif, taille des tuiles, nombre de colonnes), en respectant le format des tilesets existants. Les collisions, animations de tuiles et propriétés personnalisées se règlent ensuite dans Tiled : indique-les dans ton résumé.

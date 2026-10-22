@@ -27,10 +27,11 @@ La conception complète (scénario, personnages, carte, bestiaire, économie, ph
 
 ## Réglages techniques fixés
 
-- Résolution de base : **256×224** (format SNES), tuiles de **16×16 px**
+- Résolution de base : **640×360** (16:9 ; ×2 en 720p, ×3 en 1080p, ×4 en 1440p, ×6 en 4K), tuiles de **32×32 px**
+- Sprites : personnages dans une case de **32×32** (Corvan en 32×48), boss en **64×64 à 96×96**, proportions trapues (grosse tête) pour la lisibilité
 - Stretch mode `viewport`, scale mode `integer`, filtre de texture `Nearest`
 - Caméra : défilement par écran dans les donjons, caméra qui suit dans l'overworld
-- Un écran = 16×14 tuiles ; overworld de 5×4 écrans
+- Un écran = **20×11 tuiles** (640×352 px ; les 8 px restants en bas servent de marge, le HUD est en surimpression) ; overworld de 5×4 écrans = 100×44 tuiles
 
 ## Agents du projet
 
@@ -42,12 +43,10 @@ Aucun agent n'installe ni ne télécharge quoi que ce soit sans mon accord.
 
 Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un addon d'import (YATI, à installer en phase 0 avec mon accord). Le fichier Tiled est la source de vérité : on ne modifie jamais à la main la scène générée par l'import.
 
-**Format** : orientation orthogonale, tuiles de 16×16, cartes non infinies, données de calque en **CSV**.
-
-**Réglage d'import YATI important** : dans le panneau Import de Godot, l'option **« Add Class As Metadata »** doit être cochée (et enregistrée comme valeur par défaut pour le type « Tiled Map ») pour que la classe Tiled d'un objet (`Spawn`, `Sortie`, `Ennemi`...) soit lisible en jeu via les metadata du nœud. Sans ça, seules les propriétés personnalisées (comme `id`) sont importées, pas la classe elle-même.
+**Format** : orientation orthogonale, tuiles de 32×32, cartes non infinies, données de calque en **CSV**.
 
 **Fichiers**
-- Cartes : `maps/` — une carte par salle de donjon (`maps/donjon1/salle_01.tmx`, 16×14 tuiles), une carte par zone d'overworld (`maps/overworld/foret.tmx`), une par intérieur (`maps/interieurs/forge.tmx`)
+- Cartes : `maps/` — une carte par salle de donjon (`maps/donjon1/salle_01.tmx`, 20×11 tuiles), une carte par zone d'overworld (`maps/overworld/foret.tmx`), une par intérieur (`maps/interieurs/forge.tmx`)
 - Tilesets : `maps/tilesets/*.tsx`, qui pointent vers les PNG de `art/tilesets/`
 
 **Calques (de bas en haut, noms exacts)**

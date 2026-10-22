@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Objectif : un petit Zelda-like complet (1 overworld compact, 3 donjons, 3 boss) en environ **14 à 18 mois** à raison de 6 à 10 h par semaine, avec graphismes et sons faits maison.
+Objectif : un petit Zelda-like complet (1 overworld compact, 3 donjons, 3 boss) en environ **16 à 21 mois** à raison de 6 à 10 h par semaine, avec graphismes et sons faits maison.
 
 **Hypothèses de départ**
 
@@ -10,6 +10,7 @@ Objectif : un petit Zelda-like complet (1 overworld compact, 3 donjons, 3 boss) 
 - Tu travailles seul sur ton temps libre : chaque phase se termine par quelque chose de jouable, pour garder la motivation.
 - Combat, donjons/énigmes, inventaire et sauvegarde sont prioritaires ; l'overworld et les PNJ restent volontairement légers.
 - Pixel art et audio originaux : on fige un style simple tôt, pour que la production d'assets ne devienne pas le goulot.
+- Format graphique : **640×360, tuiles de 32×32, personnages en 32×32**. Plus lisible et plus détaillé que le 16×16 de la Super Nintendo, mais environ 3 à 4 fois plus de travail par sprite : animations réduites à l'essentiel et proportions trapues.
 
 **Règle d'or** : terminer d'abord *un* donjon complet et poli (la « vertical slice », fin de phase 4) avant de produire le reste. C'est le point de contrôle principal du projet : si ce donjon n'est pas fun, on corrige avant de multiplier le contenu.
 
@@ -22,7 +23,7 @@ Objectif : un petit Zelda-like complet (1 overworld compact, 3 donjons, 3 boss) 
 | 4 | Donjon 1 + boss (vertical slice) | 8 sem. |
 | 5 | Pixel art + audio, en parallèle des phases 2 à 4 | — |
 | ★ | **Point de contrôle : donjon 1 fun, testé par 2-3 joueurs sans aide** | — |
-| 6 | Production : 2 donjons | 5-6 mois |
+| 6 | Production : 2 donjons | 6-8 mois |
 | 7 | Polish et sortie | 2 mois |
 
 Les phases 0 à 4 construisent et valident les systèmes ; la phase 5 avance en parallèle ; les phases 6 et 7 ne démarrent qu'après le point de contrôle.
@@ -47,7 +48,7 @@ Titre : **Les Trois Sceaux** (*The Three Seals* à l'international). Héros : **
 - Pas un élu : il gagne en bricolant et en comprenant comment les choses marchent
 - Parle peu : une dizaine de répliques courtes aux moments forts, surtout face à Corvan
 - Nom d'origine celte qui signifie « corbeau » ; le corbeau est son emblème
-- Sprite 16×16 : tablier de cuir et gants de forge (brun, rouille), écharpe rouge vif avec un corbeau, cheveux en bataille lisibles de dos
+- Sprite 32×32 (personnage d'environ 24×32, grosse tête) : visage lisible, tablier de cuir et gants de forge (brun, rouille), chemise écrue, pantalon sombre, bottes brunes, écharpe rouge vif (seule couleur saturée, nouée dans le dos avec deux pans), corbeau brodé sur la bavette du tablier, cheveux bruns en bataille lisibles de dos. Sprite de référence : `art/characters/brann/brann_idle.png`
 
 **Maître Corvan**
 
@@ -63,7 +64,7 @@ Titre : **Les Trois Sceaux** (*The Three Seals* à l'international). Héros : **
 
 **Les trois gardiens**
 
-Protecteurs des sceaux depuis mille ans, rendus fous par la corruption : Brann les libère en les battant. Chacun laisse son sceau et, sauf Ondine, une réplique qui accuse Corvan. Sprites de boss en 32×32 ou 48×48 ; la corruption (ronces, cristal, armure) sur un calque séparé qui clignote.
+Protecteurs des sceaux depuis mille ans, rendus fous par la corruption : Brann les libère en les battant. Chacun laisse son sceau et, sauf Ondine, une réplique qui accuse Corvan. Sprites de boss en 64×64 à 96×96 ; la corruption (ronces, cristal, armure) sur un calque séparé qui clignote.
 
 | Gardien | Donjon | Mécanique (objet) | Phase 2 | À la libération |
 | --- | --- | --- | --- | --- |
@@ -99,9 +100,9 @@ Production : 3 ou 4 répliques par PNJ et par étape, dialogues en JSON indexés
 
 **La carte du monde**
 
-Environ 55 écrans au total pour 4 à 6 heures de jeu. Un écran = 256×224 px = 16×14 tuiles de 16 px.
+Environ 55 écrans au total pour 4 à 6 heures de jeu. Un écran = 640×352 px = 20×11 tuiles de 32 px (format 16:9, plus large que la Super Nintendo).
 
-Overworld de 5×4 écrans (1280×896 px, 80×56 tuiles) :
+Overworld de 5×4 écrans (3200×1760 px, 100×44 tuiles) :
 
 |  | Ouest | Ouest-centre | Centre | Est-centre | Est |
 | --- | --- | --- | --- | --- | --- |
@@ -273,7 +274,7 @@ Deux mécanismes complémentaires, pour qu'un joueur ne perde jamais plus de que
 
 **Le corbeau, fil rouge visuel**
 
-- Motif sur l'écharpe de Brann et sur la garde de son épée
+- Motif sur le tablier de Brann et sur la garde de son épée
 - Logo du jeu : un corbeau stylisé entouré de trois cercles, un par sceau
 - Un corbeau près des statues de sauvegarde, qui guide aussi vers l'entrée du donjon suivant
 
@@ -286,19 +287,19 @@ But : maîtriser la logique scènes/nœuds/signaux de Godot et avoir un projet C
 - [x] Installer la dernière version stable de Godot 4 en **édition .NET** (4.7.x en juillet 2026) + le SDK .NET demandé par cette version
 - [x] Choisir un IDE : VS Code + extension C# Dev Kit + Claude Code et les 5 agents du projet
 - [x] Installer l'éditeur de cartes **Tiled** et l'addon d'import Tiled pour Godot (YATI), avec l'accord explicite avant installation
-- [x] Créer une carte Tiled de test (une salle de 16×14 tuiles avec les calques de `CLAUDE.md`) et vérifier qu'elle s'importe dans Godot
+- [x] Créer une carte Tiled de test (une salle de 20×11 tuiles avec les calques de `CLAUDE.md`) et vérifier qu'elle s'importe dans Godot
 - [x] Créer un dépôt Git (GitHub/GitLab), avec un `.gitignore` qui exclut le dossier `.godot/`
 - [x] Décider des plateformes : PC (Windows/Linux/Mac) en priorité. Un projet Godot en C# ne s'exporte pas officiellement vers le web en 2026, donc pas de démo navigateur sur itch.io : prévoir un build PC téléchargeable.
 
 **Apprentissage**
 
-- [ ] Faire le tutoriel officiel « Your first 2D game » en le réécrivant en C#
+- [x] Faire le tutoriel officiel « Your first 2D game » en le réécrivant en C#
 - [ ] Comprendre : Node vs Scene, `_Ready` / `_Process` / `_PhysicsProcess`, signaux (`[Signal]` + `EmitSignal`), `[Export]`, autoloads, ressources (`Resource`)
 - [ ] Comprendre le monde 2D : `CharacterBody2D`, `Area2D`, couches/masques de collision, `AnimatedSprite2D` vs `AnimationPlayer`, `TileMapLayer` (ce que produit l'import des cartes Tiled)
 
 **Réglages pixel art (à faire dès le début)**
 
-- [x] Résolution de base proche de la SNES : 256×224 (ou 320×180 pour du 16:9), tuiles de 16×16 px
+- [x] Résolution de base : 640×360 (16:9), tuiles de 32×32 px
 - [x] Stretch mode `viewport`, scale mode `integer`, filtre de texture `Nearest` (pas de flou)
 
 **Livrable** : un projet vide qui se lance, est sur Git, affiche une tuile nette en plein écran.
@@ -377,7 +378,7 @@ But : un donjon de 8 à 12 salles, jouable du début à la fin, avec son objet, 
 
 - [ ] Portes : verrouillées par petite clé, par grande clé (boss), ou qui s'ouvrent quand tous les ennemis sont morts
 - [ ] Interrupteurs au sol (plaque de pression) et interrupteurs à frapper
-- [ ] Blocs poussables (alignés sur la grille 16×16)
+- [ ] Blocs poussables (alignés sur la grille 32×32)
 - [ ] Torches à allumer, murs fissurés (bombes), trous qui font tomber à l'étage inférieur
 - [ ] Un petit système « déclencheur → cible » via signaux, pour câbler une énigme dans l'éditeur sans écrire de code
 
@@ -403,7 +404,8 @@ But : un style simple et cohérent, que tu peux produire vite. À travailler une
 
 - [ ] Outil : Aseprite (payant, la référence) ou LibreSprite / Pixelorama (gratuits)
 - [ ] Fixer une palette limitée (24 à 32 couleurs ; partir d'une palette existante de Lospec est un bon raccourci)
-- [ ] Tuiles 16×16, personnage 16×16 ou 16×24, contour sombre ou non : décider une fois pour toutes
+- [ ] Tuiles 32×32, personnages en 32×32 (Corvan 32×48), boss 64×64 à 96×96 ; contour sombre ou non : décider une fois pour toutes
+- [ ] Dessiner les sprites finaux à la main (l'agent graphiste produit les placeholders) ; animations limitées : marche 4 images, attaque 3 images, idle 1 à 2 images
 - [ ] Ordre de production : tileset d'un donjon → joueur (marche + attaque, 4 directions) → 3 ennemis → objets/UI → boss
 - [ ] Utiliser les **terrains (autotiling) de Tiled** pour peindre les niveaux plus vite
 - [ ] Écrire une page « bible graphique » : palette, tailles, nombre de frames par animation

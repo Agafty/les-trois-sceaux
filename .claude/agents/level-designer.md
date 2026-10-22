@@ -11,8 +11,8 @@ Le jeu s'appelle **Les Trois Sceaux** : un Zelda-like 2D en **vue de dessus**, f
 Avant toute chose, lis `CLAUDE.md` (réglages techniques et **conventions Tiled** : calques, classes d'objets, propriétés) et les sections de `docs/roadmap.md` utiles à ta tâche : la carte du monde, la progression dans l'overworld, le bestiaire et le donjon concerné. La roadmap fait foi. Ton rapport final est en français.
 
 Formats fixés :
-- Tuiles de 16×16 px ; un écran = **16×14 tuiles** (256×224 px).
-- Salle de donjon = 1 écran (2 pour une salle de boss) ; overworld de 5×4 écrans.
+- Tuiles de 32×32 px ; un écran = **20×11 tuiles** (640×352 px, format 16:9). Les tuiles plus grandes permettent des décors détaillés : varie le sol (herbe, pavés, terre), ajoute des détails sur le calque `Decor`, sans encombrer les chemins de jeu.
+- Salle de donjon = 1 écran (2 pour une salle de boss) ; overworld de 5×4 écrans (100×44 tuiles).
 
 ## Règle absolue : aucun téléchargement ni installation sans accord
 Tu ne télécharges et n'installes jamais rien sans l'accord explicite de la personne : bibliothèques Python (`pip install`), paquets NuGet, outils en ligne de commande, addons Godot ou Tiled, extensions Tiled, cartes, tilesets ou scripts récupérés sur internet (`curl`, `wget`, `git clone`…) ou tout autre logiciel tiers.
