@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 
 /// <summary>
@@ -8,6 +9,7 @@ public partial class GameState : Node
 {
     public const int MaxRupees = 300;
     public const int StartMaxHealth = 6;
+    public const int MaxPlayerHealth = 18; // plafond : 9 cœurs
     public const int RespawnHealth = 6; // reprise avec 3 cœurs
 
     [Signal]
@@ -18,6 +20,53 @@ public partial class GameState : Node
 
     [Signal]
     public delegate void KeysChangedEventHandler(int total);
+
+    [Signal]
+    public delegate void HeartPiecesChangedEventHandler(int total);
+
+    public const int HeartPiecesPerHeart = 4;
+
+    private readonly HashSet<string> _collected = new();
+
+    /// <summary>Identifiants des objets uniques déjà ramassés (pour la sauvegarde).</summary>
+    public IReadOnlyCollection<string> CollectedIds => _collected;
+
+    /// <summary>Restaure les flags et le compteur de quarts depuis une sauvegarde.</summary>
+    public void LoadCollected(IEnumerable<string> ids, int heartPieces)
+    {
+        _collected.Clear();
+        if (ids != null)
+            foreach (var id in ids)
+                MarkCollected(id);
+        HeartPieces = Mathf.Clamp(heartPieces, 0, HeartPiecesPerHeart - 1);
+        EmitSignal(SignalName.HeartPiecesChanged, HeartPieces);
+    }
+
+    /// <summary>Quarts de cœur possédés vers le prochain réceptacle (0..3).</summary>
+    public int HeartPieces { get; private set; }
+
+    /// <summary>Vrai si l'objet unique (coffre, réceptacle, quart...) a déjà été ramassé.</summary>
+    public bool IsCollected(string id) => !string.IsNullOrEmpty(id) && _collected.Contains(id);
+
+    /// <summary>Mémorise un objet unique comme ramassé (base des flags de sauvegarde).</summary>
+    public void MarkCollected(string id)
+    {
+        if (!string.IsNullOrEmpty(id))
+            _collected.Add(id);
+    }
+
+    /// <summary>
+    /// Ajoute un quart de cœur. Au 4e, le compteur retombe à 0 et la méthode renvoie true
+    /// (l'appelant doit alors augmenter la vie max via le Health du joueur).
+    /// </summary>
+    public bool AddHeartPiece()
+    {
+        HeartPieces++;
+        bool complete = HeartPieces >= HeartPiecesPerHeart;
+        if (complete) HeartPieces = 0;
+        EmitSignal(SignalName.HeartPiecesChanged, HeartPieces);
+        return complete;
+    }
 
     public int Rupees { get; private set; }
 
@@ -42,7 +91,7 @@ public partial class GameState : Node
     /// <summary>Fixe la vie du joueur (et son maximum). N'émet le signal que si quelque chose change.</summary>
     public void SetPlayerHealth(int current, int max)
     {
-        max = Mathf.Max(max + (max & 1), 2); // arrondi au pair (cœurs entiers)
+        max = Mathf.Clamp(max + (max & 1), 2, MaxPlayerHealth); // arrondi au pair (cœurs entiers)
         current = Mathf.Clamp(current, 0, max);
         if (current == PlayerHealth && max == PlayerMaxHealth) return;
 

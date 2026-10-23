@@ -105,7 +105,7 @@ docs/           roadmap.md
 - Les classes de script sont `partial` et le nom du fichier correspond au nom de la classe.
 - Penser à recompiler (Build) après l'ajout d'un `[Export]` ou d'un `[Signal]`.
 - Pas d'allocations dans les boucles chaudes (`_Process`, `_PhysicsProcess`) : pas de LINQ ni de `new` à chaque frame.
-- Sauvegarde : JSON via `System.Text.Json` dans `user://saveN.json`, avec un numéro de version. Chaque coffre ou porte a un identifiant unique (ex. `dungeon1_chest_03`).
+- Sauvegarde : JSON via `System.Text.Json` dans `user://saveN.json`, avec un numéro de version. Chaque coffre, porte ou objet unique a un identifiant unique en français (ex. `donjon1_coffre_03`), mémorisé dans `GameState` une fois utilisé.
 - Textes du jeu : jamais en dur, toujours via `Tr()` et le fichier CSV de traduction (français et anglais).
 - Nommage : PascalCase pour les classes, méthodes et propriétés ; `_camelCase` pour les champs privés ; scènes et dossiers en `snake_case`.
 

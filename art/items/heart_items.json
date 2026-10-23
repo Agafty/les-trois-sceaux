@@ -1,0 +1,45 @@
+{
+ "image": "heart_items.png",
+ "frame_size": [
+  32,
+  32
+ ],
+ "animations": {
+  "receptacle": {
+   "cells": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ]
+   ],
+   "fps": 6.0,
+   "loop": true
+  },
+  "quart_coeur": {
+   "cells": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   "fps": 6.0,
+   "loop": true
+  }
+ }
+}
