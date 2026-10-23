@@ -44,6 +44,9 @@ public partial class Player : CharacterBody2D
 
     public bool IsDead => _state == State.Mort;
 
+    /// <summary>Vie du joueur (lecture seule), utilisée par les effets de ramassables.</summary>
+    public Health Health => _health;
+
     private AnimatedSprite2D _sprite;
     private AnimatedSprite2D _swordSprite;
     private HitBox _swordHitBox;

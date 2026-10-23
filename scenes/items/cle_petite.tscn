@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/Pickup.cs" id="script_pickup"]
+[ext_resource type="Texture2D" path="res://art/ui/icone_cle.png" id="key_icon"]
+[ext_resource type="Resource" path="res://resources/pickups/cle_petite.tres" id="pickup_effect"]
+
+[sub_resource type="SpriteFrames" id="key_frames"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("key_icon")
+}],
+"loop": true,
+"name": &"cle",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="pickup_shape"]
+radius = 9.0
+
+[node name="ClePetite" type="Area2D"]
+script = ExtResource("script_pickup")
+Effect = ExtResource("pickup_effect")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("key_frames")
+animation = &"cle"
+autoplay = "cle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("pickup_shape")

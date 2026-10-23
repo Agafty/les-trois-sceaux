@@ -349,7 +349,7 @@ But : la boucle « je ramasse, j'équipe, je sauvegarde, je recharge » fonction
 **HUD et ressources**
 
 - [x] HUD en `CanvasLayer` : cœurs (avec demi-cœurs), rubis, clés, objet équipé
-- [ ] Réceptacles de cœur / quarts de cœur qui augmentent la vie max
+- [x] Réceptacles de cœur / quarts de cœur qui augmentent la vie max
 - [ ] Objets ramassables génériques (`Pickup` + une `Resource` qui décrit l'effet)
 
 **Inventaire et objets**

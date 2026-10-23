@@ -1,15 +1,16 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/items/Pickup.cs" id="script_pickup"]
 [ext_resource type="SpriteFrames" path="res://art/items/heart_items_frames.tres" id="heart_frames"]
+
+[ext_resource type="Resource" path="res://resources/pickups/receptacle.tres" id="pickup_effect"]
 
 [sub_resource type="CircleShape2D" id="pickup_shape"]
 radius = 11.0
 
 [node name="Receptacle" type="Area2D"]
 script = ExtResource("script_pickup")
-Type = 2
-Amount = 2
+Effect = ExtResource("pickup_effect")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = ExtResource("heart_frames")

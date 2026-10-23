@@ -6,22 +6,14 @@ using Godot;
 /// </summary>
 public partial class Pickup : Area2D
 {
-    // Ajouter les nouvelles valeurs à la fin : les scènes enregistrent l'entier.
-    public enum PickupType { Rubis, Coeur, Receptacle, QuartCoeur }
-
     /// <summary>
     /// Identifiant unique (ex. "donjon1_quart_01"). Non vide : objet permanent (ni durée de vie,
     /// ni rebond), mémorisé dans GameState une fois ramassé et absent s'il l'a déjà été.
     /// </summary>
     [Export] public string UniqueId { get; set; } = "";
 
-    [Export] public PickupType Type { get; set; } = PickupType.Rubis;
-
-    /// <summary>
-    /// Rubis : valeur ajoutée à la bourse. Cœur : PV rendus (1 cœur = 2 PV).
-    /// Réceptacle / quart de cœur complété : PV max ajoutés (2 = un cœur).
-    /// </summary>
-    [Export] public int Amount { get; set; } = 1;
+    /// <summary>Ce que fait le ramassable (rubis, soin, clé...). Données dans resources/pickups/.</summary>
+    [Export] public PickupEffect Effect { get; set; }
 
     [Export] public float PickupDelay { get; set; } = 0.3f;
     [Export] public float Lifetime { get; set; } = 8f;
@@ -32,19 +24,24 @@ public partial class Pickup : Area2D
     private static readonly StringName PlayerGroup = "player";
 
     private AnimatedSprite2D _sprite;
-    private Node2D _playerInside;
+    private Player _playerInside;
+    private GameState _state;
     private float _age;
     private float _blinkTimer;
     private bool _collected;
 
     public override void _Ready()
     {
-        if (IsUnique && GetNode<GameState>("/root/GameState").IsCollected(UniqueId))
+        _state = GetNode<GameState>("/root/GameState");
+        if (IsUnique && _state.IsCollected(UniqueId))
         {
             _collected = true;
             QueueFree();
             return;
         }
+
+        if (Effect == null)
+            GD.PushWarning($"{Name} ({SceneFilePath}) : aucun Effect, l'objet ne pourra pas être ramassé.");
 
         _sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         BodyEntered += OnBodyEntered;
@@ -103,8 +100,8 @@ public partial class Pickup : Area2D
 
     private void OnBodyEntered(Node2D body)
     {
-        if (!body.IsInGroup(PlayerGroup)) return;
-        _playerInside = body;
+        if (!body.IsInGroup(PlayerGroup) || body is not Player player) return;
+        _playerInside = player;
     }
 
     private void OnBodyExited(Node2D body)
@@ -112,50 +109,19 @@ public partial class Pickup : Area2D
         if (body == _playerInside) _playerInside = null;
     }
 
-    // Rien n'est ramassé par un joueur mort. Un cœur reste au sol à vie pleine ;
-    // un réceptacle ou un quart reste au sol quand la vie max est au plafond.
-    private bool CanCollect(Node2D player)
+    // Rien n'est ramassé par un joueur mort ; sinon l'effet décide (ex. cœur refusé à vie pleine).
+    private bool CanCollect(Player player)
     {
-        if (player is Player { IsDead: true }) return false;
-        switch (Type)
-        {
-            case PickupType.Coeur:
-            {
-                var health = player.GetNodeOrNull<Health>("Health");
-                return health != null && health.CurrentHealth > 0 && health.CurrentHealth < health.MaxHealth;
-            }
-            case PickupType.Receptacle:
-            case PickupType.QuartCoeur:
-            {
-                var health = player.GetNodeOrNull<Health>("Health");
-                return health != null && health.CurrentHealth > 0 && health.MaxHealth < Health.MaxHealthCap;
-            }
-            default:
-                return true;
-        }
+        if (Effect == null || player.IsDead) return false;
+        return Effect.CanApply(player, _state);
     }
 
-    private void Collect(Node2D player)
+    private void Collect(Player player)
     {
         _collected = true;
-        switch (Type)
-        {
-            case PickupType.Rubis:
-                GetNode<GameState>("/root/GameState").AddRupees(Amount);
-                break;
-            case PickupType.Coeur:
-                player.GetNodeOrNull<Health>("Health")?.Heal(Amount);
-                break;
-            case PickupType.Receptacle:
-                player.GetNodeOrNull<Health>("Health")?.IncreaseMax(Amount, true);
-                break;
-            case PickupType.QuartCoeur:
-                if (GetNode<GameState>("/root/GameState").AddHeartPiece())
-                    player.GetNodeOrNull<Health>("Health")?.IncreaseMax(Amount, true);
-                break;
-        }
+        Effect.Apply(player, _state);
         if (IsUnique)
-            GetNode<GameState>("/root/GameState").MarkCollected(UniqueId);
+            _state.MarkCollected(UniqueId);
         QueueFree();
     }
 }

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="RupeeEffect" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/effects/RupeeEffect.cs" id="1_effect"]
+
+[resource]
+script = ExtResource("1_effect")
+Amount = 5
