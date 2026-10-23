@@ -1,0 +1,47 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/ChasseurEnemy.cs" id="script_chasseur"]
+[ext_resource type="SpriteFrames" path="res://art/enemies/sanglier_noirci_frames.tres" id="sanglier_frames"]
+[ext_resource type="Script" path="res://scripts/components/Health.cs" id="script_health"]
+[ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="script_hurtbox"]
+[ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="script_hitbox"]
+
+[sub_resource type="CircleShape2D" id="sanglier_shape"]
+radius = 11.0
+
+[sub_resource type="CircleShape2D" id="sanglier_hitbox_shape"]
+radius = 15.0
+
+[node name="SanglierNoirci" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("script_chasseur")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("sanglier_frames")
+animation = &"move_down"
+autoplay = "move_down"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("sanglier_shape")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("script_health")
+MaxHealth = 2
+
+[node name="HurtBox" type="Area2D" parent="."]
+script = ExtResource("script_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(0, 4)
+shape = SubResource("sanglier_shape")
+
+[node name="HitBox" type="Area2D" parent="."]
+script = ExtResource("script_hitbox")
+Team = 1
+Damage = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+position = Vector2(0, 4)
+shape = SubResource("sanglier_hitbox_shape")

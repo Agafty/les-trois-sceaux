@@ -42,6 +42,7 @@ public partial class Player : CharacterBody2D
 
     public override void _Ready()
     {
+        AddToGroup("player");
         _sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         _swordSprite = GetNode<AnimatedSprite2D>("SwordSlash");
         _swordHitBox = GetNode<HitBox>("SwordSlash/HitBox");
