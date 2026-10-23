@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="PackedScene" path="res://maps/donjon_test/salle_test2.tmx" id="map2"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
 [ext_resource type="Script" path="res://scripts/world/Room.cs" id="room_script"]
 [ext_resource type="Texture2D" path="res://art/tilesets/obstacle_test.png" id="obstacle_tex"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ronceau.tscn" id="ronceau"]
 
 [sub_resource type="RectangleShape2D" id="obstacle_trunk_shape"]
 size = Vector2(10, 14)
@@ -28,3 +29,6 @@ offset = Vector2(0, -24)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Entites/Obstacle"]
 position = Vector2(0, -8)
 shape = SubResource("obstacle_trunk_shape")
+
+[node name="Ronceau" parent="Entites" instance=ExtResource("ronceau")]
+position = Vector2(220, 220)

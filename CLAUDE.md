@@ -98,6 +98,7 @@ docs/           roadmap.md
 ```
 
 - **Composition plutôt qu'héritage** : un ennemi = `CharacterBody2D` + nœuds enfants `Health`, `HurtBox`, `HitBox`, `StateMachine`.
+- **Dégâts au contact** : la `HitBox` qui inflige des dégâts au toucher (corps à corps, pas une arme à portée) doit être **légèrement plus grande** que la forme de collision physique du personnage. Deux `CharacterBody2D` solides s'arrêtent pile au contact sans vraiment se chevaucher, donc une `Area2D` de la même taille ne détecte quasiment jamais le contact sauf quand l'un pousse activement dans l'autre (c'est pour ça qu'un ennemi semblait ne faire mal "que quand il fonce sur le joueur").
 - **Données dans des `Resource`** (`ItemData`, `EnemyData`) ; le comportement dans les scripts. On équilibre sans toucher au code.
 - **Communication par signaux** (`[Signal]` + `EmitSignal`) ou events C#. Éviter les `GetNode("../../..")` fragiles.
 - **Autoloads limités à 4** : `GameState`, `SceneManager`, `AudioManager`, `SaveSystem`.

@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/DeathEffect.cs" id="script_death_effect"]
+[ext_resource type="SpriteFrames" path="res://art/enemies/enemy_death_frames.tres" id="death_frames"]
+
+[node name="DeathEffect" type="AnimatedSprite2D"]
+script = ExtResource("script_death_effect")
+sprite_frames = ExtResource("death_frames")

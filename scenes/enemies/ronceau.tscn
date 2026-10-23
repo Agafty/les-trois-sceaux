@@ -1,0 +1,47 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/ErrantEnemy.cs" id="script_errant"]
+[ext_resource type="SpriteFrames" path="res://art/enemies/ronceau_frames.tres" id="ronceau_frames"]
+[ext_resource type="Script" path="res://scripts/components/Health.cs" id="script_health"]
+[ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="script_hurtbox"]
+[ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="script_hitbox"]
+
+[sub_resource type="CircleShape2D" id="ronceau_shape"]
+radius = 10.0
+
+[sub_resource type="CircleShape2D" id="ronceau_hitbox_shape"]
+radius = 14.0
+
+[node name="Ronceau" type="CharacterBody2D"]
+script = ExtResource("script_errant")
+Speed = 25.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("ronceau_frames")
+animation = &"move"
+autoplay = "move"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("ronceau_shape")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("script_health")
+MaxHealth = 1
+
+[node name="HurtBox" type="Area2D" parent="."]
+script = ExtResource("script_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(0, 4)
+shape = SubResource("ronceau_shape")
+
+[node name="HitBox" type="Area2D" parent="."]
+script = ExtResource("script_hitbox")
+Team = 1
+Damage = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+position = Vector2(0, 4)
+shape = SubResource("ronceau_hitbox_shape")

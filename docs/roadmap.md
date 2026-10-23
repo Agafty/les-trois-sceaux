@@ -326,15 +326,15 @@ But : un combat à l'épée lisible et satisfaisant contre 3 types d'ennemis.
 **Joueur**
 
 - [ ] Machine à états du joueur : `Idle`, `Move`, `Attack`, `Hurt`, `Dead` (une classe par état ou un `enum` + `switch` pour commencer)
-- [ ] Attaque à l'épée : hitbox `Area2D` activée quelques frames, orientée selon la direction
-- [ ] Système hitbox / hurtbox réutilisable (composants `HitBox` et `HurtBox` avec dégâts et équipe)
-- [ ] Recul (knockback) + invincibilité temporaire avec clignotement après un coup
-- [ ] « Game feel » : hit-stop de 2-3 frames, petit tremblement de caméra, flash blanc sur l'ennemi touché
+- [x] Attaque à l'épée : hitbox `Area2D` activée quelques frames, orientée selon la direction
+- [x] Système hitbox / hurtbox réutilisable (composants `HitBox` et `HurtBox` avec dégâts et équipe)
+- [x] Recul (knockback) + invincibilité temporaire avec clignotement après un coup
+- [x] « Game feel » : hit-stop de 2-3 frames, petit tremblement de caméra, flash blanc sur l'ennemi touché
 
 **Ennemis**
 
-- [ ] Composant `Health` partagé joueur/ennemis (signal `Died`, `Damaged`)
-- [ ] Ennemi 1 : patrouille aléatoire, dégâts au contact
+- [x] Composant `Health` partagé joueur/ennemis (signal `Died`, `Damaged`)
+- [x] Ennemi 1 : patrouille aléatoire, dégâts au contact
 - [ ] Ennemi 2 : poursuit le joueur quand il est proche (`NavigationAgent2D` ou ligne droite)
 - [ ] Ennemi 3 : attaque à distance (projectile)
 - [ ] Butin à la mort : cœur, rubis, avec probabilité
