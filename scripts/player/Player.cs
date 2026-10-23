@@ -40,6 +40,7 @@ public partial class Player : CharacterBody2D
     private Vector2 _knockbackVelocity;
     private float _respawnTimer = -1f;
     private SceneManager _sceneManager;
+    private GameState _gameState;
 
     public bool IsDead => _state == State.Mort;
 
@@ -58,6 +59,10 @@ public partial class Player : CharacterBody2D
         _swordHitBox = GetNode<HitBox>("SwordSlash/HitBox");
         _health = GetNode<Health>("Health");
         _hurtBox = GetNode<HurtBox>("HurtBox");
+        _gameState = GetNode<GameState>("/root/GameState");
+        // Les _Ready des enfants passent avant celui du parent : Health a déjà fait son init par défaut.
+        _health.SetValues(_gameState.PlayerHealth, _gameState.PlayerMaxHealth);
+        _health.HealthChanged += OnHealthChanged;
         _hurtBox.Hit += OnHit;
         _health.Died += OnDied;
         _sprite.AnimationFinished += OnAnimationFinished;
@@ -67,13 +72,22 @@ public partial class Player : CharacterBody2D
     {
         if (_hurtBox != null) _hurtBox.Hit -= OnHit;
         if (_health != null) _health.Died -= OnDied;
+        if (_health != null) _health.HealthChanged -= OnHealthChanged;
         if (_sprite != null) _sprite.AnimationFinished -= OnAnimationFinished;
+    }
+
+    // Sens unique : Health -> GameState -> HUD. GameState n'écrit jamais dans Health.
+    private void OnHealthChanged(int current, int max)
+    {
+        _gameState.SetPlayerHealth(current, max);
     }
 
     // Health.Died arrive AVANT HurtBox.Hit (ReceiveHit : Damage puis Hit).
     private void OnDied()
     {
         _state = State.Mort;
+        // HealthChanged(0) vient d'être recopié dans GameState ; on y remet la vie de reprise sans signal.
+        _gameState.PrepareRespawn();
         Velocity = Vector2.Zero;
         _knockbackVelocity = Vector2.Zero;
         _invincibleTimer = 0f;

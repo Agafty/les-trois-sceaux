@@ -5,6 +5,13 @@ public partial class Room : Node2D
 {
     public override void _Ready()
     {
+        // Le HUD vit avec la salle (pas d'autoload supplémentaire) ; il ne dépend que de GameState.
+        var hudScene = GD.Load<PackedScene>("res://scenes/ui/hud.tscn"); // mis en cache par Godot
+        if (hudScene != null)
+            AddChild(hudScene.Instantiate());
+        else
+            GD.PushError("HUD introuvable : res://scenes/ui/hud.tscn");
+
         var player = FindPlayer(this);
         var sceneManager = GetNode<SceneManager>("/root/SceneManager");
         var spawn = FindSpawnById(this, sceneManager.ConsumeSpawnId());

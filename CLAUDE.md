@@ -14,7 +14,7 @@ La conception complète (scénario, personnages, carte, bestiaire, économie, ph
 
 ## Phase en cours
 
-**Phase 2 — Combat et ennemis.** (Mettre à jour cette ligne à chaque changement de phase.)
+**Phase 3 — Vie, inventaire, objets, sauvegarde.** (Mettre à jour cette ligne à chaque changement de phase.)
 
 ## Comment travailler avec moi
 

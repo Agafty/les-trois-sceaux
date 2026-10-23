@@ -21,6 +21,16 @@ public partial class Health : Node
         CurrentHealth = MaxHealth;
     }
 
+    /// <summary>
+    /// Fixe directement la vie (restauration depuis GameState). N'émet aucun signal,
+    /// donc ni Died ni HealthChanged : évite les boucles avec l'état global.
+    /// </summary>
+    public void SetValues(int current, int max)
+    {
+        MaxHealth = max;
+        CurrentHealth = Mathf.Clamp(current, 0, max);
+    }
+
     public void Damage(int amount)
     {
         if (CurrentHealth <= 0) return;
