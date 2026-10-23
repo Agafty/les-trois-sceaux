@@ -1,0 +1,23 @@
+{
+ "image": "tetard_encre_red.png",
+ "frame_size": [
+  32,
+  32
+ ],
+ "animations": {
+  "move": {
+   "cells": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ]
+   ],
+   "fps": 6.0,
+   "loop": true
+  }
+ }
+}

@@ -1,0 +1,22 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://art/enemies/lutin_des_branches.png" id="1_lutin_des_branches"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1"]
+atlas = ExtResource("1_lutin_des_branches")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2"]
+atlas = ExtResource("1_lutin_des_branches")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3"]
+atlas = ExtResource("1_lutin_des_branches")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4"]
+atlas = ExtResource("1_lutin_des_branches")
+region = Rect2(32, 64, 32, 32)
+
+[resource]
+animations = [{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_1")}], "loop": true, "name": &"hidden", "speed": 3.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_2")}], "loop": false, "name": &"peek", "speed": 3.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_3")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_4")}], "loop": false, "name": &"throw", "speed": 6.0}]

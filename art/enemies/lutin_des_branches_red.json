@@ -1,0 +1,43 @@
+{
+ "image": "lutin_des_branches_red.png",
+ "frame_size": [
+  32,
+  32
+ ],
+ "animations": {
+  "hidden": {
+   "cells": [
+    [
+     0,
+     0
+    ]
+   ],
+   "fps": 3.0,
+   "loop": true
+  },
+  "peek": {
+   "cells": [
+    [
+     0,
+     1
+    ]
+   ],
+   "fps": 3.0,
+   "loop": false
+  },
+  "throw": {
+   "cells": [
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   "fps": 6.0,
+   "loop": false
+  }
+ }
+}

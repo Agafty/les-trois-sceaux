@@ -1,0 +1,61 @@
+{
+ "image": "oeil_morvath.png",
+ "frame_size": [
+  32,
+  32
+ ],
+ "animations": {
+  "closed": {
+   "cells": [
+    [
+     0,
+     0
+    ]
+   ],
+   "fps": 4.0,
+   "loop": true
+  },
+  "open": {
+   "cells": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   "fps": 8.0,
+   "loop": false
+  },
+  "idle_open": {
+   "cells": [
+    [
+     0,
+     2
+    ]
+   ],
+   "fps": 4.0,
+   "loop": true
+  },
+  "shoot": {
+   "cells": [
+    [
+     0,
+     3
+    ],
+    [
+     1,
+     3
+    ]
+   ],
+   "fps": 8.0,
+   "loop": false
+  }
+ }
+}

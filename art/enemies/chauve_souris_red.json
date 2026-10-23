@@ -1,0 +1,23 @@
+{
+ "image": "chauve_souris_red.png",
+ "frame_size": [
+  32,
+  32
+ ],
+ "animations": {
+  "fly": {
+   "cells": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ]
+   ],
+   "fps": 8.0,
+   "loop": true
+  }
+ }
+}

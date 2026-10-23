@@ -1,0 +1,41 @@
+{
+ "image": "ombre_noyee_red.png",
+ "frame_size": [
+  32,
+  32
+ ],
+ "animations": {
+  "float": {
+   "cells": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   "fps": 5.0,
+   "loop": true
+  },
+  "revealed": {
+   "cells": [
+    [
+     0,
+     1
+    ]
+   ],
+   "fps": 5.0,
+   "loop": true
+  }
+ }
+}

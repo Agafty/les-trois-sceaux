@@ -1,0 +1,47 @@
+{
+ "image": "projectiles.png",
+ "frame_size": [
+  32,
+  32
+ ],
+ "animations": {
+  "acorn": {
+   "cells": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ]
+   ],
+   "fps": 10.0,
+   "loop": true
+  },
+  "morvath_orb": {
+   "cells": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   "fps": 10.0,
+   "loop": true
+  },
+  "pebble": {
+   "cells": [
+    [
+     0,
+     2
+    ]
+   ],
+   "fps": 1.0,
+   "loop": true
+  }
+ }
+}
