@@ -1,10 +1,13 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/TireurEnemy.cs" id="script_tireur"]
 [ext_resource type="SpriteFrames" path="res://art/enemies/lutin_des_branches_frames.tres" id="lutin_frames"]
 [ext_resource type="Script" path="res://scripts/components/Health.cs" id="script_health"]
 [ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="script_hurtbox"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/projectile_gland.tscn" id="gland"]
+
+[ext_resource type="Script" path="res://scripts/components/LootDropper.cs" id="script_loot"]
+[ext_resource type="Resource" path="res://resources/loot/foret_commun.tres" id="loot_table"]
 
 [sub_resource type="CircleShape2D" id="lutin_shape"]
 radius = 10.0
@@ -34,3 +37,7 @@ Team = 1
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
 position = Vector2(0, 4)
 shape = SubResource("lutin_shape")
+
+[node name="LootDropper" type="Node" parent="."]
+script = ExtResource("script_loot")
+Table = ExtResource("loot_table")

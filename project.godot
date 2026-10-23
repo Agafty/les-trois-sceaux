@@ -16,6 +16,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+GameState="*res://scenes/core/game_state.tscn"
 SceneManager="*res://scenes/core/scene_manager.tscn"
 
 [display]

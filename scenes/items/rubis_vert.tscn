@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/Pickup.cs" id="script_pickup"]
+[ext_resource type="SpriteFrames" path="res://art/items/pickups_frames.tres" id="pickups_frames"]
+
+[sub_resource type="CircleShape2D" id="pickup_shape"]
+radius = 9.0
+
+[node name="RubisVert" type="Area2D"]
+script = ExtResource("script_pickup")
+Type = 0
+Amount = 1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("pickups_frames")
+animation = &"rubis_vert"
+autoplay = "rubis_vert"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("pickup_shape")

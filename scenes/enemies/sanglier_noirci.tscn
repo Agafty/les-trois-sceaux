@@ -1,10 +1,13 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/ChasseurEnemy.cs" id="script_chasseur"]
 [ext_resource type="SpriteFrames" path="res://art/enemies/sanglier_noirci_frames.tres" id="sanglier_frames"]
 [ext_resource type="Script" path="res://scripts/components/Health.cs" id="script_health"]
 [ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="script_hurtbox"]
 [ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="script_hitbox"]
+
+[ext_resource type="Script" path="res://scripts/components/LootDropper.cs" id="script_loot"]
+[ext_resource type="Resource" path="res://resources/loot/foret_commun.tres" id="loot_table"]
 
 [sub_resource type="CircleShape2D" id="sanglier_shape"]
 radius = 11.0
@@ -45,3 +48,7 @@ Damage = 1
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
 position = Vector2(0, 4)
 shape = SubResource("sanglier_hitbox_shape")
+
+[node name="LootDropper" type="Node" parent="."]
+script = ExtResource("script_loot")
+Table = ExtResource("loot_table")
