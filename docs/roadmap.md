@@ -338,7 +338,7 @@ But : un combat à l'épée lisible et satisfaisant contre 3 types d'ennemis.
 - [x] Ennemi 2 : poursuit le joueur quand il est proche (`NavigationAgent2D` ou ligne droite)
 - [x] Ennemi 3 : attaque à distance (projectile)
 - [x] Butin à la mort : cœur, rubis, avec probabilité
-- [ ] Réapparition des ennemis quand on quitte et revient sur l'écran
+- [x] Réapparition des ennemis quand on quitte et revient sur l'écran
 
 **Livrable** : un écran avec 5 ennemis qu'on a envie de recombattre. Faire tester à quelqu'un.
 
