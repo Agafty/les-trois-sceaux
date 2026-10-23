@@ -3,7 +3,9 @@ using Godot;
 public partial class Player : CharacterBody2D
 {
     private enum Direction { Bas, Haut, Gauche, Droite }
-    private enum State { Deplacement, Attaque, Touche }
+    private enum State { Deplacement, Attaque, Touche, Mort }
+
+    private static readonly StringName DeathAnim = "death";
 
     [Export]
     public float Speed { get; set; } = 100f;
@@ -26,6 +28,9 @@ public partial class Player : CharacterBody2D
     [Export]
     public float KnockbackFriction { get; set; } = 600f;
 
+    [Export]
+    public float RespawnDelay { get; set; } = 1.0f;
+
     private Direction _facing = Direction.Bas;
     private State _state = State.Deplacement;
     private float _attackTimer;
@@ -33,6 +38,10 @@ public partial class Player : CharacterBody2D
     private float _invincibleTimer;
     private float _blinkTimer;
     private Vector2 _knockbackVelocity;
+    private float _respawnTimer = -1f;
+    private SceneManager _sceneManager;
+
+    public bool IsDead => _state == State.Mort;
 
     private AnimatedSprite2D _sprite;
     private AnimatedSprite2D _swordSprite;
@@ -43,16 +52,51 @@ public partial class Player : CharacterBody2D
     public override void _Ready()
     {
         AddToGroup("player");
+        _sceneManager = GetNode<SceneManager>("/root/SceneManager");
         _sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         _swordSprite = GetNode<AnimatedSprite2D>("SwordSlash");
         _swordHitBox = GetNode<HitBox>("SwordSlash/HitBox");
         _health = GetNode<Health>("Health");
         _hurtBox = GetNode<HurtBox>("HurtBox");
         _hurtBox.Hit += OnHit;
+        _health.Died += OnDied;
+        _sprite.AnimationFinished += OnAnimationFinished;
+    }
+
+    public override void _ExitTree()
+    {
+        if (_hurtBox != null) _hurtBox.Hit -= OnHit;
+        if (_health != null) _health.Died -= OnDied;
+        if (_sprite != null) _sprite.AnimationFinished -= OnAnimationFinished;
+    }
+
+    // Health.Died arrive AVANT HurtBox.Hit (ReceiveHit : Damage puis Hit).
+    private void OnDied()
+    {
+        _state = State.Mort;
+        Velocity = Vector2.Zero;
+        _knockbackVelocity = Vector2.Zero;
+        _invincibleTimer = 0f;
+        _hurtBox.Invincible = true;
+        _hurtBox.SetDeferred(Area2D.PropertyName.Monitorable, false);
+        _swordSprite.Visible = false;
+        _swordHitBox.SetDeferred(Area2D.PropertyName.Monitoring, false);
+        _sprite.Visible = true;
+        _sprite.Play(DeathAnim);
+        // Filet de sécurité si AnimationFinished n'arrive jamais (animation absente).
+        _respawnTimer = RespawnDelay + 2f;
+        GD.Print("Brann est mort");
+    }
+
+    private void OnAnimationFinished()
+    {
+        if (_state == State.Mort && _sprite.Animation == DeathAnim)
+            _respawnTimer = Mathf.Min(_respawnTimer, RespawnDelay);
     }
 
     private void OnHit(int amount, Vector2 fromPosition)
     {
+        if (_state == State.Mort) return;
         _state = State.Touche;
         _hurtTimer = HurtDuration;
         _invincibleTimer = InvincibleDuration;
@@ -78,6 +122,12 @@ public partial class Player : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
+        if (_state == State.Mort)
+        {
+            ProcessDead((float)delta);
+            return;
+        }
+
         UpdateInvincibility((float)delta);
 
         if (_state == State.Attaque)
@@ -177,6 +227,18 @@ public partial class Player : CharacterBody2D
         if (_hurtTimer > 0f) return;
 
         _state = State.Deplacement;
+    }
+
+    private void ProcessDead(float delta)
+    {
+        if (_respawnTimer < 0f) return;
+
+        _respawnTimer -= delta;
+        if (_respawnTimer > 0f) return;
+
+        // Si refusé (fondu en cours), on réessaie à la frame suivante.
+        if (_sceneManager.ReloadCurrentRoom())
+            _respawnTimer = -1f;
     }
 
     private void UpdateInvincibility(float delta)

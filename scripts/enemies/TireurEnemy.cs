@@ -111,7 +111,7 @@ public partial class TireurEnemy : CharacterBody2D
     private void Fire()
     {
         _fired = true;
-        if (ProjectileScene == null || !HasPlayer()) return;
+        if (ProjectileScene == null || !HasPlayer() || _player is Player { IsDead: true }) return;
 
         Vector2 origin = GlobalPosition + ProjectileOffset;
         Vector2 dir = _player.GlobalPosition - origin;
@@ -133,6 +133,7 @@ public partial class TireurEnemy : CharacterBody2D
     private bool PlayerInRange()
     {
         if (!HasPlayer()) return false;
+        if (_player is Player { IsDead: true }) return false;
         return GlobalPosition.DistanceSquaredTo(_player.GlobalPosition) <= DetectionRadius * DetectionRadius;
     }
 

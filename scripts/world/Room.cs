@@ -66,7 +66,7 @@ public partial class Room : Node2D
 
     private void OnSortieEntered(Node sortie, Node body)
     {
-        if (body is not Player) return;
+        if (body is not Player { IsDead: false }) return;
         if (!sortie.HasMeta("cible_carte")) return;
 
         var cibleCarte = (string)sortie.GetMeta("cible_carte");

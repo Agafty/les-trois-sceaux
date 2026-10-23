@@ -198,6 +198,7 @@ public partial class ChasseurEnemy : CharacterBody2D
             _player = GetTree().GetFirstNodeInGroup(PlayerGroup) as Node2D;
             if (_player == null) return false;
         }
+        if (_player is Player { IsDead: true }) return false;
         return GlobalPosition.DistanceSquaredTo(_player.GlobalPosition) <= DetectionRadius * DetectionRadius;
     }
 
