@@ -53,10 +53,11 @@ from enemy_lib import build_enemy  # noqa: E402
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'art', 'items')
 
-# Rubis 10x14 : v = teinte, w = teinte sombre, g = reflet
-GEM = ["...0000...", "..0ggvv0..", ".0gvvvvw0.", "0gvvvvvvw0", "0gvvvvvvw0", "0vvvvvvvw0",
-       "0vvvvvvww0", "0vvvvvwww0", ".0vvvvww0.", ".0vvvwww0.", "..0vvww0..", "..0vwww0..",
-       "...0ww0...", "....00...."]
+# Rubis taille en diamant 14x11 : v = teinte, w = teinte sombre, g = reflet clair (haut gauche)
+GEM = ["...00000000...", "..0ggggvvvvw0.", ".0ggvwvvvvwvw0", "0gvvwvvvvwvvw0",
+       "0vvvvvvvvvvvw0", ".0vvvwvvwvvw0.", "..0vvwvvwvw0..", "...0vwvvwv0...",
+       "....0vwwv0....", ".....0vv0.....", "......00......"]
+assert all(len(r) == 14 for r in GEM), [len(r) for r in GEM]
 # Moitie gauche du coeur (12 de large une fois mise en miroir)
 HEART_HALF = ["..000.", ".0gg40", "0g4444", "044444", "044444", "044444", ".04444", "..0444",
               "...044", "....04", ".....0"]
@@ -78,15 +79,15 @@ def put(g, rows, x0, bottom=31):
 def gem(base, dark, frame):
     rows = [list(r.replace('v', base).replace('w', dark)) for r in GEM]
     if frame == 1:      # eclat : reflet agrandi + etoile
-        rows[3][2] = rows[4][2] = rows[5][1] = rows[2][3] = 'g'
+        rows[3][2] = rows[4][1] = rows[2][4] = rows[5][2] = 'g'
     if frame == 2:      # terne : reflet eteint
         rows = [[base if c == 'g' else c for c in r] for r in rows]
-    g = put(blank(), [''.join(r) for r in rows], 11)
+    g = put(blank(), [''.join(r) for r in rows], 9)
     if frame == 1:
-        for x, y in ((22, 18), (21, 19), (23, 19), (22, 20)):
+        for x, y in ((24, 21), (23, 22), (25, 22), (24, 23)):
             g[y][x] = 'g'
     if frame == 2:
-        g[22][9] = 'g'
+        g[25][7] = 'g'
     return g
 
 
