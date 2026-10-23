@@ -45,7 +45,7 @@ public partial class HitBox : Area2D
         _hitStopActive = true;
 
         Engine.TimeScale = 0.05f;
-        GetTree().CreateTimer(HitStopDuration, ignoreTimeScale: true).Timeout += () =>
+        GetTree().CreateTimer(HitStopDuration, processAlways: true, processInPhysics: false, ignoreTimeScale: true).Timeout += () =>
         {
             Engine.TimeScale = 1f;
             _hitStopActive = false;

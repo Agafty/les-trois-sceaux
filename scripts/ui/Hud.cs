@@ -33,6 +33,12 @@ public partial class Hud : CanvasLayer
     private TextureRect[] _rupeeDigits;
     private TextureRect[] _keyDigits;
 
+    // Objet équipé : icône 24x24 centrée dans le cadre 32x32, quantité en bas à droite du cadre.
+    private static readonly Vector2 EquippedIconPos = new(FramePos.X + 4, FramePos.Y + 4);
+    private static readonly Vector2 EquippedDigitsPos = new(FramePos.X + 15, FramePos.Y + 23);
+    private TextureRect _equippedIcon;
+    private TextureRect[] _equippedDigits;
+
     public override void _Ready()
     {
         Layer = 5; // sous le fondu du SceneManager (10)
@@ -55,6 +61,8 @@ public partial class Hud : CanvasLayer
         AddRect(LoadTexture("res://art/ui/cadre_objet.png"), FramePos);
         AddRect(LoadTexture("res://art/ui/icone_rubis.png"), RupeeIconPos);
         AddRect(LoadTexture("res://art/ui/icone_cle.png"), KeyIconPos);
+        _equippedIcon = AddRect(null, EquippedIconPos);
+        _equippedDigits = CreateDigits(2, EquippedDigitsPos);
         _rupeeDigits = CreateDigits(3, RupeeDigitsPos);
         _keyDigits = CreateDigits(2, KeyDigitsPos);
 
@@ -66,11 +74,21 @@ public partial class Hud : CanvasLayer
         _gameState.HeartPiecesChanged += OnHeartPiecesChanged;
         _gameState.KeysChanged += OnKeysChanged;
         _gameState.PlayerHealthChanged += OnHealthChanged;
+        _gameState.InventoryChanged += RefreshEquipped;
+        _gameState.EquippedItemChanged += OnEquippedItemChanged;
 
         OnRupeesChanged(_gameState.Rupees);
         OnHeartPiecesChanged(_gameState.HeartPieces);
         OnKeysChanged(_gameState.Keys);
         OnHealthChanged(_gameState.PlayerHealth, _gameState.PlayerMaxHealth);
+        RefreshEquipped();
+
+        // L'écran d'inventaire vit avec le HUD (il ne dépend que de GameState).
+        var menuScene = GD.Load<PackedScene>("res://scenes/ui/inventaire.tscn");
+        if (menuScene != null)
+            AddChild(menuScene.Instantiate());
+        else
+            GD.PushError("Inventaire introuvable : res://scenes/ui/inventaire.tscn");
     }
 
     public override void _ExitTree()
@@ -80,6 +98,21 @@ public partial class Hud : CanvasLayer
         _gameState.HeartPiecesChanged -= OnHeartPiecesChanged;
         _gameState.KeysChanged -= OnKeysChanged;
         _gameState.PlayerHealthChanged -= OnHealthChanged;
+        _gameState.InventoryChanged -= RefreshEquipped;
+        _gameState.EquippedItemChanged -= OnEquippedItemChanged;
+    }
+
+    private void OnEquippedItemChanged(string itemId) => RefreshEquipped();
+
+    private void RefreshEquipped()
+    {
+        var item = _gameState.EquippedItem;
+        _equippedIcon.Texture = item?.Icon;
+        bool showCount = item != null && item.HasQuantity;
+        foreach (var digit in _equippedDigits)
+            digit.Visible = showCount;
+        if (showCount)
+            SetNumber(_equippedDigits, _gameState.GetQuantity(item.Id));
     }
 
     private static Texture2D LoadTexture(string path)

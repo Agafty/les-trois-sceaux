@@ -1,0 +1,25 @@
+[remap]
+
+importer="font_data_image"
+type="FontFile"
+uid="uid://cbv1ttclrx2l1"
+path="res://.godot/imported/police.png-99f6a6d26b16246baac7b6b2fc590b31.fontdata"
+
+[deps]
+
+source_file="res://art/ui/police.png"
+dest_files=["res://.godot/imported/police.png-99f6a6d26b16246baac7b6b2fc590b31.fontdata"]
+
+[params]
+
+character_ranges=PackedStringArray("32-126", "224", "226", "228", "231", "233", "232", "234", "235", "238", "239", "244", "246", "249", "251", "252", "255", "339", "230", "192", "194", "196", "199", "201", "200", "202", "203", "206", "207", "212", "214", "217", "219", "220", "376", "338", "198", "171", "187", "8217", "8230")
+kerning_pairs=PackedStringArray()
+columns=16
+rows=9
+image_margin=Rect2i(0, 0, 0, 0)
+character_margin=Rect2i(0, 0, 0, 0)
+ascent=0
+descent=0
+fallbacks=[]
+compress=true
+scaling_mode=2

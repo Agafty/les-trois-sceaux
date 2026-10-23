@@ -350,12 +350,12 @@ But : la boucle « je ramasse, j'équipe, je sauvegarde, je recharge » fonction
 
 - [x] HUD en `CanvasLayer` : cœurs (avec demi-cœurs), rubis, clés, objet équipé
 - [x] Réceptacles de cœur / quarts de cœur qui augmentent la vie max
-- [ ] Objets ramassables génériques (`Pickup` + une `Resource` qui décrit l'effet)
+- [x] Objets ramassables génériques (`Pickup` + une `Resource` qui décrit l'effet)
 
 **Inventaire et objets**
 
-- [ ] Définir chaque objet comme une `Resource` C# (`ItemData` : id, nom, icône, type, quantité max)
-- [ ] Écran d'inventaire en pause (grille, sélection à la manette)
+- [x] Définir chaque objet comme une `Resource` C# (`ItemData` : id, nom, icône, type, quantité max)
+- [x] Écran d'inventaire en pause (grille, sélection à la manette)
 - [ ] Objet assigné à la touche `use_item`
 - [ ] Implémenter 2 objets « clés » qui servent aux énigmes : par exemple **arc** (activer des interrupteurs à distance) et **bombes** (ouvrir des murs fissurés)
 - [ ] Coffres (petit objet / objet clé) avec la petite animation « objet levé au-dessus de la tête »

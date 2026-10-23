@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="PackedScene" path="res://maps/donjon_test/salle_test2.tmx" id="map2"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
@@ -8,6 +8,10 @@
 
 [ext_resource type="PackedScene" path="res://scenes/enemies/sanglier_noirci.tscn" id="sanglier"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/lutin_des_branches.tscn" id="lutin"]
+
+[ext_resource type="PackedScene" path="res://scenes/items/objet_inventaire.tscn" id="objet"]
+[ext_resource type="Resource" path="res://resources/pickups/objet_arc.tres" id="effet_arc"]
+[ext_resource type="Resource" path="res://resources/pickups/objet_bombes.tres" id="effet_bombes"]
 
 [sub_resource type="RectangleShape2D" id="obstacle_trunk_shape"]
 size = Vector2(10, 14)
@@ -41,3 +45,13 @@ position = Vector2(480, 220)
 
 [node name="LutinDesBranches" parent="Entites" instance=ExtResource("lutin")]
 position = Vector2(350, 260)
+
+[node name="TestArc" parent="Entites" instance=ExtResource("objet")]
+position = Vector2(200, 100)
+UniqueId = "test_arc"
+Effect = ExtResource("effet_arc")
+
+[node name="TestBombes" parent="Entites" instance=ExtResource("objet")]
+position = Vector2(440, 100)
+UniqueId = "test_bombes"
+Effect = ExtResource("effet_bombes")

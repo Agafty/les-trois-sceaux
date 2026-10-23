@@ -22,6 +22,9 @@ public partial class SceneManager : CanvasLayer
         _fade.MouseFilter = Control.MouseFilterEnum.Ignore;
     }
 
+    /// <summary>Vrai pendant un fondu / changement de salle.</summary>
+    public bool IsTransitioning => _transitioning;
+
     public bool GoToScene(string scenePath, string spawnId = "")
     {
         if (_transitioning) return false;

@@ -24,7 +24,119 @@ public partial class GameState : Node
     [Signal]
     public delegate void HeartPiecesChangedEventHandler(int total);
 
+    [Signal]
+    public delegate void InventoryChangedEventHandler();
+
+    [Signal]
+    public delegate void EquippedItemChangedEventHandler(string itemId);
+
     public const int HeartPiecesPerHeart = 4;
+    private const string ItemsFolder = "res://resources/items/";
+
+    private readonly Inventory _inventory = new();
+    private readonly Dictionary<string, ItemData> _itemData = new();
+
+    /// <summary>Identifiant de l'objet assigné à use_item ("" = rien).</summary>
+    public string EquippedItemId { get; private set; } = "";
+
+    /// <summary>Objets possédés, dans l'ordre d'obtention (pour la sauvegarde et l'affichage).</summary>
+    public IReadOnlyList<string> InventoryIds => _inventory.Ids;
+
+    public override void _Ready()
+    {
+        LoadItemRegistry();
+    }
+
+    // Registre Id -> ItemData : tous les .tres de resources/items/. Un nouvel objet = un nouveau fichier, sans code.
+    private void LoadItemRegistry()
+    {
+        using var dir = DirAccess.Open(ItemsFolder);
+        if (dir == null)
+        {
+            GD.PushWarning($"Dossier d'objets introuvable : {ItemsFolder}");
+            return;
+        }
+        foreach (var file in dir.GetFiles())
+        {
+            // Dans un jeu exporté, les ressources apparaissent en « .tres.remap ».
+            var name = file.EndsWith(".remap") ? file[..^6] : file;
+            if (!name.EndsWith(".tres")) continue;
+            if (ResourceLoader.Load(ItemsFolder + name) is ItemData data && !string.IsNullOrEmpty(data.Id))
+                _itemData[data.Id] = data;
+        }
+    }
+
+    /// <summary>Données d'un objet par son id (null si inconnu).</summary>
+    public ItemData GetItemData(string id) => id != null && _itemData.TryGetValue(id, out var d) ? d : null;
+
+    /// <summary>Objet actuellement équipé (null si aucun).</summary>
+    public ItemData EquippedItem => GetItemData(EquippedItemId);
+
+    public bool HasItem(string id) => _inventory.Has(id);
+
+    /// <summary>Quantité possédée (1 pour un objet sans quantité, 0 si absent).</summary>
+    public int GetQuantity(string id) => _inventory.GetQuantity(id);
+
+    /// <summary>Faux si l'objet est déjà au maximum (le ramassable reste alors au sol).</summary>
+    public bool CanAddItem(ItemData item) => item != null && _inventory.CanAdd(item.Id, item.MaxQuantity);
+
+    /// <summary>Ajoute un objet. Le premier équipable obtenu s'équipe seul si rien n'est équipé.</summary>
+    public bool AddItem(ItemData item, int quantity = 1)
+    {
+        if (item == null || string.IsNullOrEmpty(item.Id)) return false;
+        _itemData[item.Id] = item; // garantit que le registre connaît l'objet
+        if (!_inventory.Add(item.Id, quantity, item.MaxQuantity)) return false;
+
+        EmitSignal(SignalName.InventoryChanged);
+        if (item.Type == ItemType.Equipable && EquippedItemId == "")
+            Equip(item.Id);
+        return true;
+    }
+
+    /// <summary>Retire des unités d'un objet à quantité (bombes, flèches...). Préparé pour use_item.</summary>
+    public bool RemoveItem(string id, int quantity = 1)
+    {
+        var data = GetItemData(id);
+        if (data == null || !data.HasQuantity) return false; // objet sans quantité : rien à retirer
+        if (!_inventory.Remove(id, quantity)) return false;
+        EmitSignal(SignalName.InventoryChanged);
+        return true;
+    }
+
+    /// <summary>Équipe un objet possédé et équipable. Renvoie false sinon.</summary>
+    public bool Equip(string id)
+    {
+        var data = GetItemData(id);
+        if (data == null || data.Type != ItemType.Equipable || !_inventory.Has(id)) return false;
+        if (EquippedItemId == id) return true;
+
+        EquippedItemId = id;
+        EmitSignal(SignalName.EquippedItemChanged, id);
+        return true;
+    }
+
+    /// <summary>Restaure l'inventaire depuis une sauvegarde (listes parallèles id / quantité).</summary>
+    public void LoadInventory(IReadOnlyList<string> ids, IReadOnlyList<int> quantities, string equippedId)
+    {
+        _inventory.Load(ids, quantities);
+        // Borne les quantités sur le maximum de chaque objet (1 s'il n'a pas de quantité) ; retire les ids inconnus.
+        var loaded = new List<string>(_inventory.Ids);
+        foreach (var id in loaded)
+        {
+            var data = GetItemData(id);
+            if (data == null)
+            {
+                GD.PushWarning($"Objet inconnu dans la sauvegarde, ignoré : {id}");
+                _inventory.Discard(id);
+                continue;
+            }
+            _inventory.Clamp(id, data.HasQuantity ? data.MaxQuantity : 1);
+        }
+        EquippedItemId = "";
+        EmitSignal(SignalName.InventoryChanged);
+        if (!string.IsNullOrEmpty(equippedId) && Equip(equippedId)) return;
+        EmitSignal(SignalName.EquippedItemChanged, "");
+    }
 
     private readonly HashSet<string> _collected = new();
 

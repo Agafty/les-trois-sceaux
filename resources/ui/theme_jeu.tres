@@ -1,0 +1,10 @@
+[gd_resource type="Theme" load_steps=2 format=3]
+
+[ext_resource type="FontFile" uid="uid://cbv1ttclrx2l1" path="res://art/ui/police.png" id="1_font"]
+
+[resource]
+default_font = ExtResource("1_font")
+default_font_size = 10
+Label/colors/font_shadow_color = Color(0.105882, 0.0784314, 0.12549, 1)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 1

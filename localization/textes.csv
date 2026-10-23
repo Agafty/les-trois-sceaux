@@ -1,0 +1,8 @@
+keys,fr,en
+MENU_INVENTAIRE,Inventaire,Inventory
+ITEM_ARC_NOM,Arc,Bow
+ITEM_ARC_DESC,"Un arc de chasse. Atteint les cibles et les interrupteurs éloignés.","A hunting bow. Hits distant targets and switches."
+ITEM_BOMBES_NOM,Bombes,Bombs
+ITEM_BOMBES_DESC,"Explosent après quelques secondes. Ouvrent les murs fissurés.","They explode after a few seconds. Open cracked walls."
+ITEM_LANTERNE_NOM,Lanterne,Lantern
+ITEM_LANTERNE_DESC,"Éclaire les salles sombres et allume les torches.","Lights up dark rooms and ignites torches."
