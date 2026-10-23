@@ -325,7 +325,7 @@ But : un combat à l'épée lisible et satisfaisant contre 3 types d'ennemis.
 
 **Joueur**
 
-- [ ] Machine à états du joueur : `Idle`, `Move`, `Attack`, `Hurt`, `Dead` (une classe par état ou un `enum` + `switch` pour commencer)
+- [x] Machine à états du joueur : `Idle`, `Move`, `Attack`, `Hurt`, `Dead` (une classe par état ou un `enum` + `switch` pour commencer)
 - [x] Attaque à l'épée : hitbox `Area2D` activée quelques frames, orientée selon la direction
 - [x] Système hitbox / hurtbox réutilisable (composants `HitBox` et `HurtBox` avec dégâts et équipe)
 - [x] Recul (knockback) + invincibilité temporaire avec clignotement après un coup
