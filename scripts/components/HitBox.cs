@@ -17,6 +17,10 @@ public partial class HitBox : Area2D
     [Export]
     public float CameraShakeDuration { get; set; } = 0.15f;
 
+    /// <summary>Émis après qu'une HurtBox ennemie a été touchée (même si elle était invincible).</summary>
+    [Signal]
+    public delegate void HitLandedEventHandler();
+
     private static bool _hitStopActive;
 
     public override void _Ready()
@@ -32,6 +36,7 @@ public partial class HitBox : Area2D
         hurtBox.ReceiveHit(Damage, GlobalPosition);
         TriggerHitStop();
         ShakeCamera();
+        EmitSignal(SignalName.HitLanded);
     }
 
     private void TriggerHitStop()

@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/Projectile.cs" id="script_projectile"]
+[ext_resource type="SpriteFrames" path="res://art/enemies/projectiles_frames.tres" id="proj_frames"]
+[ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="script_hitbox"]
+
+[sub_resource type="CircleShape2D" id="gland_wall_shape"]
+radius = 3.0
+
+[sub_resource type="CircleShape2D" id="gland_hit_shape"]
+radius = 5.0
+
+[node name="ProjectileGland" type="Area2D"]
+script = ExtResource("script_projectile")
+Speed = 110.0
+Lifetime = 3.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("proj_frames")
+animation = &"acorn"
+autoplay = "acorn"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("gland_wall_shape")
+
+[node name="HitBox" type="Area2D" parent="."]
+script = ExtResource("script_hitbox")
+Team = 1
+Damage = 1
+HitStopDuration = 0.03
+CameraShakeStrength = 1.5
+CameraShakeDuration = 0.1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+shape = SubResource("gland_hit_shape")

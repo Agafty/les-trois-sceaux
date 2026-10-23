@@ -335,7 +335,7 @@ But : un combat à l'épée lisible et satisfaisant contre 3 types d'ennemis.
 
 - [x] Composant `Health` partagé joueur/ennemis (signal `Died`, `Damaged`)
 - [x] Ennemi 1 : patrouille aléatoire, dégâts au contact
-- [ ] Ennemi 2 : poursuit le joueur quand il est proche (`NavigationAgent2D` ou ligne droite)
+- [x] Ennemi 2 : poursuit le joueur quand il est proche (`NavigationAgent2D` ou ligne droite)
 - [ ] Ennemi 3 : attaque à distance (projectile)
 - [ ] Butin à la mort : cœur, rubis, avec probabilité
 - [ ] Réapparition des ennemis quand on quitte et revient sur l'écran

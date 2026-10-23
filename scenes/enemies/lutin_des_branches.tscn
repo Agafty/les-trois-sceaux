@@ -1,0 +1,36 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/TireurEnemy.cs" id="script_tireur"]
+[ext_resource type="SpriteFrames" path="res://art/enemies/lutin_des_branches_frames.tres" id="lutin_frames"]
+[ext_resource type="Script" path="res://scripts/components/Health.cs" id="script_health"]
+[ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="script_hurtbox"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/projectile_gland.tscn" id="gland"]
+
+[sub_resource type="CircleShape2D" id="lutin_shape"]
+radius = 10.0
+
+[node name="LutinDesBranches" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("script_tireur")
+ProjectileScene = ExtResource("gland")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("lutin_frames")
+animation = &"hidden"
+autoplay = "hidden"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("lutin_shape")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("script_health")
+MaxHealth = 1
+
+[node name="HurtBox" type="Area2D" parent="."]
+script = ExtResource("script_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(0, 4)
+shape = SubResource("lutin_shape")

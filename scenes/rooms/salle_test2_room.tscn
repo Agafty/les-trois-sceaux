@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="PackedScene" path="res://maps/donjon_test/salle_test2.tmx" id="map2"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/enemies/ronceau.tscn" id="ronceau"]
 
 [ext_resource type="PackedScene" path="res://scenes/enemies/sanglier_noirci.tscn" id="sanglier"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/lutin_des_branches.tscn" id="lutin"]
 
 [sub_resource type="RectangleShape2D" id="obstacle_trunk_shape"]
 size = Vector2(10, 14)
@@ -37,3 +38,6 @@ position = Vector2(220, 220)
 
 [node name="SanglierNoirci" parent="Entites" instance=ExtResource("sanglier")]
 position = Vector2(480, 220)
+
+[node name="LutinDesBranches" parent="Entites" instance=ExtResource("lutin")]
+position = Vector2(350, 260)
