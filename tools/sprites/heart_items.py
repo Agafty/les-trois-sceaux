@@ -114,15 +114,15 @@ def quart(frame):
     return o
 
 
-def quart_hud():
-    """Coeur 16x16 divise en 4, quart superieur gauche rempli."""
-    rows = hud.heart_rows(hud.FULL, hud.EMPTY)       # 14 x 12, a (1, 2)
+def quart_hud(n=1):
+    """Coeur 16x16 divise en 4, n quarts remplis (sens horaire : haut-gauche, haut-droit, bas-droit, bas-gauche)."""
+    rows = hud.heart_rows(hud.FULL, hud.FULL)       # 14 x 12, a (1, 2)
     g = hud.blank(16, 16)
     for j, r in enumerate(rows):
         for i, c in enumerate(r):
             if c == '.':
                 continue
-            full = i < 7 and j < 6
+            full = (0, 1, 3, 2)[(i >= 7) + 2 * (j >= 6)] < n
             if c == '0':
                 c = '0' if full else 'k'
             elif not full:
@@ -142,4 +142,6 @@ if __name__ == '__main__':
     os.makedirs(ITEMS, exist_ok=True)
     build_enemy(ITEMS, 'heart_items', anims, folder='items')
     hud.save_png(os.path.join(hud.OUT, 'quart_coeur_hud.png'), hud.to_rgba(quart_hud()))
+    for k in range(4):
+        hud.save_png(os.path.join(hud.OUT, f'quart_coeur_hud_{k}.png'), hud.to_rgba(quart_hud(k)))
     print('ok')

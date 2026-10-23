@@ -25,6 +25,10 @@ public partial class Hud : CanvasLayer
     private Texture2D _heartEmpty;
     private readonly AtlasTexture[] _digitTextures = new AtlasTexture[10];
 
+    private const int HeartPieceGap = 4;
+    private readonly Texture2D[] _heartPieceTextures = new Texture2D[GameState.HeartPiecesPerHeart];
+    private TextureRect _heartPieceRect;
+
     private TextureRect[] _hearts = System.Array.Empty<TextureRect>();
     private TextureRect[] _rupeeDigits;
     private TextureRect[] _keyDigits;
@@ -54,11 +58,17 @@ public partial class Hud : CanvasLayer
         _rupeeDigits = CreateDigits(3, RupeeDigitsPos);
         _keyDigits = CreateDigits(2, KeyDigitsPos);
 
+        for (int i = 0; i < _heartPieceTextures.Length; i++)
+            _heartPieceTextures[i] = LoadTexture($"res://art/ui/quart_coeur_hud_{i}.png");
+        _heartPieceRect = AddRect(null, Vector2.Zero);
+
         _gameState.RupeesChanged += OnRupeesChanged;
+        _gameState.HeartPiecesChanged += OnHeartPiecesChanged;
         _gameState.KeysChanged += OnKeysChanged;
         _gameState.PlayerHealthChanged += OnHealthChanged;
 
         OnRupeesChanged(_gameState.Rupees);
+        OnHeartPiecesChanged(_gameState.HeartPieces);
         OnKeysChanged(_gameState.Keys);
         OnHealthChanged(_gameState.PlayerHealth, _gameState.PlayerMaxHealth);
     }
@@ -67,6 +77,7 @@ public partial class Hud : CanvasLayer
     {
         if (_gameState == null) return;
         _gameState.RupeesChanged -= OnRupeesChanged;
+        _gameState.HeartPiecesChanged -= OnHeartPiecesChanged;
         _gameState.KeysChanged -= OnKeysChanged;
         _gameState.PlayerHealthChanged -= OnHealthChanged;
     }
@@ -116,6 +127,11 @@ public partial class Hud : CanvasLayer
 
     private void OnKeysChanged(int total) => SetNumber(_keyDigits, total);
 
+    private void OnHeartPiecesChanged(int total)
+    {
+        _heartPieceRect.Texture = _heartPieceTextures[Mathf.Clamp(total, 0, _heartPieceTextures.Length - 1)];
+    }
+
     private void OnHealthChanged(int current, int max)
     {
         int heartCount = (max + 1) / 2;
@@ -137,6 +153,7 @@ public partial class Hud : CanvasLayer
         _hearts = new TextureRect[count];
         int rowWidth = HeartsPerRow * HeartSize;
         float left = ScreenWidth - HeartsMarginRight - rowWidth;
+        _heartPieceRect.Position = new Vector2(left - HeartPieceGap - HeartSize, HeartsTop);
         for (int i = 0; i < count; i++)
         {
             var pos = new Vector2(left + (i % HeartsPerRow) * HeartSize, HeartsTop + (i / HeartsPerRow) * HeartSize);
