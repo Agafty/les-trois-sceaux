@@ -35,6 +35,9 @@ public partial class Player : CharacterBody2D
     [Export]
     public float UseDistance { get; set; } = 24f;
 
+    /// <summary>Recul (px) du point de pose par rapport au mur quand un objet est posé contre lui.</summary>
+    private const float WallPoseMargin = 4f;
+
     private Direction _facing = Direction.Bas;
     private State _state = State.Deplacement;
     private float _attackTimer;
@@ -210,8 +213,40 @@ public partial class Player : CharacterBody2D
         }
 
         var direction = FacingVector();
+        var from = GlobalPosition + new Vector2(0, 6);
+        float distance = item.UseDistance > 0f ? item.UseDistance : UseDistance;
+        var target = from + direction * distance;
+
+        // Un mur entre Brann et le point de pose ? Raycast(s) à l'appui de la touche seulement.
+        // Les CharacterBody2D (ennemis) ne sont pas des murs : on les exclut et on relance pour voir derrière eux.
+        // Pour un objet qui s'annule contre un mur, le rayon est prolongé de la longueur de sa pointe.
+        var rayEnd = item.CancelIfBlocked ? target + direction * item.BlockCheckExtra : target;
+        var query = PhysicsRayQueryParameters2D.Create(from, rayEnd);
+        query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
+        var space = GetWorld2D().DirectSpaceState;
+        for (int attempt = 0; attempt < 4; attempt++)
+        {
+            var hit = space.IntersectRay(query);
+            if (hit.Count == 0) break;
+            if (hit["collider"].AsGodotObject() is CharacterBody2D body)
+            {
+                query.Exclude.Add(body.GetRid());
+                continue;
+            }
+            if (item.CancelIfBlocked)
+            {
+                use.QueueFree(); // jamais ajoutée à l'arbre : rien n'est consommé
+                return;
+            }
+            // Pose contre le mur, reculée de quelques pixels (une bombe collée à un mur fissuré l'atteint).
+            // Mur déjà plus près que la marge : on pose au point de départ, jamais derrière Brann.
+            var impact = hit["position"].AsVector2();
+            target = from.DistanceTo(impact) <= WallPoseMargin ? from : impact - direction * WallPoseMargin;
+            break;
+        }
+
         GetParent().AddChild(use); // même parent que Brann : tri en profondeur (Y-sort) de la salle
-        use.GlobalPosition = GlobalPosition + new Vector2(0, 6) + direction * UseDistance;
+        use.GlobalPosition = target;
         use.AddToGroup(group);
         use.Begin(this, direction);
 

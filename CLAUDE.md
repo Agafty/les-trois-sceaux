@@ -80,7 +80,11 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 
 **Éléments détruits par une bombe** (`MurFissure`…) : le nœud est dans le groupe Godot `destructible_bombe` et implémente l'interface C# `IBombDestructible` (`OnBombExplosion(Vector2 center)`). L'explosion appelle cette méthode sur chaque nœud du groupe à portée.
 
-**Objets utilisables** (`use_item`) : chaque `ItemData` utilisable référence une scène dans `UseScene`, dont le script hérite de `ItemUse` (`Begin(Player, direction)`). Le joueur ne connaît aucun objet en particulier.
+**Cibles touchées par une flèche** (interrupteurs à distance, Œil de Morvath…) : le nœud est dans le groupe Godot `cible_fleche`, implémente `IArrowTarget` (`OnArrowHit(Vector2 position, Vector2 direction)`) et a une `Area2D` ou un corps de collision sur la couche 1. Un simple mur (`StaticBody2D`, tuile solide) arrête la flèche sans rien de plus.
+
+**Munitions** : les flèches sont la quantité de l'objet `arc` (pas d'objet séparé). Un ramassable de munitions utilise `GiveItemEffect` avec `OnlyIfOwned` (reste au sol tant que l'objet n'est pas possédé) et éventuellement `PickupIcon`.
+
+**Objets utilisables** (`use_item`) : chaque `ItemData` utilisable référence une scène dans `UseScene`, dont le script hérite de `ItemUse` (`Begin(Player, direction)`). Le joueur ne connaît aucun objet en particulier. Si un mur est entre Brann et le point de pose : avec `CancelIfBlocked` (arc) rien n'est utilisé ni consommé ; sinon (bombe) l'objet est posé contre le mur. Une `HitBox` avec `SingleHit` ne blesse qu'une seule cible (flèche).
 
 Ces conventions sont un point de départ, à ajuster en phase 1. Toute nouvelle convention est ajoutée ici avant d'être utilisée dans une carte ou dans le code.
 

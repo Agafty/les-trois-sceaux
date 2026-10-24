@@ -34,7 +34,7 @@ public class Inventory
 
         if (!_quantities.TryGetValue(id, out int current))
             _ids.Add(id);
-        _quantities[id] = System.Math.Min(current + quantity, maxQuantity);
+        _quantities[id] = current + System.Math.Min(quantity, maxQuantity - current);
         return true;
     }
 

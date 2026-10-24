@@ -21,6 +21,11 @@ public partial class HitBox : Area2D
     [Signal]
     public delegate void HitLandedEventHandler();
 
+    /// <summary>Vrai : après le premier coup infligé, cette HitBox ignore toute autre HurtBox (flèche).</summary>
+    [Export]
+    public bool SingleHit { get; set; }
+
+    private bool _hasHit;
     private static bool _hitStopActive;
 
     public override void _Ready()
@@ -32,6 +37,8 @@ public partial class HitBox : Area2D
     {
         if (area is not HurtBox hurtBox) return;
         if (hurtBox.Team == Team) return;
+        if (SingleHit && _hasHit) return;
+        _hasHit = true;
 
         hurtBox.ReceiveHit(Damage, GlobalPosition);
         TriggerHitStop();
@@ -54,6 +61,7 @@ public partial class HitBox : Area2D
 
     private void ShakeCamera()
     {
+        if (CameraShakeStrength <= 0f) return;
         if (GetViewport().GetCamera2D() is CameraShake shake)
             shake.Shake(CameraShakeStrength, CameraShakeDuration);
     }

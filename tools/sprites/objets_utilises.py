@@ -204,41 +204,38 @@ def explosion_frames():
 
 # ------------------------------- fleche -------------------------------------
 def arrow():
+    """Flèche fine : hampe de 1 px (y=15), pointe de 3 px de haut max, empennage de 3 px. Sans contour."""
     g = blank(32, 32)
-    for x in range(5, 25):                      # hampe 2 px (clair en haut, sombre en bas)
+    for x in range(5, 26):
         g[15][x] = '7'
-        g[16][x] = '6'
-    for x, half in ((22, 3), (23, 3), (24, 2), (25, 2), (26, 1), (27, 1), (28, 0)):   # pointe metal
-        for dy in range(-half, half + 2 if half else 2):
-            g[15 + dy][x] = 'g' if dy <= 0 else 'h'
-    for y in (14, 15, 16, 17):                  # empennage rouge, en V vers l'arriere
-        for x in range(3, 8):
-            pass
-    for x, ys in ((3, (13, 18)), (4, (13, 18)), (5, (14, 17)), (6, (14, 17)), (7, (14, 17))):
+    for x, ys in ((25, (14, 15, 16)), (26, (14, 15, 16)), (27, (15,)), (28, (15,))):   # pointe
         for y in ys:
-            g[y][x] = '4' if y < 15 else 'F'
-    for x in range(4, 9):
-        g[15][x] = '4'
-        g[16][x] = 'F'
-    outline(g)
+            g[y][x] = 'g' if y < 16 else 'h'
+    g[15][27] = 'g'
+    g[15][28] = 'w'
+    for x in (3, 4, 5):                          # empennage
+        g[14][x + 1] = '4'
+        g[16][x + 1] = 'F'
+    g[15][4] = g[15][5] = '4'
+    g[14][3] = '4'
+    g[16][3] = 'F'
     return g
 
 
 def icon_arrow():
-    """Icone 24x24 (meme taille que art/ui/items/*.png) : fleche en diagonale, pointe en haut a droite.
+    """Icone 24x24 fine (aussi icone au sol du paquet de fleches) : diagonale, pointe en haut a droite.
     Axe : x + y = 24 ; u = x - y mesure la position le long de la fleche."""
     g = blank(24, 24)
     for y in range(24):
         for x in range(24):
-            u, v = x - y, x + y - 24            # u le long de l'axe, v ecart a l'axe
-            if -14 <= u <= 11 and v in (0, 1):  # hampe 2 px
-                g[y][x] = '7' if v == 0 else '6'
-            elif 12 <= u <= 21 and abs(v) <= (24 - u) // 4:  # pointe
-                g[y][x] = 'g' if v <= 0 else 'h'
-            elif -14 <= u <= -7 and 1 <= abs(v) <= 3 - (u + 14) // 4:  # plumes
+            u, v = x - y, x + y - 24
+            if -14 <= u <= 14 and v == 0:                       # hampe 1 px
+                g[y][x] = '7'
+            elif -14 <= u <= -9 and abs(v) in (1, 2) and abs(v) <= 2 - (u + 14) // 3:   # plumes
                 g[y][x] = '4' if v < 0 else 'F'
-    put(g, 21, 3, 'w')
-    outline(g)
+    for x, y, c in ((22, 2, 'w'), (21, 2, 'g'), (21, 3, 'g'), (22, 3, 'h'), (20, 3, 'g'), (20, 4, 'g'),
+                    (21, 4, 'h'), (19, 4, 'g'), (19, 5, 'h'), (20, 5, 'h'), (18, 5, 'g'), (18, 6, 'h')):
+        g[y][x] = c
     return g
 
 

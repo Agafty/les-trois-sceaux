@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/Arrow.cs" id="1_arrow"]
+[ext_resource type="Texture2D" path="res://art/items/fleche.png" id="2_tex"]
+[ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="3_hitbox"]
+
+[sub_resource type="RectangleShape2D" id="tip_shape"]
+size = Vector2(10, 6)
+
+[node name="Fleche" type="Node2D"]
+script = ExtResource("1_arrow")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_tex")
+
+[node name="HitBox" type="Area2D" parent="."]
+script = ExtResource("3_hitbox")
+Team = 0
+SingleHit = true
+HitStopDuration = 0.03
+CameraShakeStrength = 0.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+position = Vector2(10, 0)
+shape = SubResource("tip_shape")

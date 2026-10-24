@@ -33,5 +33,20 @@ public partial class ItemData : Resource
     /// <summary>Nombre maximal d'instances de UseScene en même temps (0 = illimité). Bombes : 1.</summary>
     [Export(PropertyHint.Range, "0,10,1")] public int MaxSimultaneous { get; set; }
 
+    /// <summary>
+    /// Si un mur gêne le point de pose : vrai = l'utilisation est annulée sans rien consommer (flèche) ;
+    /// faux = l'objet est posé contre le mur (bombe).
+    /// </summary>
+    [Export] public bool CancelIfBlocked { get; set; }
+
+    /// <summary>Distance de pose devant Brann (px, depuis ses pieds). 0 = valeur par défaut du Player.</summary>
+    [Export(PropertyHint.Range, "0,64,1")] public float UseDistance { get; set; }
+
+    /// <summary>
+    /// Pour CancelIfBlocked : longueur (px) dont on prolonge la vérification de mur au-delà du point de pose
+    /// (la pointe de la flèche), pour qu'un mur juste devant la pointe annule aussi le tir.
+    /// </summary>
+    [Export(PropertyHint.Range, "0,64,1")] public float BlockCheckExtra { get; set; }
+
     public bool HasQuantity => MaxQuantity > 0;
 }
