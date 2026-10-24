@@ -58,6 +58,8 @@ public partial class Chest : StaticBody2D
     private bool _opened;
     private bool _sequenceRunning;
     private bool _valid;
+    private bool _canApply = true; // décidé à l'ouverture ; faux = le contenu n'est pas donné
+    private bool _applied;
     private Node _temporaryIcon;
     private CanvasLayer _temporaryText;
 
@@ -195,8 +197,12 @@ public partial class Chest : StaticBody2D
         try
         {
             // Contenu sans effet possible (objet au max, vie au plafond) : erreur de level design, le coffre s'ouvre quand même.
+            // Dans ce cas l'effet n'est PAS appliqué (sinon des munitions donneraient l'arc), mais le coffre s'ouvre.
             if (Effect != null && !Effect.CanApply(player, _state))
-                GD.PushWarning($"Coffre {Id} : son contenu ne peut pas s'appliquer (objet déjà au maximum ?). Revoyez le level design.");
+            {
+                _canApply = false;
+                GD.PushWarning($"Coffre {Id} : son contenu ne peut pas s'appliquer (objet déjà au maximum, ou prérequis manquant). Revoyez le level design.");
+            }
 
             _sprite.Frame = OpenFrame;
             _zone.SetDeferred(Area2D.PropertyName.Monitoring, false);
@@ -223,6 +229,7 @@ public partial class Chest : StaticBody2D
                 _sequenceRunning = false;
                 if (IsInstanceValid(tree)) tree.Paused = false; // le jeu ne doit jamais rester figé
                 try { CleanupTemporaryNodes(); } catch (Exception) { /* nœuds déjà détruits */ }
+                try { ApplyEffect(_liftPlayer); } catch (Exception e2) { GD.PushError($"Coffre {Id} (effet) : {e2}"); }
                 _state.MarkCollected(Id);
             }
         }
@@ -233,8 +240,7 @@ public partial class Chest : StaticBody2D
     {
         try
         {
-            if (Effect != null && player != null && IsInstanceValid(player))
-                Effect.Apply(player, _state);
+            ApplyEffect(player);
         }
         finally
         {
@@ -242,6 +248,13 @@ public partial class Chest : StaticBody2D
         }
         EmitSignal(SignalName.Opened, Id, Important);
         if (Important) _state.NotifyImportantChestOpened(Id);
+    }
+
+    private void ApplyEffect(Player player)
+    {
+        if (_applied || !_canApply || Effect == null || player == null || !IsInstanceValid(player)) return;
+        _applied = true; // jamais deux fois, même si l'application échoue en route
+        Effect.Apply(player, _state);
     }
 
     // Icône au-dessus de la tête de Brann (enfant du joueur) et texte en bas de l'écran (CanvasLayer).

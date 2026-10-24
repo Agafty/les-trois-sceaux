@@ -20,8 +20,8 @@ public partial class GiveItemEffect : PickupEffect
 
     public override void Apply(Player player, GameState state) => state.AddItem(Item, Quantity);
 
-    // Dans un coffre, on montre l'objet lui-même (arc...) et non l'icône de ramassage au sol.
-    public override Texture2D GetIcon() => Icon ?? Item?.Icon;
+    // Dans un coffre : icône propre à l'effet, sinon celle de ramassage (flèche), sinon celle de l'objet (arc).
+    public override Texture2D GetIcon() => Icon ?? PickupIcon ?? Item?.Icon;
 
     public override string GetNameKey() => string.IsNullOrEmpty(NameKey) ? Item?.NameKey ?? "" : NameKey;
 }

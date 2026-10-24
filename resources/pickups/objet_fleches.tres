@@ -10,3 +10,4 @@ Item = ExtResource("2_item")
 Quantity = 5
 OnlyIfOwned = true
 PickupIcon = ExtResource("3_icon")
+NameKey = "OBJ_FLECHES"
