@@ -437,4 +437,6 @@ Tuiles à prévoir pour l'étape 2 (carte) : murs, portes (`porte_haut` à `port
 
 ## 8. Suite
 
-L'étape 2 (cartes `.tmx`) ne démarre qu'après validation de ce plan. `maps/tilesets/temple_racines.tsx` et `art/tilesets/temple_racines_plan.md` existent déjà.
+Plan validé. Les 10 cartes `salle_01.tmx` à `salle_boss.tmx` sont créées (étape 2) et `verif_donjon.py` relit aussi les `.tmx` : il reconstruit l'aperçu de chaque carte et le compare à ceux de ce fichier. Décisions validées : butin de flèches garanti (moins de 5 flèches avec l'arc : chaque ennemi tué en lâche une, et les ennemis réapparaissent au retour dans la salle) ; couloirs du boss (3 à 8 cases) et Sylve de 96 px acceptés.
+
+Précisions de réalisation : les trous (`~`) sont peints en rectangles avec les tuiles du terrain `Trous` ; les deux cibles (salles 06 et 09) sont posées sur la dernière colonne ou la première du rectangle de trou ; les `O` de 1 case sont `colonne_base` (Murs) + `colonne_haut` (Dessus) ; les piliers du boss sont des blocs 2×2 de `mur_coin_ext_*`.

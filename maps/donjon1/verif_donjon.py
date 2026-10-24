@@ -485,14 +485,181 @@ def apercu(salles_ascii):
  (D clé, G grande clé, N ennemis, I interrupteur ; sans lettre = ouvert)""")
 
 
+# --- Lecture des vraies cartes .tmx ----------------------------------------------------------------------
+import xml.etree.ElementTree as ET
+
+NB_TUILES = 128                                   # temple_racines.tsx
+MURS_PLEINS = set(range(16, 31)) | {72, 73, 113, 114, 116}
+ENNEMIS_OK = {"ronceau", "sanglier_noirci", "lutin_des_branches"}
+CLASSES_OK = {"Spawn", "Sortie", "Ennemi", "Coffre", "Porte", "Interrupteur", "BlocPoussable", "StatueCorbeau", "Ramassable"}
+
+
+def lire_cartes(dossier):
+    """Reconstruit un aperçu ASCII de chaque salle à partir du .tmx et contrôle le fichier lui-même."""
+    dossier = Path(dossier)
+    out, ids_spawn, cibles = {}, {}, []
+    noms = ["salle_%02d" % i for i in range(1, 10)] + [SALLE_BOSS]
+    for n in noms:
+        f = dossier / (n + ".tmx")
+        if not f.exists():
+            err("carte manquante : " + f.name)
+            continue
+        racine = ET.parse(f).getroot()               # lève une exception si le XML est invalide
+        w, h = int(racine.get("width")), int(racine.get("height"))
+        entete = (racine.get("version"), racine.get("orientation"), racine.get("infinite"),
+                  racine.get("tilewidth"), racine.get("tileheight"))
+        if entete != ("1.10", "orthogonal", "0", "32", "32"):
+            err(n + " : en-tête de carte inattendu")
+        if (w, h) != (20, 22 if n == SALLE_BOSS else 11):
+            err("%s : taille %dx%d" % (n, w, h))
+        tilesets = racine.findall("tileset")
+        if [(t.get("firstgid"), t.get("source")) for t in tilesets] != [("1", "../tilesets/temple_racines.tsx")]:
+            err(n + " : tileset inattendu")
+        noms_calques = [e.get("name") for e in racine if e.tag in ("layer", "objectgroup")]
+        if noms_calques != ["Sol", "Decor", "Murs", "Objets", "Dessus"]:
+            err("%s : calques %s" % (n, noms_calques))
+        ids_calques = [int(e.get("id")) for e in racine if e.tag in ("layer", "objectgroup")]
+        if len(set(ids_calques)) != 5 or int(racine.get("nextlayerid")) <= max(ids_calques):
+            err(n + " : ids de calques / nextlayerid")
+        grilles = {}
+        for l in racine.findall("layer"):
+            d = l.find("data")
+            if d.get("encoding") != "csv":
+                err(n + " : calque non CSV")
+            vals = [int(x) for x in d.text.replace("\n", "").split(",") if x.strip() != ""]
+            if len(vals) != w * h:
+                err("%s : calque %s a %d valeurs au lieu de %d" % (n, l.get("name"), len(vals), w * h))
+                continue
+            if any(v < 0 or v > NB_TUILES for v in vals):
+                err("%s : GID hors du tileset dans %s" % (n, l.get("name")))
+            grilles[l.get("name")] = [vals[r * w:(r + 1) * w] for r in range(h)]
+        if len(grilles) != 4:
+            continue
+        sol, murs = grilles["Sol"], grilles["Murs"]
+        if any(v == 0 for l in sol for v in l):
+            err(n + " : case de sol vide")
+        groupe = racine.find("objectgroup")
+        objs, ids = [], set()
+        for o in groupe.findall("object"):
+            i = int(o.get("id"))
+            if i in ids:
+                err("%s : id d'objet %d en double" % (n, i))
+            ids.add(i)
+            props = {p.get("name"): p.get("value") for p in o.iter("property")}
+            objs.append((o.get("type"), float(o.get("x")), float(o.get("y")), o.get("width"), o.get("height"),
+                         props, o.get("name")))
+            if o.get("type") and o.get("type") not in CLASSES_OK:
+                err("%s : classe inconnue %s" % (n, o.get("type")))
+        if int(racine.get("nextobjectid")) <= max(ids):
+            err(n + " : nextobjectid trop petit")
+        g = [["."] * w for _ in range(h)]
+        for r in range(h):
+            for c in range(w):
+                m, s = murs[r][c], sol[r][c]
+                bord = r in (0, h - 1) or c in (0, w - 1)
+                if 58 <= s - 1 <= 66:
+                    g[r][c] = "~"
+                if m:
+                    t = m - 1
+                    if 40 <= t <= 43:
+                        g[r][c] = "X"
+                    elif t in (72, 73):
+                        g[r][c] = "r"
+                    elif t in (113, 114, 116) or (not bord and 24 <= t <= 27):
+                        g[r][c] = "O"
+                    elif t in MURS_PLEINS or 24 <= t <= 27:
+                        g[r][c] = "#"
+                    else:
+                        err("%s : tuile %d inattendue sur Murs en (%d,%d)" % (n, t, c, r))
+        cel = lambda x, y: (int(x) // 32, int(y) // 32)
+        portes = {}
+        for (cl, x, y, ow, oh, pr, nom) in objs:
+            if cl == "Porte":
+                portes[cel(x, y)] = pr
+        for (cl, x, y, ow, oh, pr, nom) in objs:
+            if cl is None and nom == "indice_ronces_coupees":
+                for c in range(int(x) // 32, int(x + float(ow)) // 32):
+                    g[int(y) // 32][c] = "i"
+        for (cl, x, y, ow, oh, pr, nom) in objs:
+            if cl is None:
+                continue
+            c, r = cel(x, y)
+            if cl == "Spawn":
+                g[r][c] = "P"
+                ids_spawn.setdefault(n, set()).add(pr["id"])
+            elif cl == "Ennemi":
+                if pr["type"] not in ENNEMIS_OK or pr["variante"] not in ("normal", "rouge"):
+                    err("%s : ennemi invalide %s" % (n, pr))
+                if pr["variante"] == "rouge" and n not in ("salle_08", "salle_09", SALLE_BOSS):
+                    err(n + " : variante rouge trop tôt")
+                g[r][c] = "L" if pr["type"] == "lutin_des_branches" else "E"
+            elif cl == "Coffre":
+                g[r][c] = "C"
+                cf = COFFRES.get(pr.get("id"))
+                if not cf or cf[2] != pr["contenu"] or cf[1] != (c, r) or cf[0] != n:
+                    err("%s : coffre %s incohérent avec la table" % (n, pr))
+            elif cl == "StatueCorbeau":
+                g[r][c] = "R"
+            elif cl == "BlocPoussable":
+                g[r][c] = "B"
+            elif cl == "Ramassable":
+                g[r][c] = "F"
+            elif cl == "Interrupteur":
+                g[r][c] = "S"
+                if INTERRUPTEURS.get(pr["id"], (None, None, None))[2] != pr["cible"] or pr.get("mode") != "fleche":
+                    err("%s : interrupteur %s incohérent" % (n, pr))
+            elif cl == "Sortie":
+                if pr.get("godot_node_type") != "area" or not (ow == "32" and oh == "32"):
+                    err(n + " : Sortie mal formée")
+                cibles.append((n, pr["cible_carte"], pr["cible_spawn"]))
+            elif cl == "Porte":
+                if pr["type"] not in ("cle", "grande_cle", "ennemis", "interrupteur") or pr["id"] not in PORTES:
+                    err("%s : porte invalide %s" % (n, pr))
+        t2c = {"cle": "D", "grande_cle": "G", "ennemis": "N", "interrupteur": "I"}
+        for r in range(h):
+            for c in range(w):
+                if g[r][c] == "X" and (c, r) in portes:
+                    g[r][c] = t2c[portes[(c, r)]["type"]]
+        out[n] = g
+    for (n, carte, sp) in cibles:
+        m = re.match(r"res://scenes/rooms/donjon1_(salle_\w+)_room\.tscn$", carte)
+        if not m:
+            if "foret_temple" not in carte:
+                err("%s : cible_carte inconnue %s" % (n, carte))
+            continue
+        if sp not in ids_spawn.get(m.group(1), set()):
+            err("%s : Spawn %s absent de %s" % (n, sp, m.group(1)))
+    return out
+
+
 def main():
-    chemin = sys.argv[1] if len(sys.argv) > 1 else Path(__file__).with_name("plan.md")
-    salles = lire_plan(chemin)
-    verifier_structure(salles)
+    dossier = Path(__file__).parent
+    chemin = sys.argv[1] if len(sys.argv) > 1 else dossier / "plan.md"
+    plan = lire_plan(chemin)
+    verifier_structure(plan)
     if not erreurs:
-        verifier_donjon(salles)
-        verifier_blocs(salles)
-        autotest(salles)
+        verifier_donjon(plan)
+        verifier_blocs(plan)
+        autotest(plan)
+    if any((dossier / ("salle_%02d.tmx" % i)).exists() for i in range(1, 10)):
+        print("\n######## Vraies cartes (.tmx) ########")
+        cartes = lire_cartes(dossier)
+        print("== 0. %d cartes lues : XML valide, ids uniques, GID dans 1..%d ==" % (len(cartes), NB_TUILES))
+        for n in plan:
+            if n in cartes:
+                a, b = ["".join(l) for l in cartes[n]], ["".join(l) for l in plan[n]]
+                if a != b:
+                    err("%s : la carte diffère de l'aperçu du plan" % n)
+                    for x, y in zip(a, b):
+                        if x != y:
+                            print("   carte:", x)
+                            print("   plan :", y)
+        if len(cartes) == len(plan) and not erreurs:
+            print("  Les %d cartes reproduisent exactement les aperçus de plan.md." % len(cartes))
+            verifier_structure(cartes)
+            verifier_donjon(cartes)
+            verifier_blocs(cartes)
+            autotest(cartes)
     print()
     if erreurs:
         print("RÉSULTAT : %d erreur(s)" % len(erreurs))
