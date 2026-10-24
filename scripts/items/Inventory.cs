@@ -53,6 +53,13 @@ public class Inventory
             _quantities[id] = max;
     }
 
+    /// <summary>Fixe la quantité d'un objet possédé (sans effet s'il n'est pas possédé).</summary>
+    public void SetQuantity(string id, int quantity)
+    {
+        if (_quantities.ContainsKey(id))
+            _quantities[id] = quantity;
+    }
+
     /// <summary>Retire complètement un objet (id inconnu à la restauration).</summary>
     public void Discard(string id)
     {

@@ -6,6 +6,7 @@
 
 [node name="salle_test" unique_id=377118666 instance=ExtResource("1_u1wtu")]
 script = ExtResource("2_pv064")
+Zone = "test"
 
 [node name="Player" parent="." index="5" unique_id=1579000947 instance=ExtResource("2_qw0j1")]
 position = Vector2(316, 179)

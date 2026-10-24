@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/SaveSystem.cs" id="script_save_system"]
+
+[node name="SaveSystem" type="Node"]
+script = ExtResource("script_save_system")

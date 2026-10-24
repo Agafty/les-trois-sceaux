@@ -142,6 +142,7 @@ docs/           roadmap.md
 - Penser à recompiler (Build) après l'ajout d'un `[Export]` ou d'un `[Signal]`.
 - Pas d'allocations dans les boucles chaudes (`_Process`, `_PhysicsProcess`) : pas de LINQ ni de `new` à chaque frame.
 - Sauvegarde : JSON via `System.Text.Json` dans `user://saveN.json`, avec un numéro de version. Chaque coffre, porte ou objet unique a un identifiant unique en français (ex. `donjon1_coffre_03`), mémorisé dans `GameState` une fois utilisé.
+- Format de sauvegarde : classe `SaveData` (C# pur), écriture atomique via `System.IO` (fichier `.tmp` puis renommage). Tout nouvel état à persister passe par `GameState.CreateSaveData` / `ApplySaveData` avec un champ dans `SaveData`. **Toute modification du format incrémente `SaveData.CurrentVersion` et ajoute un `case` dans `SaveSerializer.Migrate`.** La position de reprise est une scène + un id de `Spawn`, jamais des coordonnées. Chaque salle (`Room`) a une `Zone` (ex. `donjon1`, `foret`, `village`) : la sauvegarde automatique se fait au changement de zone (pas de salle), à l'ouverture d'un coffre important et après un boss. Raccourcis de debug (build debug seulement) : F10 sauvegarde le slot 1, F11 le charge.
 - Textes du jeu : jamais en dur, toujours via `Tr()` et le fichier CSV de traduction (français et anglais).
 - Nommage : PascalCase pour les classes, méthodes et propriétés ; `_camelCase` pour les champs privés ; scènes et dossiers en `snake_case`.
 

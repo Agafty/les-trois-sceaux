@@ -10,6 +10,7 @@
 
 [node name="Arene" type="Node2D"]
 script = ExtResource("room_script")
+Zone = "test"
 
 [node name="Map" parent="." instance=ExtResource("map2")]
 

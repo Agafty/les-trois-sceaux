@@ -32,7 +32,7 @@ public partial class GameState : Node
 
     /// <summary>
     /// Un coffre important (objet clé, grosse récompense) vient d'être ouvert et son contenu appliqué.
-    /// Point d'accroche de la future sauvegarde automatique (SaveSystem s'y abonnera).
+    /// Point d'accroche de la sauvegarde automatique (SaveSystem s'y abonne).
     /// </summary>
     [Signal]
     public delegate void ImportantChestOpenedEventHandler(string chestId);
@@ -139,7 +139,10 @@ public partial class GameState : Node
                 _inventory.Discard(id);
                 continue;
             }
-            _inventory.Clamp(id, data.HasQuantity ? data.MaxQuantity : 1);
+            if (data.HasQuantity)
+                _inventory.Clamp(id, data.MaxQuantity);
+            else
+                _inventory.SetQuantity(id, 1); // objet sans quantité : toujours 1
         }
         EquippedItemId = "";
         EmitSignal(SignalName.InventoryChanged);
@@ -189,6 +192,68 @@ public partial class GameState : Node
         return complete;
     }
 
+    /// <summary>Photographie de l'état à sauvegarder (la position de reprise et le temps de jeu sont ajoutés par SaveSystem).</summary>
+    public SaveData CreateSaveData()
+    {
+        var data = new SaveData
+        {
+            Health = PlayerHealth,
+            MaxHealth = PlayerMaxHealth,
+            HeartPieces = HeartPieces,
+            Rupees = Rupees,
+            Keys = Keys,
+            EquippedItemId = EquippedItemId,
+        };
+        foreach (var id in _inventory.Ids)
+            data.Inventory.Add(new SaveInventoryEntry { Id = id, Quantity = _inventory.GetQuantity(id) });
+        data.CollectedIds.AddRange(_collected);
+        data.CollectedIds.Sort(string.CompareOrdinal); // ordre stable : fichiers comparables
+        return data;
+    }
+
+    /// <summary>Remet l'état aux valeurs d'une nouvelle partie (vie de départ, 0 rubis, inventaire et flags vides).</summary>
+    public void ResetState()
+    {
+        ApplySaveData(new SaveData
+        {
+            Health = StartMaxHealth,
+            MaxHealth = StartMaxHealth,
+        });
+    }
+
+    /// <summary>Remplace tout l'état par celui d'une sauvegarde (valeurs bornées) et prévient le HUD par les signaux habituels.</summary>
+    public void ApplySaveData(SaveData data)
+    {
+        if (data == null) throw new System.ArgumentNullException(nameof(data));
+
+        // 1) Tout préparer (sans toucher à l'état) : si quelque chose est invalide, rien n'a changé.
+        var ids = new List<string>();
+        var quantities = new List<int>();
+        if (data.Inventory != null)
+            foreach (var entry in data.Inventory)
+            {
+                if (string.IsNullOrEmpty(entry?.Id)) continue;
+                ids.Add(entry.Id);
+                quantities.Add(entry.Quantity);
+            }
+        int max = Mathf.Clamp(data.MaxHealth, 2, MaxPlayerHealth);
+        max += max & 1;
+        int health = data.Health <= 0 ? Mathf.Min(RespawnHealth, max) : Mathf.Min(data.Health, max);
+
+        // 2) Appliquer.
+        Rupees = Mathf.Clamp(data.Rupees, 0, MaxRupees);
+        EmitSignal(SignalName.RupeesChanged, Rupees);
+        Keys = Mathf.Max(data.Keys, 0);
+        EmitSignal(SignalName.KeysChanged, Keys);
+
+        PlayerMaxHealth = max;
+        PlayerHealth = health;
+        EmitSignal(SignalName.PlayerHealthChanged, PlayerHealth, PlayerMaxHealth);
+
+        LoadInventory(ids, quantities, data.EquippedItemId);
+        LoadCollected(data.CollectedIds, data.HeartPieces);
+    }
+
     public int Rupees { get; private set; }
 
     /// <summary>Points de vie du joueur (1 PV = un demi-cœur).</summary>
@@ -212,7 +277,8 @@ public partial class GameState : Node
     /// <summary>Fixe la vie du joueur (et son maximum). N'émet le signal que si quelque chose change.</summary>
     public void SetPlayerHealth(int current, int max)
     {
-        max = Mathf.Clamp(max + (max & 1), 2, MaxPlayerHealth); // arrondi au pair (cœurs entiers)
+        max = Mathf.Clamp(max, 2, MaxPlayerHealth); // borne d'abord...
+        max += max & 1; // ...puis arrondi au pair (cœurs entiers) ; 18 est pair, donc jamais au-dessus du plafond
         current = Mathf.Clamp(current, 0, max);
         if (current == PlayerHealth && max == PlayerMaxHealth) return;
 

@@ -3,6 +3,13 @@ using System.Collections.Generic;
 
 public partial class Room : Node2D
 {
+    /// <summary>
+    /// Zone de jeu (ex. « donjon1 », « foret », « village »). La sauvegarde automatique se déclenche
+    /// quand on passe d'une zone à une autre, pas à chaque changement de salle.
+    /// </summary>
+    [Export]
+    public string Zone { get; set; } = "";
+
     public override void _Ready()
     {
         // Le HUD vit avec la salle (pas d'autoload supplémentaire) ; il ne dépend que de GameState.

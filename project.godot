@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameState="*res://scenes/core/game_state.tscn"
 SceneManager="*res://scenes/core/scene_manager.tscn"
+SaveSystem="*res://scenes/core/save_system.tscn"
 
 [display]
 
