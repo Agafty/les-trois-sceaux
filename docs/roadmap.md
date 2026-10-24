@@ -404,7 +404,7 @@ But : un style simple et cohérent, que tu peux produire vite. À travailler une
 
 - [ ] Outil : Aseprite (payant, la référence) ou LibreSprite / Pixelorama (gratuits)
 - [ ] Fixer une palette limitée (24 à 32 couleurs ; partir d'une palette existante de Lospec est un bon raccourci)
-- [ ] Tuiles 32×32, personnages en 32×32 (Corvan 32×48), boss 64×64 à 96×96 ; contour sombre ou non : décider une fois pour toutes
+- [ ] Tuiles 32×32, personnages en 32×32 (Corvan compris, voûté), boss 64×64 à 96×96 ; contour sombre ou non : décider une fois pour toutes
 - [ ] Dessiner les sprites finaux à la main (l'agent graphiste produit les placeholders) ; animations limitées : marche 4 images, attaque 3 images, idle 1 à 2 images
 - [ ] Ordre de production : tileset d'un donjon → joueur (marche + attaque, 4 directions) → 3 ennemis → objets/UI → boss
 - [ ] Utiliser les **terrains (autotiling) de Tiled** pour peindre les niveaux plus vite

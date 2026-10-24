@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="PackedScene" path="res://maps/donjon_test/salle_test2.tmx" id="map2"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
@@ -14,6 +14,11 @@
 [ext_resource type="Resource" path="res://resources/pickups/objet_bombes.tres" id="effet_bombes"]
 
 [ext_resource type="Resource" path="res://resources/pickups/objet_fleches.tres" id="effet_fleches"]
+
+[ext_resource type="PackedScene" path="res://scenes/puzzles/coffre.tscn" id="coffre"]
+[ext_resource type="Resource" path="res://resources/pickups/rubis_rouge.tres" id="effet_rubis20"]
+[ext_resource type="Resource" path="res://resources/pickups/cle_petite.tres" id="effet_cle"]
+[ext_resource type="Resource" path="res://resources/pickups/quart_coeur.tres" id="effet_quart"]
 
 [sub_resource type="RectangleShape2D" id="obstacle_trunk_shape"]
 size = Vector2(10, 14)
@@ -62,3 +67,19 @@ Effect = ExtResource("effet_bombes")
 position = Vector2(320, 100)
 UniqueId = "test_fleches"
 Effect = ExtResource("effet_fleches")
+
+[node name="CoffreRubis" parent="Entites" instance=ExtResource("coffre")]
+position = Vector2(100, 160)
+Id = "test_coffre_rubis"
+Effect = ExtResource("effet_rubis20")
+
+[node name="CoffreCle" parent="Entites" instance=ExtResource("coffre")]
+position = Vector2(100, 260)
+Id = "test_coffre_cle"
+Effect = ExtResource("effet_cle")
+
+[node name="CoffreQuartCoeur" parent="Entites" instance=ExtResource("coffre")]
+position = Vector2(560, 160)
+Id = "test_coffre_quart_coeur"
+Effect = ExtResource("effet_quart")
+Important = true

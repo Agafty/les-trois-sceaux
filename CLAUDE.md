@@ -28,7 +28,7 @@ La conception complète (scénario, personnages, carte, bestiaire, économie, ph
 ## Réglages techniques fixés
 
 - Résolution de base : **640×360** (16:9 ; ×2 en 720p, ×3 en 1080p, ×4 en 1440p, ×6 en 4K), tuiles de **32×32 px**
-- Sprites : personnages dans une case de **32×32** (Corvan en 32×48), boss en **64×64 à 96×96**, proportions trapues (grosse tête) pour la lisibilité
+- Sprites : **tous** les personnages dans une case de **32×32**, Corvan compris (le plus grand, tenu en 32×32 grâce à son dos voûté), boss en **64×64 à 96×96**, proportions trapues (grosse tête) pour la lisibilité
 - Stretch mode `viewport`, scale mode `integer`, filtre de texture `Nearest`
 - Caméra : défilement par écran dans les donjons, caméra qui suit dans l'overworld
 - Un écran = **20×11 tuiles** (640×352 px ; les 8 px restants en bas servent de marge, le HUD est en surimpression) ; overworld de 5×4 écrans = 100×44 tuiles
@@ -38,6 +38,32 @@ La conception complète (scénario, personnages, carte, bestiaire, économie, ph
 Cinq agents sont définis dans `.claude/agents/` : `developpeur`, `relecteur`, `testeur`, `graphiste`, `level-designer`.
 Pour chaque tâche de code : **developpeur** → **relecteur** → corrections → **testeur** → commit. Le graphiste et le level-designer travaillent en parallèle.
 Aucun agent n'installe ni ne télécharge quoi que ce soit sans mon accord.
+
+### Partage des fichiers entre agents
+
+Pour que plusieurs agents travaillent en même temps sans s'écraser, chacun ne modifie que son territoire :
+
+| Agent | Peut modifier | Ne touche pas |
+| --- | --- | --- |
+| `graphiste` | `art/`, `tools/sprites/`, création de nouveaux `.tsx` dans `maps/tilesets/` | `maps/**/*.tmx`, `scenes/`, `scripts/` |
+| `level-designer` | `maps/**/*.tmx` (et `.tx` si besoin) | `maps/tilesets/*.tsx`, `art/`, `scenes/`, `scripts/` |
+| `developpeur` | `scripts/`, `scenes/`, `resources/`, `project.godot`, `.csproj`, `localization/` | `art/`, `maps/` |
+| `relecteur`, `testeur` | rien (ils lisent et rapportent) ; le testeur peut ajouter des tests | — |
+
+- Fichiers communs (`CLAUDE.md`, `docs/roadmap.md`) : un agent qui veut y ajouter une convention ou cocher une tâche le **propose dans son rapport** ; je l'applique (ou je donne mon accord explicite).
+- Un besoin hors de son territoire (une tuile manquante pour le level-designer, une nouvelle classe d'objet Tiled, une scène à créer) est **demandé dans le rapport**, jamais fait directement.
+- Avant de modifier un fichier, l'agent vérifie avec `git status` qu'il n'a pas de modifications non commitées ; si c'est le cas, il s'arrête et le signale.
+- Un commit par tâche terminée, pour que le travail d'un agent soit visible par les autres.
+
+### Tilesets : le plan d'abord, le dessin ensuite
+
+Une carte Tiled mémorise le **numéro** de chaque tuile, pas son dessin. Pour que le level-designer peigne les cartes pendant que le graphiste dessine :
+
+1. Le graphiste livre d'abord le **plan** du tileset d'une zone : le `.tsx` et son PNG avec toutes les tuiles à leur place définitive (aplats de couleur lisibles), les collisions et les terrains (autotiling) déjà définis, et un fichier `art/tilesets/<nom>_plan.md` qui liste chaque tuile (numéro, rôle, collision).
+2. Le level-designer peint les cartes avec ce tileset.
+3. Le graphiste remplace ensuite le dessin de chaque tuile **au même emplacement**. Les cartes se mettent à jour sans être repeintes.
+
+Il est interdit de déplacer, retirer ou réordonner une tuile d'un tileset utilisé par une carte : on ajoute seulement des lignes à la fin du PNG.
 
 ## Cartes : Tiled
 
@@ -69,7 +95,7 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 | `Spawn` | `id` (point d'arrivée, ex. `depuis_village`) |
 | `Sortie` | `cible_carte` (chemin de la carte), `cible_spawn` (id du Spawn d'arrivée) |
 | `Ennemi` | `type` (nom de la ressource `EnemyData`), `variante` (`normal` ou `rouge`) |
-| `Coffre` | `id` (unique, ex. `donjon1_coffre_03`), `contenu` (id d'`ItemData`) |
+| `Coffre` | `id` (unique, ex. `donjon1_coffre_03`), `contenu` (nom d'un `.tres` de `resources/pickups/`, sans extension), `important` (bool : grand coffre, animation plus longue, future sauvegarde auto) |
 | `Porte` | `id`, `type` (`cle`, `grande_cle`, `ennemis`, `interrupteur`) |
 | `Interrupteur` | `id`, `cible` (id de la porte ou de l'élément déclenché) |
 | `BlocPoussable` | — |
@@ -83,6 +109,8 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 **Cibles touchées par une flèche** (interrupteurs à distance, Œil de Morvath…) : le nœud est dans le groupe Godot `cible_fleche`, implémente `IArrowTarget` (`OnArrowHit(Vector2 position, Vector2 direction)`) et a une `Area2D` ou un corps de collision sur la couche 1. Un simple mur (`StaticBody2D`, tuile solide) arrête la flèche sans rien de plus.
 
 **Munitions** : les flèches sont la quantité de l'objet `arc` (pas d'objet séparé). Un ramassable de munitions utilise `GiveItemEffect` avec `OnlyIfOwned` (reste au sol tant que l'objet n'est pas possédé) et éventuellement `PickupIcon`.
+
+**Coffres** : l'`Id` est mémorisé dans `GameState` via `MarkCollected` (un `Id` vide est une erreur). Le contenu est un `PickupEffect` ; tout `PickupEffect` doit renseigner `Icon` et `NameKey` (clé `OBJ_*` dans `textes.csv`) pour l'affichage « Vous obtenez ». Pendant l'animation d'ouverture le jeu est en pause : aucun code ne doit lancer de transition (`GoToScene`) à ce moment.
 
 **Objets utilisables** (`use_item`) : chaque `ItemData` utilisable référence une scène dans `UseScene`, dont le script hérite de `ItemUse` (`Begin(Player, direction)`). Le joueur ne connaît aucun objet en particulier. Si un mur est entre Brann et le point de pose : avec `CancelIfBlocked` (arc) rien n'est utilisé ni consommé ; sinon (bombe) l'objet est posé contre le mur. Une `HitBox` avec `SingleHit` ne blesse qu'une seule cible (flèche).
 

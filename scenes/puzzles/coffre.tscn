@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/Chest.cs" id="script_chest"]
+[ext_resource type="Texture2D" path="res://art/puzzles/coffre.png" id="chest_tex"]
+[ext_resource type="Texture2D" path="res://art/puzzles/grand_coffre.png" id="big_tex"]
+
+[sub_resource type="RectangleShape2D" id="body_shape"]
+size = Vector2(24, 14)
+
+[sub_resource type="RectangleShape2D" id="zone_shape"]
+size = Vector2(72, 40)
+
+[node name="Coffre" type="StaticBody2D"]
+script = ExtResource("script_chest")
+ImportantTexture = ExtResource("big_tex")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("chest_tex")
+offset = Vector2(0, -16)
+hframes = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -9)
+shape = SubResource("body_shape")
+
+[node name="ZoneInteraction" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ZoneInteraction"]
+position = Vector2(0, 16)
+shape = SubResource("zone_shape")

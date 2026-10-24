@@ -6,6 +6,7 @@ public partial class Player : CharacterBody2D
     private enum State { Deplacement, Attaque, Touche, Mort }
 
     private static readonly StringName DeathAnim = "death";
+    private static readonly StringName LiftAnim = "lift";
 
     [Export]
     public float Speed { get; set; } = 100f;
@@ -183,6 +184,23 @@ public partial class Player : CharacterBody2D
         else if (Input.IsActionJustPressed("use_item"))
             TryUseItem();
     }
+
+    /// <summary>Vrai quand Brann peut agir (ni attaque, ni touché, ni mort) : utilisé pour interagir avec un coffre.</summary>
+    public bool CanInteract => _state == State.Deplacement;
+
+    /// <summary>Direction vers laquelle Brann regarde (Vector2.Up, Down, Left ou Right).</summary>
+    public Vector2 FacingDirection => FacingVector();
+
+    /// <summary>Pose « objet levé » (un coffre vient de s'ouvrir). Le jeu est en pause : Brann ne bouge plus.</summary>
+    public void BeginLift()
+    {
+        Velocity = Vector2.Zero;
+        _sprite.Visible = true; // le clignotement d'invincibilité pourrait l'avoir caché
+        _sprite.Play(LiftAnim);
+    }
+
+    /// <summary>Fin de la pose : Brann reprend son attitude immobile, face à la même direction.</summary>
+    public void EndLift() => UpdateAnimation(false);
 
     private Vector2 FacingVector() => _facing switch
     {

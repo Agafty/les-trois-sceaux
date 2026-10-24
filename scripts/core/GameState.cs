@@ -30,6 +30,15 @@ public partial class GameState : Node
     [Signal]
     public delegate void EquippedItemChangedEventHandler(string itemId);
 
+    /// <summary>
+    /// Un coffre important (objet clé, grosse récompense) vient d'être ouvert et son contenu appliqué.
+    /// Point d'accroche de la future sauvegarde automatique (SaveSystem s'y abonnera).
+    /// </summary>
+    [Signal]
+    public delegate void ImportantChestOpenedEventHandler(string chestId);
+
+    public void NotifyImportantChestOpened(string chestId) => EmitSignal(SignalName.ImportantChestOpened, chestId);
+
     public const int HeartPiecesPerHeart = 4;
     private const string ItemsFolder = "res://resources/items/";
 

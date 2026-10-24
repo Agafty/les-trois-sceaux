@@ -19,4 +19,9 @@ public partial class GiveItemEffect : PickupEffect
         Item != null && state.CanAddItem(Item) && (!OnlyIfOwned || state.HasItem(Item.Id));
 
     public override void Apply(Player player, GameState state) => state.AddItem(Item, Quantity);
+
+    // Dans un coffre, on montre l'objet lui-même (arc...) et non l'icône de ramassage au sol.
+    public override Texture2D GetIcon() => Icon ?? Item?.Icon;
+
+    public override string GetNameKey() => string.IsNullOrEmpty(NameKey) ? Item?.NameKey ?? "" : NameKey;
 }

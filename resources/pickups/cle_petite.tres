@@ -1,7 +1,11 @@
-[gd_resource type="Resource" script_class="KeyEffect" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="KeyEffect" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/items/effects/KeyEffect.cs" id="1_effect"]
+
+[ext_resource type="Texture2D" path="res://art/ui/icone_cle.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_effect")
 Amount = 1
+Icon = ExtResource("2_icon")
+NameKey = "OBJ_CLE_PETITE"
