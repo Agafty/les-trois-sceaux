@@ -12,6 +12,9 @@ public partial class GameState : Node
     public const int MaxPlayerHealth = 18; // plafond : 9 cœurs
     public const int RespawnHealth = 6; // reprise avec 3 cœurs
 
+    /// <summary>Id de l'objet « arc » : ses flèches sont sa quantité (butin garanti, tir).</summary>
+    public const string BowItemId = "arc";
+
     [Signal]
     public delegate void RupeesChangedEventHandler(int total);
 
@@ -166,6 +169,36 @@ public partial class GameState : Node
         EmitSignal(SignalName.HeartPiecesChanged, HeartPieces);
     }
 
+    private readonly HashSet<string> _dungeonItems = new();
+
+    /// <summary>Objets de donjon possédés (carte, boussole, grande clé), sous la forme « zone/type » (pour la sauvegarde).</summary>
+    public IReadOnlyCollection<string> DungeonItemKeys => _dungeonItems;
+
+    /// <summary>Plumes de corbeau trouvées (compteur de progression, sans usage pour l'instant).</summary>
+    public int RavenFeathers { get; private set; }
+
+    public bool HasDungeonItem(string zone, string kind) => _dungeonItems.Contains(DungeonItems.MakeKey(zone, kind));
+
+    /// <summary>Donne un objet de donjon (carte, boussole, grande clé) pour cette zone. Faux s'il est inconnu ou déjà possédé.</summary>
+    public bool AddDungeonItem(string zone, string kind)
+    {
+        if (!DungeonItems.IsKnownKind(kind)) return false;
+        return _dungeonItems.Add(DungeonItems.MakeKey(zone, kind));
+    }
+
+    public void AddRavenFeather() => RavenFeathers++;
+
+    /// <summary>Restaure les objets de donjon et les plumes depuis une sauvegarde.</summary>
+    public void LoadProgress(IEnumerable<string> dungeonItems, int ravenFeathers)
+    {
+        _dungeonItems.Clear();
+        if (dungeonItems != null)
+            foreach (var key in dungeonItems)
+                if (!string.IsNullOrEmpty(key))
+                    _dungeonItems.Add(key);
+        RavenFeathers = Mathf.Max(ravenFeathers, 0);
+    }
+
     /// <summary>Quarts de cœur possédés vers le prochain réceptacle (0..3).</summary>
     public int HeartPieces { get; private set; }
 
@@ -203,7 +236,10 @@ public partial class GameState : Node
             Rupees = Rupees,
             Keys = Keys,
             EquippedItemId = EquippedItemId,
+            RavenFeathers = RavenFeathers,
         };
+        data.DungeonItems.AddRange(_dungeonItems);
+        data.DungeonItems.Sort(string.CompareOrdinal);
         foreach (var id in _inventory.Ids)
             data.Inventory.Add(new SaveInventoryEntry { Id = id, Quantity = _inventory.GetQuantity(id) });
         data.CollectedIds.AddRange(_collected);
@@ -252,6 +288,7 @@ public partial class GameState : Node
 
         LoadInventory(ids, quantities, data.EquippedItemId);
         LoadCollected(data.CollectedIds, data.HeartPieces);
+        LoadProgress(data.DungeonItems, data.RavenFeathers);
     }
 
     public int Rupees { get; private set; }

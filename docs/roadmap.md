@@ -376,7 +376,7 @@ But : un donjon de 8 à 12 salles, jouable du début à la fin, avec son objet, 
 
 **Briques d'énigmes (réutilisables partout)**
 
-- [ ] Portes : verrouillées par petite clé, par grande clé (boss), ou qui s'ouvrent quand tous les ennemis sont morts
+- [x] Portes : verrouillées par petite clé, par grande clé (boss), ou qui s'ouvrent quand tous les ennemis sont morts
 - [ ] Interrupteurs au sol (plaque de pression) et interrupteurs à frapper
 - [ ] Blocs poussables (alignés sur la grille 32×32)
 - [ ] Torches à allumer, murs fissurés (bombes), trous qui font tomber à l'étage inférieur

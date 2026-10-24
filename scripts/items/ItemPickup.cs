@@ -13,7 +13,7 @@ public partial class ItemPickup : Pickup
             GD.PushWarning($"{Name} ({SceneFilePath}) : UniqueId vide, l'objet réapparaîtra à chaque chargement de la salle.");
         var sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         var give = Effect as GiveItemEffect;
-        var icon = give?.PickupIcon ?? give?.Item?.Icon;
+        var icon = give?.PickupIcon ?? give?.Item?.Icon ?? Effect?.GetIcon(); // effet non-objet (plume...) : son icône
         if (icon != null)
         {
             var frames = new SpriteFrames(); // contient déjà l'animation "default"

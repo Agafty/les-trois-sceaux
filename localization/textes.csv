@@ -33,3 +33,7 @@ TITLE_ERR_UNREADABLE,Sauvegarde illisible ou corrompue.,Save is unreadable or co
 TITLE_ERR_START,Impossible de lancer la partie.,Could not start the game.
 SAVE_DONE,Partie sauvegardée,Game saved
 SAVE_FAILED,Sauvegarde impossible,Could not save
+OBJ_CARTE_DONJON,la carte du donjon,the dungeon map
+OBJ_BOUSSOLE,la boussole,the compass
+OBJ_GRANDE_CLE,la grande clé,the big key
+OBJ_PLUME_CORBEAU,une plume de corbeau,a raven feather

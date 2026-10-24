@@ -15,7 +15,7 @@ public class SaveInventoryEntry
 public class SaveData
 {
     /// <summary>Version du format écrite par cette version du jeu. À incrémenter quand le format change.</summary>
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     /// <summary>0 = absente du fichier : sera rejetée par la migration. SaveSystem écrit CurrentVersion à la sauvegarde.</summary>
     public int Version { get; set; }
@@ -34,6 +34,12 @@ public class SaveData
 
     /// <summary>Ids uniques déjà utilisés : coffres, ramassables uniques, portes ouvertes...</summary>
     public List<string> CollectedIds { get; set; } = new();
+
+    /// <summary>Version 2. Objets de donjon possédés, sous la forme « zone/type » (ex. « donjon1/grande_cle »).</summary>
+    public List<string> DungeonItems { get; set; } = new();
+
+    /// <summary>Version 2. Plumes de corbeau trouvées.</summary>
+    public int RavenFeathers { get; set; }
 
     /// <summary>Position de reprise : chemin de la scène (carte) et id du Spawn, jamais des coordonnées.</summary>
     public string ScenePath { get; set; } = "";

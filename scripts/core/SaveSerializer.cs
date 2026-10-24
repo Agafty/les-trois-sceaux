@@ -44,6 +44,9 @@ public static class SaveSerializer
         foreach (var e in d.Inventory) e.Id ??= "";
         d.CollectedIds ??= new();
         d.CollectedIds.RemoveAll(string.IsNullOrEmpty);
+        d.DungeonItems ??= new();
+        d.DungeonItems.RemoveAll(string.IsNullOrEmpty);
+        if (d.RavenFeathers < 0) d.RavenFeathers = 0;
         d.EquippedItemId ??= "";
         d.ScenePath ??= "";
         d.SpawnId ??= "";
@@ -52,7 +55,8 @@ public static class SaveSerializer
 
     /// <summary>
     /// Met à niveau les données jusqu'à <see cref="SaveData.CurrentVersion"/>.
-    /// Pour un futur format 2 : ajouter « case 1: ...adapter les champs...; data.Version = 2; goto case 2; ».
+    /// Chaque ancienne version a son case qui adapte les champs, monte Version d'un cran puis fait « goto » vers le suivant.
+    /// Pour un futur format 3 : « case 2: ...adapter...; data.Version = 3; goto case 3; » puis « case 3: return true; ».
     /// </summary>
     public static bool Migrate(SaveData data, out string error)
     {
@@ -64,7 +68,13 @@ public static class SaveSerializer
         }
         switch (data.Version)
         {
-            case SaveData.CurrentVersion:
+            case 1:
+                // Version 1 -> 2 : ajout des objets de donjon et des plumes (absents = aucun).
+                data.DungeonItems = new();
+                data.RavenFeathers = 0;
+                data.Version = 2;
+                goto case 2;
+            case 2:
                 return true; // rien à migrer
             case 0:
                 error = "numéro de version absent";

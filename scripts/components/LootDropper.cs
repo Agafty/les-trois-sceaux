@@ -3,15 +3,28 @@ using Godot;
 /// <summary>
 /// Composant à placer à côté du nœud Health d'un ennemi : à sa mort, tire dans la table
 /// de butin et fait apparaître le résultat à la position de l'ennemi.
+/// Règle anti-blocage : si Brann a l'arc mais peu de flèches, l'ennemi lâche toujours des flèches
+/// (désactivable avec <see cref="GuaranteeArrows"/>).
 /// </summary>
 public partial class LootDropper : Node
 {
     [Export] public LootTable Table { get; set; }
 
+    /// <summary>Décocher pour supprimer le butin de flèches garanti sur cet ennemi.</summary>
+    [ExportGroup("Flèches garanties")]
+    [Export] public bool GuaranteeArrows { get; set; } = true;
+
+    /// <summary>Le butin garanti tombe si Brann a strictement moins de flèches que cette valeur.</summary>
+    [Export(PropertyHint.Range, "1,30,1")] public int ArrowsBelow { get; set; } = 5;
+
+    private const string ArrowsScenePath = "res://scenes/items/fleches.tscn";
+
     private Health _health;
+    private GameState _state;
 
     public override void _Ready()
     {
+        _state = GetNodeOrNull<GameState>("/root/GameState");
         _health = GetParent().GetNodeOrNull<Health>("Health");
         if (_health != null) _health.Died += OnDied;
     }
@@ -23,12 +36,15 @@ public partial class LootDropper : Node
 
     private void OnDied()
     {
-        if (Table == null) return;
         if (GetParent() is not Node2D enemy) return;
         var world = enemy.GetParent();
         if (world == null) return;
 
-        var scene = Table.Roll();
+        // La table d'abord (cœurs, rubis...) ; les flèches garanties ne comblent que les tirages vides.
+        PackedScene scene = Table?.Roll();
+        if (scene == null && GuaranteeArrows && _state != null
+            && ArrowLootRule.ShouldDrop(_state.HasItem(GameState.BowItemId), _state.GetQuantity(GameState.BowItemId), ArrowsBelow))
+            scene = GD.Load<PackedScene>(ArrowsScenePath); // mis en cache par Godot
         if (scene == null) return;
 
         var loot = scene.Instantiate<Node2D>();
