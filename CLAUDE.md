@@ -93,11 +93,14 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 | Classe | Propriétés |
 | --- | --- |
 | `Spawn` | `id` (point d'arrivée, ex. `depuis_village`) |
-| `Sortie` | `cible_carte` (chemin de la carte), `cible_spawn` (id du Spawn d'arrivée) |
+| `Sortie` | `cible_carte` (chemin de la carte), `cible_spawn` (id du Spawn d'arrivée), `transition` facultative (`escalier` : posée sur une tuile 56/57, Spawn `depuis_escalier` sur la case voisine ; une Sortie ne se redéclenche pas tant que Brann n'en est pas sorti) |
 | `Ennemi` | `type` (nom de la ressource `EnemyData`), `variante` (`normal` ou `rouge`) |
 | `Coffre` | `id` (unique, ex. `donjon1_coffre_03`), `contenu` (nom d'un `.tres` de `resources/pickups/`, sans extension), `important` (bool : grand coffre, animation plus longue, future sauvegarde auto) |
 | `Porte` | `id`, `type` (`cle`, `grande_cle`, `ennemis`, `interrupteur`) |
-| `Interrupteur` | `id`, `cible` (id de la porte ou de l'élément déclenché), `mode` (`fleche` par défaut, ou `epee`) |
+| `Interrupteur` | `id`, `cible` (id de la porte ou de l'élément déclenché), `mode` (`fleche` par défaut, ou `epee`), `ordre` (entier, 0 = pas d'ordre), `duree` (s, 0 = permanent), `symbole` (`gland`, `racine`, `feuille` ; vide + `epee` = levier). Les interrupteurs de même `cible` forment un groupe : la porte s'ouvre quand tous sont actifs ; hors ordre = tout le groupe revient à zéro |
+| `PlaqueDePression` | rectangle 32×32, `godot_node_type`=`area` : `id`, `cible` (porte `interrupteur`), `declencheur` (`bloc`, `joueur`, `tous` par défaut). Toutes les plaques de même `cible` enfoncées ensemble ouvrent la porte (mémorisée) ; plaques non sauvegardées |
+| `Chute` | rectangle, `godot_node_type`=`area` : `id`, `cible_carte`, `cible_spawn` (`depuis_chute_<salle>`). Trou de passage vers l'étage du dessous, 0 PV perdu ; peint avec les tuiles `trou_passage`, jamais avec les tuiles 58-66 (mortelles) |
+| `Torche` | point : `id`, `etat` (`eteinte`/`allumee`), `permanente` (bool, brasero), `duree` (s, 0 = reste allumée), `cible` (porte `interrupteur`). Allumée : la flèche passe et prend feu ; éteinte : arrête la flèche (une flèche enflammée l'allume). Toutes les torches de même `cible` allumées ensemble ouvrent la porte |
 | `BlocPoussable` | — |
 | `MurFissure` | `id` (s'ouvre avec une bombe, état sauvegardé) |
 | `StatueCorbeau` | `id` (point de sauvegarde) |
@@ -124,6 +127,8 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 - **Calque `Dessus`** : la `Room` lui donne `z_index = 2` pour qu'il passe devant Brann.
 - **Sortie vers une scène pas encore créée** : `Room.MissingExitFallbackScene` (provisoire) ; sinon avertissement et rien ne se passe.
 - **Butin de flèches garanti** : `LootDropper.GuaranteeArrows` (vrai par défaut) lâche des flèches quand Brann a l'arc et moins de `ArrowsBelow` (5) flèches.
+
+**Propriétés de carte (donjons)** : `etage` (`rdc` ou `sous_sol`), `carte_x`, `carte_y` (position dans la grille du donjon, pour la carte du menu pause). **Règles de conception** : un déclencheur (interrupteur, plaque, torche) est toujours dans la même salle qu'une face de sa porte ; un bloc ne peut pas être poussé sur ou à côté (8 voisines) d'un Spawn, d'une `Sortie` ou d'une `Porte` ; option d'aide = multiplicateur des `duree` (torches, cibles) pour le jeune joueur.
 
 Ces conventions sont un point de départ, à ajuster en phase 1. Toute nouvelle convention est ajoutée ici avant d'être utilisée dans une carte ou dans le code.
 
