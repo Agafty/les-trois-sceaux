@@ -267,5 +267,21 @@
    <wangtile tileid="107" wangid="0,2,0,1,0,1,0,1"/>
    <wangtile tileid="108" wangid="0,1,0,1,0,1,0,2"/>
   </wangset>
+  <wangset name="Trous de passage" type="corner" tile="31">
+   <wangcolor name="sol" color="#9a948c" tile="-1" probability="1"/>
+   <wangcolor name="passage" color="#3fc0a8" tile="-1" probability="1"/>
+   <wangtile tileid="0" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="1" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="2" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="31" wangid="0,2,0,2,0,2,0,2"/>
+   <wangtile tileid="32" wangid="0,1,0,2,0,2,0,1"/>
+   <wangtile tileid="33" wangid="0,2,0,1,0,1,0,2"/>
+   <wangtile tileid="34" wangid="0,2,0,2,0,1,0,1"/>
+   <wangtile tileid="35" wangid="0,1,0,1,0,2,0,2"/>
+   <wangtile tileid="36" wangid="0,1,0,2,0,1,0,1"/>
+   <wangtile tileid="37" wangid="0,1,0,1,0,2,0,1"/>
+   <wangtile tileid="38" wangid="0,2,0,1,0,1,0,1"/>
+   <wangtile tileid="39" wangid="0,1,0,1,0,1,0,2"/>
+  </wangset>
  </wangsets>
 </tileset>

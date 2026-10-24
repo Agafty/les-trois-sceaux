@@ -27,6 +27,8 @@ HEX = dict(
     vert='#5a8a3c', vert_c='#6a9a48', vert_s='#3a5a2c',        # mousse
     or_='#c8a050', orange='#f08a28',                           # feuilles
     vase='#b06e40', vase_s='#8a5a34', vase_c='#d6c49c', vase_l='#c98250',
+    ab_l='#c8fff0', ab_c='#7fe8d0', ab_g='#3fc0a8', ab_m='#2a9a9c', ab_d='#1d7488', ab_dd='#14566a',   # trou de passage
+    ab_sol='#35a898', ab_j='#237c8c',
 )
 
 
@@ -542,6 +544,78 @@ def trou(bits):
     return t
 
 
+# ---------------------------------------------------------------- 4b. trou de passage (decoratif, sans collision)
+def trou_passage(bits):
+    """Trou de PASSAGE : on peut y tomber sans mourir (objet Chute). Il ne ressemble pas au trou mortel noir :
+    anneau de racines brunes, fond vert-bleu lumineux, petit sol de dalles visible tres loin en dessous, etincelles.
+    bits = coins occupes par le trou (comme trou()). Le fond est periodique (8 px) : les tuiles voisines se raccordent."""
+    tl, tr, bl, br = bits
+    n, s = not tl and not tr, not bl and not br
+    w, e = not tl and not bl, not tr and not br
+    TH = 5
+
+    def thick(a):                      # epaisseur de l'anneau le long d'un cote (noeuds tous les 16 px)
+        return TH + (1 if a % 16 in (6, 7, 8, 9) else 0) - (1 if a % 16 in (14, 15, 0, 1) else 0)
+
+    def dist(x, y):
+        return min(y if n else 99, 31 - y if s else 99, x if w else 99, 31 - x if e else 99)
+
+    t = new()
+    for y in range(T):
+        for x in range(T):
+            inner = dist(x, y) - TH
+            jx = (x + (4 if (y // 8) % 2 else 0)) % 8       # dalles lointaines de 8 px en quinconce
+            if y % 8 == 0 or jx == 0:
+                col = 'ab_j'
+            elif y % 8 == 1 or jx == 1:
+                col = 'ab_c'
+            else:
+                col = 'ab_sol'
+            if inner < 7:                                   # ombre portee de l'anneau
+                col = {'ab_j': 'ab_dd', 'ab_c': 'ab_d', 'ab_sol': 'ab_m'}[col]
+            elif inner < 11 and col == 'ab_c':
+                col = 'ab_g'
+            t[y][x] = C[col]
+    if n:       # paroi visible sous l'anneau nord (face au joueur) : racines pendantes
+        for y in range(TH + 1, TH + 7):
+            for x in range(T):
+                strand = x % 8 in (2, 3) and (y - TH) < 6 - (x // 8) % 3
+                t[y][x] = C[('terre_s' if x % 8 == 2 else 'racine_s') if strand else 'ab_dd' if y < TH + 4 else 'ab_d']
+    for x, y in ((11, 14), (22, 20), (16, 12), (9, 22), (25, 11), (18, 17)):     # etincelles du fond
+        if dist(x, y) > 11:
+            px(t, x, y, 'ab_l')
+            px(t, x + 1, y, 'ab_c')
+    for y in range(T):          # anneau de racines
+        for x in range(T):
+            hits = []
+            if n and y < thick(x):
+                hits.append((y, thick(x)))
+            if s and 31 - y < thick(x):
+                hits.append((thick(x) - 1 - (31 - y), thick(x)))     # u mesure depuis le bord haut du ruban
+            if w and x < thick(y):
+                hits.append((x, thick(y)))
+            if e and 31 - x < thick(y):
+                hits.append((thick(y) - 1 - (31 - x), thick(y)))
+            if not hits:
+                continue
+            u, th = min(hits)
+            k = u / max(th - 1, 1)
+            col = 'I' if u == 0 or u == th - 1 else 'terre_c' if k < 0.34 else 'terre' if k < 0.62 else 'racine'
+            if u == th - 2:
+                col = 'racine_s'
+            if col in ('terre', 'racine') and (x + y) % 7 == 0:
+                col = 'racine_s' if col == 'racine' else 'racine'     # ecorce
+            t[y][x] = C[col]
+    if n:       # tendrilles qui plongent dans le trou
+        for x0 in (6, 22):
+            for k in range(1, 5):
+                px(t, x0 + (k // 2), TH + 6 + k, 'racine_s' if k < 4 else 'terre_s')
+    for x, y, c in ((3, 1, 'vert'), (4, 1, 'vert_c'), (27, 2, 'vert'), (12, 30, 'vert'), (13, 30, 'vert_c'), (30, 20, 'vert')):
+        if t[y][x] in (C['terre_c'], C['terre']):     # un peu de mousse : l'anneau fait partie du decor du temple
+            t[y][x] = C[c]
+    return t
+
+
 # ---------------------------------------------------------------- 5. ronces
 def ronces_bloc(v):
     t = new()
@@ -908,6 +982,10 @@ def build():
              63: (0, 0, 0, 1), 64: (0, 0, 1, 0), 65: (0, 1, 0, 0), 66: (1, 0, 0, 0)}
     for i, b in holes.items():
         out[i] = trou(b)
+    passages = {31: (1, 1, 1, 1), 32: (0, 0, 1, 1), 33: (1, 1, 0, 0), 34: (0, 1, 0, 1), 35: (1, 0, 1, 0),
+                36: (0, 0, 0, 1), 37: (0, 0, 1, 0), 38: (0, 1, 0, 0), 39: (1, 0, 0, 0)}
+    for i, b in passages.items():
+        out[i] = trou_passage(b)
     out[72], out[73] = ronces_bloc(0), ronces_bloc(1)
     out[74], out[75] = ronces_sol(0), ronces_sol(1)
     edges = [(1, (0, 0, 1, 1)), (2, (1, 1, 0, 0)), (3, (0, 1, 0, 1)), (4, (1, 0, 1, 0)),

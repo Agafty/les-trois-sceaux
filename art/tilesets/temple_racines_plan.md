@@ -42,7 +42,20 @@
 | 28 | `mur_plein` | Mur plein (intérieur d'un mur épais, rien de visible autour) | Murs | pleine |
 | 29 | `mur_diag_a` | Mur en diagonale (mur en haut-gauche et bas-droite) — complète le terrain | Murs | pleine |
 | 30 | `mur_diag_b` | Mur en diagonale (mur en haut-droite et bas-gauche) — complète le terrain | Murs | pleine |
-| 31–39 | — | réserve (vide) | — | — |
+
+## 2b. Trous de passage
+
+| N° | Nom | Rôle | Calque | Collision |
+| --- | --- | --- | --- | --- |
+| 31 | `trou_passage` | Trou de passage : case entière (fond vert-bleu lumineux, sans anneau) | Sol | aucune |
+| 32 | `trou_passage_bord_haut` | Bord haut d'un trou de passage (sol au-dessus) | Sol | aucune |
+| 33 | `trou_passage_bord_bas` | Bord bas d'un trou de passage (sol en dessous) | Sol | aucune |
+| 34 | `trou_passage_bord_gauche` | Bord gauche d'un trou de passage (sol à gauche) | Sol | aucune |
+| 35 | `trou_passage_bord_droite` | Bord droit d'un trou de passage (sol à droite) | Sol | aucune |
+| 36 | `trou_passage_coin_hg` | Coin haut-gauche d'un trou de passage rectangulaire | Sol | aucune |
+| 37 | `trou_passage_coin_hd` | Coin haut-droite d'un trou de passage rectangulaire | Sol | aucune |
+| 38 | `trou_passage_coin_bg` | Coin bas-gauche d'un trou de passage rectangulaire | Sol | aucune |
+| 39 | `trou_passage_coin_bd` | Coin bas-droite d'un trou de passage rectangulaire | Sol | aucune |
 
 ## 3. Ouvertures de porte
 
@@ -134,17 +147,19 @@
 
 ## Terrains Tiled (autotiling)
 
-Quatre terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dans Tiled : panneau **Terrains**, choisir le terrain puis peindre avec le pinceau de terrain (T).
+Cinq terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dans Tiled : panneau **Terrains**, choisir le terrain puis peindre avec le pinceau de terrain (T).
 
 | Terrain | Couleurs | Calque | Tuiles |
 | --- | --- | --- | --- |
 | `Murs` | `mur` (le reste = vide) | Murs | 16–30 |
 | `Trous` | `sol`, `trou` | Sol | 0–2 (sol), 58–66 |
+| `Trous de passage` | `sol`, `passage` | Sol | 0–2 (sol), 31–39 |
 | `Eau` | `sol`, `eau` | Sol | 0–2 (sol), 80–92 |
 | `Eau profonde` | `eau`, `profonde` | Murs | 80 (eau), 96–108 |
 
 - **Murs** : une seule couleur, `mur`. Le sol n'en fait pas partie (il est peint sur le calque Sol), pour que le pinceau ne pose jamais de dalle sur le calque Murs. Pour une salle de 20×11 entourée d'un mur d'une tuile, peindre `mur` sur tous les coins du pourtour : on obtient exactement l'anneau mur_haut / mur_bas / mur_gauche / mur_droite + les 4 coins intérieurs. Un seul coin peint au milieu de la salle donne un bloc de 2×2 tuiles (les 4 coins extérieurs). Les tuiles de mur sont entières : toute la case bloque.
 - **Trous** : comme les murs, toutes les tuiles du terrain sont entièrement « trou » (on tombe partout dedans). Seules les formes rectangulaires sont prévues (pas de coin rentrant) ; les coins rentrants pourront être ajoutés dans la réserve 67–71 si besoin.
+- **Trous de passage** : tuiles 31 à 39, même logique que les trous mortels (rectangles seulement), mais décoratives : anneau de racines brunes, fond vert-bleu lumineux avec un petit sol de dalles très bas, étincelles. Elles sont à peindre sur le calque Sol, sans collision, avec l'objet `Chute` par-dessus ; `HoleRules` ne les reconnaît pas (seules les tuiles 58 à 66 tuent). Pour un trou 2×2 : coin_hg, coin_hd sur la ligne du haut, coin_bg, coin_bd sur celle du bas (ou le pinceau du terrain `Trous de passage`).
 - **Eau / Eau profonde** : le bord passe au **milieu** de la tuile (chaque quart de 16×16 est soit de l'eau, soit l'autre terrain). L'eau peu profonde est sur le calque Sol, sans collision. L'eau profonde est posée sur le calque **Murs** (par-dessus l'eau peu profonde) car elle bloque : sa collision couvre exactement ses quarts d'eau profonde. Il manque volontairement les deux tuiles en diagonale (deux quarts opposés) : éviter de les demander au pinceau.
 - Les dalles fissurées (3, 4) et la terre (5) ne sont pas dans les terrains : à poser à la main.
 
@@ -174,4 +189,5 @@ Quatre terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dan
 | Ronces | `#241a22`, `#3a1a4a`, `#6a2a7a` |
 | Mousse, feuilles | `#5a8a3c`, `#6a9a48`, `#3a5a2c`, `#c8a050`, `#f08a28` |
 | Vase | `#b06e40`, `#8a5a34`, `#d6c49c` |
+| Trou de passage | `#c8fff0`, `#7fe8d0`, `#3fc0a8`, `#2a9a9c`, `#1d7488`, `#14566a`, `#58cdb4`, `#2a8a96` |
 | Nuances ajoutées (dessin final) | dalles `#aaa49a`, `#847e76` ; murs `#44384e`, `#2e2638`, `#8a7a98`, `#645672` ; eau `#7a9ac0`, `#b8d0e8`, `#324d7a`, `#1e2e4e` ; vase `#c98250` |

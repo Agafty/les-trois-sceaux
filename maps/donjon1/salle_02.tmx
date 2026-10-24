@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="13">
+ <properties>
+  <property name="carte_x" type="int" value="1"/>
+  <property name="carte_y" type="int" value="1"/>
+  <property name="etage" value="rdc"/>
+ </properties>
  <tileset firstgid="1" source="../tilesets/temple_racines.tsx"/>
  <layer id="1" name="Sol" width="20" height="11">
   <data encoding="csv">

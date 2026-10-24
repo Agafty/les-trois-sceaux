@@ -26,11 +26,17 @@ fermée ; elle prend feu en traversant une torche allumée ou un brasero et allu
 une porte `ennemis` s'ouvre quand la salle est nettoyée (impossible tant qu'il reste un Lutin et qu'on
 n'a pas l'arc) ; les blocs reviennent à leur place à chaque chargement de salle.
 
-La lecture des vraies cartes .tmx sera ajoutée à l'étape 2 (les anciennes cartes ne correspondent plus au plan).
+Étape 2 : relit aussi les 16 cartes .tmx voisines (section 1b) : XML valide, calques et GID, ids d'objets,
+propriétés de carte (etage, carte_x, carte_y), aperçu reconstruit depuis les calques et les objets IDENTIQUE à
+celui du plan, objets (classe, position, propriétés) identiques aux puces « Objets Tiled » du plan, rectangles de
+zone en godot_node_type=area, raccords entre cartes (cible, Spawn d'arrivée, porte de retour) et parcours (BFS)
+sur la grille de collision des tuiles. Les parcours d'état (2 à 6) tournent ensuite sur ces aperçus, devenus
+identiques à ceux des cartes.
 """
 import re
 import sys
 import time
+import xml.etree.ElementTree as ET
 from collections import deque
 from itertools import permutations
 from pathlib import Path
@@ -904,6 +910,440 @@ def autotest(salles_ascii):
         err("l'auto-test échoue : la limite de temps n'est pas prise en compte")
 
 
+# --- Lecture des objets du plan (puces « Objets Tiled » de chaque salle) --------------------------------------
+INT_PROPS = {"ordre", "duree"}
+BOOL_PROPS = {"important", "permanente"}
+
+
+def _valeur(cle, v):
+    v = v.strip("`")
+    if cle in BOOL_PROPS:
+        return v == "true"
+    if cle in INT_PROPS:
+        return int(v)
+    return v
+
+
+def lire_ligne_objet(ligne):
+    """Une puce du plan -> dict(cls, nom, geom=(genre, nombres...), props) ou None."""
+    m = re.match(r"- `(\w+)` (.*)$", ligne)
+    cls = nom = None
+    if m:
+        cls, reste = m.groups()
+    else:
+        m = re.match(r"- Rectangle nommé `(\w+)` (.*)$", ligne)
+        if not m:
+            return None
+        nom, reste = m.groups()
+    geom_txt, _, props_txt = reste.partition(" : ")
+    g = re.search(r"\((\d+),(\d+)\) -> centre \((\d+),(\d+)\)", geom_txt)
+    if g:
+        geom = ("point", int(g.group(3)), int(g.group(4)))
+    else:
+        g = re.search(r"point \((\d+),(\d+)\)", geom_txt)
+        if g:
+            geom = ("point", int(g.group(1)), int(g.group(2)))
+        else:
+            g = re.search(r"\((\d+),(\d+),(\d+),(\d+)\)", geom_txt)
+            if not g:
+                return None
+            geom = ("rect",) + tuple(int(x) for x in g.groups())
+    props = {}
+    if cls:
+        for k, v in re.findall(r"`(\w+)`=(`[^`]*`|[^\s,]+)", props_txt):
+            props[k] = _valeur(k, v)
+    else:
+        for k, v in re.findall(r"(\w+)=(\w+)", props_txt):
+            props[k] = _valeur(k, v)
+    return dict(cls=cls, nom=nom, geom=geom, props=props)
+
+
+def lire_objets_plan(chemin):
+    texte = Path(chemin).read_text(encoding="utf-8")
+    res = {}
+    for m in re.finditer(r"<!--\s*(salle_\w+)\s*-->", texte):
+        fin = texte.find("\n### ", m.end())
+        bloc = texte[m.end(): fin if fin >= 0 else len(texte)]
+        res[m.group(1)] = [o for o in (lire_ligne_objet(l) for l in bloc.split("\n") if l.startswith("- ")) if o]
+    return res
+
+
+def lire_positions_plan(chemin):
+    """Table du §3 : salle -> (etage, carte_x, carte_y)."""
+    texte = Path(chemin).read_text(encoding="utf-8")
+    res = {}
+    for etage, salle, x, y in re.findall(r"`(rdc|sous_sol)` \| (\w+) \| \((\d+), (\d+)\)", texte):
+        res["salle_" + salle] = (etage, int(x), int(y))
+    return res
+
+
+# --- Lecture des cartes .tmx ---------------------------------------------------------------------------------
+GRAND_TILESET = 128                      # tilecount de temple_racines.tsx (et de la variante sous-sol)
+NOMS_COUCHES = [("layer", "Sol"), ("layer", "Decor"), ("layer", "Murs"), ("objectgroup", "Objets"),
+                ("layer", "Dessus")]
+CLASSES_ZONE = {"Sortie", "PlaqueDePression", "Chute"}
+SCENE_RE = re.compile(r"res://scenes/rooms/donjon1_(salle_\w+?)_room\.tscn$")
+MUR_IDS = set(range(16, 31)) | {9, 10, 11}      # 9 à 11 : fresque du sous-sol (mur nord de la salle 11)
+PORTE_TUILES = {40: "N", 41: "S", 42: "O", 43: "E"}
+TYPE_PORTE_CAR = {"cle": "D", "grande_cle": "G", "ennemis": "N", "interrupteur": "I"}
+
+
+def _props(el):
+    res = {}
+    if el is None:
+        return res
+    for p in el.findall("property"):
+        t, v = p.get("type", "string"), p.get("value")
+        res[p.get("name")] = (int(v) if t == "int" else (v == "true") if t == "bool" else v)
+    return res
+
+
+def lire_tmx(chemin):
+    root = ET.parse(chemin).getroot()
+    t = dict(chemin=str(chemin), attrs=dict(root.attrib), w=int(root.get("width")), h=int(root.get("height")),
+             props=_props(root.find("properties")), tilesets=[(ts.get("firstgid"), ts.get("source"))
+                                                             for ts in root.findall("tileset")],
+             couches=[], layers={}, objets=[], ids_couches=[])
+    for el in root:
+        if el.tag in ("layer", "objectgroup"):
+            t["couches"].append((el.tag, el.get("name")))
+            t["ids_couches"].append(int(el.get("id")))
+        if el.tag == "layer":
+            data = el.find("data")
+            t["layers"][el.get("name")] = dict(enc=data.get("encoding"), w=int(el.get("width")),
+                                               h=int(el.get("height")),
+                                               v=[int(x) for x in data.text.replace("\n", "").split(",") if x.strip()])
+        elif el.tag == "objectgroup":
+            for o in el.findall("object"):
+                num = lambda k: (float(o.get(k)) if o.get(k) is not None else None)
+                t["objets"].append(dict(id=int(o.get("id")), cls=o.get("type") or o.get("class"), nom=o.get("name"),
+                                        x=num("x"), y=num("y"), w=num("width"), h=num("height"),
+                                        point=o.find("point") is not None, props=_props(o.find("properties"))))
+    return t
+
+
+def lire_collisions_tsx(chemin):
+    """ids de tuiles dont la collision couvre toute la case, et ids à collision partielle."""
+    pleines, partielles = set(), set()
+    for tile in ET.parse(chemin).getroot().iter("tile"):
+        objs = [(float(o.get("width", 0)), float(o.get("height", 0))) for o in tile.iter("object")]
+        if not objs:
+            continue
+        (pleines if any(w >= 32 and h >= 32 for w, h in objs) else partielles).add(int(tile.get("id")))
+    return pleines, partielles
+
+
+def case_de(o):
+    """Case (col, ligne) d'un objet : le point, ou le centre du rectangle."""
+    if o["point"] or o["w"] is None:
+        return int(o["x"] // 32), int(o["y"] // 32)
+    return int((o["x"] + o["w"] / 2) // 32), int((o["y"] + o["h"] / 2) // 32)
+
+
+def apercu_tmx(t):
+    """Aperçu en texte (même légende que plan.md) reconstruit depuis les calques et les objets."""
+    w, h = t["w"], t["h"]
+    sol, murs = t["layers"]["Sol"]["v"], t["layers"]["Murs"]["v"]
+    g = [["."] * w for _ in range(h)]
+    for r in range(h):
+        for c in range(w):
+            s, m = sol[r * w + c] - 1, murs[r * w + c] - 1
+            if s == 56:
+                g[r][c] = "^"
+            elif s == 57:
+                g[r][c] = "v"
+            elif 58 <= s <= 66:
+                g[r][c] = "~"
+            elif 31 <= s <= 39:
+                g[r][c] = "T"
+            if m in MUR_IDS:
+                g[r][c] = "#"
+            elif m == 72 or m == 73:
+                g[r][c] = "r"
+            elif m == 113:
+                g[r][c] = "O"
+            elif m in PORTE_TUILES:
+                g[r][c] = "?"
+    # blocs 2x2 de coins extérieurs (24 25 / 26 27) = pilier massif
+    for r in range(h - 1):
+        for c in range(w - 1):
+            if [murs[(r + a) * w + c + b] - 1 for a in (0, 1) for b in (0, 1)] == [24, 25, 26, 27]:
+                for a in (0, 1):
+                    for b in (0, 1):
+                        g[r + a][c + b] = "O"
+    ordre = ["Sortie", "indice", "Porte", "StatueCorbeau", "Ramassable", "PlaqueDePression", "BlocPoussable",
+             "Coffre", "Torche", "Interrupteur", "Ennemi", "Spawn"]
+
+    def rang(o):
+        k = o["cls"] or ("indice" if (o["nom"] or "").startswith("indice") else "")
+        return ordre.index(k) if k in ordre else -1
+    for o in sorted(t["objets"], key=rang):
+        if rang(o) < 0:
+            continue
+        cases = [case_de(o)]
+        if o["cls"] is None and o["w"]:                       # rectangle d'indice : toutes ses cases
+            cases = [(c, r) for r in range(int(o["y"]) // 32, int(o["y"] + o["h"]) // 32)
+                     for c in range(int(o["x"]) // 32, int(o["x"] + o["w"]) // 32)]
+        for (c, r) in cases:
+            if not (0 <= c < w and 0 <= r < h):
+                continue
+            cl, p = o["cls"], o["props"]
+            if cl == "Sortie":
+                if p.get("transition") != "escalier":
+                    g[r][c] = "X"
+            elif cl is None:
+                if g[r][c] == ".":
+                    g[r][c] = "i"
+            elif cl == "Porte":
+                g[r][c] = TYPE_PORTE_CAR.get(p.get("type"), "?")
+            elif cl == "StatueCorbeau":
+                g[r][c] = "R"
+            elif cl == "Ramassable":
+                g[r][c] = "F"
+            elif cl == "PlaqueDePression":
+                g[r][c] = "p"
+            elif cl == "BlocPoussable":
+                g[r][c] = "B"
+            elif cl == "Coffre":
+                g[r][c] = "C"
+            elif cl == "Torche":
+                g[r][c] = "Y" if p.get("etat") == "allumee" else "f"
+            elif cl == "Interrupteur":
+                g[r][c] = "l" if p.get("mode") == "epee" else "S"
+            elif cl == "Ennemi":
+                g[r][c] = "L" if p.get("type") == "lutin_des_branches" else "E"
+            elif cl == "Spawn":
+                g[r][c] = "P"
+    return g
+
+
+def objets_normalises_plan(liste):
+    res = []
+    for o in liste:
+        res.append((o["cls"], o["nom"], tuple(o["geom"]), tuple(sorted(o["props"].items()))))
+    return sorted(res, key=repr)
+
+
+def objets_normalises_tmx(t):
+    res = []
+    for o in t["objets"]:
+        if o["cls"] is None and o["nom"] in ("boss_sylve", "pilier"):
+            continue                                       # conventions de la salle du boss (hors plan)
+        geom = ("point", int(o["x"]), int(o["y"])) if o["point"] else \
+            ("rect", int(o["x"]), int(o["y"]), int(o["w"]), int(o["h"]))
+        res.append((o["cls"], o["nom"], geom, tuple(sorted(o["props"].items()))))
+    return sorted(res, key=repr)
+
+
+def verifier_tmx(dossier, plan_ascii, plan_objets, positions):
+    print("\n== 1b. Cartes .tmx : validité, aperçus comparés au plan, objets, raccords, parcours ==")
+    tmx = {}
+    for n in SALLES:
+        f = dossier / (n + ".tmx")
+        if not f.exists():
+            err("carte manquante : %s.tmx" % n)
+            continue
+        try:
+            tmx[n] = lire_tmx(f)
+        except Exception as e:                              # noqa: BLE001
+            err("%s.tmx illisible : %s" % (n, e))
+    tsx_cache = {}
+    nb_obj = nb_spawn = 0
+    sources = set()
+    for n, t in tmx.items():
+        h = 22 if n == SALLE_BOSS else 11
+        a = t["attrs"]
+        for k, v in (("version", "1.10"), ("orientation", "orthogonal"), ("tilewidth", "32"), ("tileheight", "32"),
+                     ("infinite", "0"), ("width", "20"), ("height", str(h))):
+            if a.get(k) != v:
+                err("%s : attribut %s=%r au lieu de %r" % (n, k, a.get(k), v))
+        if t["couches"] != NOMS_COUCHES:
+            err("%s : calques %s au lieu de %s" % (n, t["couches"], NOMS_COUCHES))
+        if len(set(t["ids_couches"])) != len(t["ids_couches"]) or int(a["nextlayerid"]) <= max(t["ids_couches"]):
+            err("%s : ids de calques ou nextlayerid incohérents" % n)
+        ids = [o["id"] for o in t["objets"]]
+        if len(set(ids)) != len(ids) or int(a["nextobjectid"]) <= max(ids):
+            err("%s : ids d'objets en double ou nextobjectid trop petit" % n)
+        if len(t["tilesets"]) != 1 or t["tilesets"][0][0] != "1":
+            err("%s : un seul tileset attendu avec firstgid=1 (%s)" % (n, t["tilesets"]))
+            continue
+        src = t["tilesets"][0][1]
+        sources.add((n, src))
+        attendu_ts = "../tilesets/temple_racines_sous_sol.tsx" if n[6:].isdigit() and int(n[6:]) in NUMEROS_B1             else "../tilesets/temple_racines.tsx"
+        if src != attendu_ts:
+            err("%s : tileset %s au lieu de %s" % (n, src, attendu_ts))
+        if not (dossier / src).resolve().exists():
+            err("%s : tileset introuvable : %s" % (n, src))
+            continue
+        if src not in tsx_cache:
+            tsx_cache[src] = lire_collisions_tsx((dossier / src).resolve())
+        for nom_c, c in t["layers"].items():
+            if c["enc"] != "csv":
+                err("%s : calque %s non CSV" % (n, nom_c))
+            if len(c["v"]) != 20 * h or c["w"] != 20 or c["h"] != h:
+                err("%s : calque %s de %d valeurs au lieu de %d" % (n, nom_c, len(c["v"]), 20 * h))
+            mauvais = [g for g in c["v"] if g < 0 or g > GRAND_TILESET]
+            if mauvais:
+                err("%s : calque %s : GID hors tileset (%s)" % (n, nom_c, sorted(set(mauvais))[:5]))
+        pos = positions.get(n)
+        if pos is None:
+            err("%s : position absente de la table du plan" % n)
+        else:
+            p = t["props"]
+            if (p.get("etage"), p.get("carte_x"), p.get("carte_y")) != pos:
+                err("%s : propriétés de carte %s au lieu de %s" % (n, (p.get("etage"), p.get("carte_x"),
+                                                                     p.get("carte_y")), pos))
+        # aperçu comparé au plan
+        ap = apercu_tmx(t)
+        for r in range(h):
+            if "".join(ap[r]) != "".join(plan_ascii[n][r]):
+                err("%s : ligne %d de l'aperçu .tmx %r différente du plan %r" % (n, r, "".join(ap[r]),
+                                                                                  "".join(plan_ascii[n][r])))
+        # objets comparés au plan
+        a_plan, a_tmx = objets_normalises_plan(plan_objets[n]), objets_normalises_tmx(t)
+        if a_plan != a_tmx:
+            for x in a_plan:
+                if x not in a_tmx:
+                    err("%s : objet du plan absent de la carte : %s" % (n, x))
+            for x in a_tmx:
+                if x not in a_plan:
+                    err("%s : objet de la carte absent du plan : %s" % (n, x))
+        nb_obj += len(a_tmx)
+        nb_spawn += sum(1 for o in t["objets"] if o["cls"] == "Spawn")
+        # classes de zone et rectangles d'indice
+        for o in t["objets"]:
+            zone = o["cls"] in CLASSES_ZONE or (o["cls"] is None and (o["nom"] or "").startswith("indice"))
+            if zone and o["props"].get("godot_node_type") != "area":
+                err("%s : objet %d (%s) sans godot_node_type=area" % (n, o["id"], o["cls"] or o["nom"]))
+            if o["cls"] in ("Sortie", "Porte", "PlaqueDePression") and (o["w"], o["h"]) != (32, 32):
+                err("%s : objet %d (%s) pas en 32x32" % (n, o["id"], o["cls"]))
+            if o["cls"] == "Porte" and "godot_node_type" in o["props"]:
+                err("%s : une Porte ne doit pas avoir godot_node_type" % n)
+        # Murs : tuile d'ouverture <-> Sortie, et la bonne orientation
+        w = 20
+        murs, sol = t["layers"]["Murs"]["v"], t["layers"]["Sol"]["v"]
+        sorties = {case_de(o): o for o in t["objets"] if o["cls"] == "Sortie"}
+        for r in range(h):
+            for c in range(w):
+                m = murs[r * w + c] - 1
+                if m in PORTE_TUILES:
+                    if (c, r) != cellule_porte(PORTE_TUILES[m], h) or (c, r) not in sorties:
+                        err("%s : tuile d'ouverture %d en (%d,%d) sans Sortie ou mal placée" % (n, m, c, r))
+        for (c, r), o in sorties.items():
+            if o["props"].get("transition") == "escalier":
+                if sol[r * w + c] - 1 not in (56, 57):
+                    err("%s : Sortie d'escalier en (%d,%d) hors d'une tuile 56/57" % (n, c, r))
+            elif murs[r * w + c] - 1 not in PORTE_TUILES:
+                err("%s : Sortie en (%d,%d) hors d'une tuile d'ouverture" % (n, c, r))
+        # Dessus : encadrement des portes (porte_xxx_dessus = tuile d'ouverture + 4)
+        dessus = t["layers"]["Dessus"]["v"]
+        for (c, r), o in sorties.items():
+            m = murs[r * w + c] - 1
+            if m in PORTE_TUILES and dessus[r * w + c] - 1 != m + 4:
+                err("%s : encadrement (Dessus) absent en (%d,%d)" % (n, c, r))
+        # fresque : tuiles 9, 10, 11 (gland, racine, feuille) sur le mur nord de la salle 11 et nulle part ailleurs
+        fresque = [(c, r) for r in range(h) for c in range(w) if murs[r * w + c] - 1 in (9, 10, 11)]
+        if n == "salle_11":
+            if [murs[8 + k] - 1 for k in range(3)] != [9, 10, 11] or len(fresque) != 3:
+                err("salle_11 : fresque (tuiles 9, 10, 11) attendue en (8..10, 0)")
+        elif fresque:
+            err("%s : tuiles de fresque hors de la salle 11" % n)
+        # Chute : rectangle = tuiles trou_passage exactes
+        chutes = [o for o in t["objets"] if o["cls"] == "Chute"]
+        cases_t = {(c, r) for r in range(h) for c in range(w) if 31 <= sol[r * w + c] - 1 <= 39}
+        cases_c = set()
+        for o in chutes:
+            cases_c |= {(c, r) for r in range(int(o["y"]) // 32, int(o["y"] + o["h"]) // 32)
+                        for c in range(int(o["x"]) // 32, int(o["x"] + o["w"]) // 32)}
+        if cases_t != cases_c:
+            err("%s : les rectangles Chute ne couvrent pas exactement les tuiles trou_passage" % n)
+        # escaliers : Spawn depuis_escalier sur la case voisine
+        for (c, r), o in sorties.items():
+            if o["props"].get("transition") == "escalier":
+                sp = [s for s in t["objets"] if s["cls"] == "Spawn" and s["props"].get("id") == "depuis_escalier"]
+                ok = sp and abs(case_de(sp[0])[0] - c) + abs(case_de(sp[0])[1] - r) == 1
+                if not ok:
+                    err("%s : Spawn depuis_escalier absent ou pas sur la case voisine de l'escalier" % n)
+        # ids de Spawn uniques, objets au centre d'une case
+        sp_ids = [s["props"].get("id") for s in t["objets"] if s["cls"] == "Spawn"]
+        if len(sp_ids) != len(set(sp_ids)):
+            err("%s : ids de Spawn en double %s" % (n, sp_ids))
+        for s in t["objets"]:
+            if s["cls"] in ("Spawn", "Coffre", "Torche", "Interrupteur", "BlocPoussable", "StatueCorbeau") and \
+                    ((s["x"] - 16) % 32 or (s["y"] - 16) % 32):
+                err("%s : objet %d (%s) pas au centre d'une case" % (n, s["id"], s["cls"]))
+    # raccords entre cartes : la cible existe, son Spawn existe, et la porte revient
+    for n, t in tmx.items():
+        for o in t["objets"]:
+            if o["cls"] not in ("Sortie", "Chute"):
+                continue
+            cc, cs = o["props"].get("cible_carte", ""), o["props"].get("cible_spawn", "")
+            m = SCENE_RE.match(cc)
+            if not m:
+                if "foret_temple_room" not in cc:
+                    err("%s : cible_carte inattendue %r" % (n, cc))
+                continue
+            dest = m.group(1)
+            if dest not in tmx:
+                err("%s : la carte cible %s n'existe pas" % (n, dest))
+                continue
+            if cs not in [s["props"].get("id") for s in tmx[dest]["objets"] if s["cls"] == "Spawn"]:
+                err("%s -> %s : Spawn %r introuvable dans la carte d'arrivée" % (n, dest, cs))
+            if o["cls"] == "Sortie":
+                retour = [s for s in tmx[dest]["objets"] if s["cls"] == "Sortie" and
+                          (SCENE_RE.match(s["props"].get("cible_carte", "")) or [None, None])[1] == n]
+                if not retour:
+                    err("%s -> %s : pas de Sortie de retour dans %s" % (n, dest, dest))
+    # parcours sur la grille de collision des .tmx (toutes portes ouvertes, blocs à leur place)
+    for n, t in tmx.items():
+        if t["tilesets"][0][1] not in tsx_cache:
+            continue
+        pleines, partielles = tsx_cache[t["tilesets"][0][1]]
+        w, h = 20, t["h"]
+        murs, sol = t["layers"]["Murs"]["v"], t["layers"]["Sol"]["v"]
+        bloque = set()
+        for r in range(h):
+            for c in range(w):
+                m, s = murs[r * w + c] - 1, sol[r * w + c] - 1
+                if m in pleines or 58 <= s <= 66 or 31 <= s <= 39:
+                    bloque.add((c, r))
+        for o in t["objets"]:
+            if o["cls"] in ("Coffre", "Torche", "Interrupteur", "BlocPoussable", "StatueCorbeau"):
+                bloque.add(case_de(o))
+        spawns = [case_de(o) for o in t["objets"] if o["cls"] == "Spawn"]
+        if not spawns:
+            err("%s : aucun Spawn" % n)
+            continue
+        vus, file = {spawns[0]}, deque([spawns[0]])
+        while file:
+            c, r = file.popleft()
+            for dc, dr in DIRS:
+                q = (c + dc, r + dr)
+                if 0 <= q[0] < w and 0 <= q[1] < h and q not in vus and q not in bloque:
+                    vus.add(q)
+                    file.append(q)
+        voisin = lambda cel: any((cel[0] + dc, cel[1] + dr) in vus for dc, dr in DIRS)
+        for o in t["objets"]:
+            cel, cl = case_de(o), o["cls"]
+            if cl in ("Spawn", "Sortie", "Ramassable", "PlaqueDePression", "Porte", "Ennemi") and cel not in vus:
+                err("%s : %s %s en %s inatteignable depuis le premier Spawn (portes ouvertes)"
+                    % (n, cl, o["props"].get("id", ""), cel))
+            if cl == "Interrupteur" and o["props"].get("mode") != "epee":
+                continue                      # cible de flèche : se tire de loin (portée vérifiée par l'énigme)
+            if cl in ("Coffre", "Torche", "Interrupteur", "BlocPoussable", "StatueCorbeau") and not voisin(cel):
+                err("%s : %s %s en %s inaccessible (aucune case voisine atteignable)"
+                    % (n, cl, o["props"].get("id", ""), cel))
+    par_source = {}
+    for n, src in sources:
+        par_source.setdefault(src, []).append(n[6:])
+    print("  %d cartes .tmx lues (%d objets, %d Spawn) : XML, calques, GID, ids, propriétés de carte, aperçus "
+          "identiques à ceux du plan, objets identiques aux puces du plan, raccords et parcours (collisions des "
+          "tuiles) : %s" % (len(tmx), nb_obj, nb_spawn, "OK" if not erreurs else "voir les erreurs"))
+    for src, noms in sorted(par_source.items()):
+        print("  tileset %s : salles %s" % (src, ", ".join(sorted(noms))))
+    return tmx
+
+
 # --- Structure des aperçus ----------------------------------------------------------------------------------
 def verifier_structure(salles):
     print("== 1. Structure et cohérence des aperçus ==")
@@ -1108,6 +1548,8 @@ def main():
     chemin_plan = args[0] if args else dossier / "plan.md"
     plan = lire_plan(chemin_plan)
     verifier_structure(plan)
+    if not erreurs:
+        verifier_tmx(dossier, plan, lire_objets_plan(chemin_plan), lire_positions_plan(chemin_plan))
     if not erreurs:
         res = verifier_donjon(plan)
         if not erreurs:

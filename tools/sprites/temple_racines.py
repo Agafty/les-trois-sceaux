@@ -502,6 +502,11 @@ def feuilles(v):
     return t
 
 
+def trou_passage(bits):
+    """Plan : meme aplat que le trou (le dessin final est dans temple_racines_final.trou_passage)."""
+    return trou(bits)
+
+
 # ---------------------------------------------------------------- catalogue des tuiles
 FULL = [(0, 0, 32, 32)]
 COINS = {'hg': 'haut-gauche', 'hd': 'haut-droite', 'bg': 'bas-gauche', 'bd': 'bas-droite'}
@@ -546,7 +551,7 @@ add(7, 'racine_v', 'Racine verticale (se raccorde en haut et en bas)', 'Decor', 
 add(8, 'racine_touffe', 'Nœud de racines (départ ou fin d\'une racine)', 'Decor', None, racine('t'))
 
 # 2. Murs (lignes 2-4) — tuiles entières, collision pleine
-group('2. Murs', 16, 39)
+group('2. Murs', 16, 30)
 walls = [
     (16, 'mur_haut', 'Mur du haut de la salle : sol en dessous, face avant visible', (1, 1, 0, 0)),
     (17, 'mur_bas', 'Mur du bas de la salle : sol au-dessus', (0, 0, 1, 1)),
@@ -566,6 +571,25 @@ walls = [
 ]
 for i, nom, role, bits in walls:
     add(i, nom, role, 'Murs', FULL, wall(bits), ('Murs', bits))
+
+# 2b. Trous de passage (réserve 31-39) — décoratifs, sans collision ; la chute est l'objet Chute
+group('2b. Trous de passage', 31, 39)
+PASSAGES = [
+    (31, 'trou_passage', 'Trou de passage : case entière (fond vert-bleu lumineux, sans anneau)', (1, 1, 1, 1)),
+    (32, 'trou_passage_bord_haut', 'Bord haut d\'un trou de passage (sol au-dessus)', (0, 0, 1, 1)),
+    (33, 'trou_passage_bord_bas', 'Bord bas d\'un trou de passage (sol en dessous)', (1, 1, 0, 0)),
+    (34, 'trou_passage_bord_gauche', 'Bord gauche d\'un trou de passage (sol à gauche)', (0, 1, 0, 1)),
+    (35, 'trou_passage_bord_droite', 'Bord droit d\'un trou de passage (sol à droite)', (1, 0, 1, 0)),
+    (36, 'trou_passage_coin_hg', 'Coin haut-gauche d\'un trou de passage rectangulaire', (0, 0, 0, 1)),
+    (37, 'trou_passage_coin_hd', 'Coin haut-droite d\'un trou de passage rectangulaire', (0, 0, 1, 0)),
+    (38, 'trou_passage_coin_bg', 'Coin bas-gauche d\'un trou de passage rectangulaire', (0, 1, 0, 0)),
+    (39, 'trou_passage_coin_bd', 'Coin bas-droite d\'un trou de passage rectangulaire', (1, 0, 0, 0)),
+]
+WANG['Trous de passage'] = dict(colors=[('sol', '#9a948c'), ('passage', '#3fc0a8')], tile=31, tiles={})
+for v in range(3):
+    WANG['Trous de passage']['tiles'][v] = (1, 1, 1, 1)
+for i, nom, role, bits in PASSAGES:
+    add(i, nom, role, 'Sol', None, trou_passage(bits), ('Trous de passage', tuple(2 if b else 1 for b in bits)))
 
 # 3. Portes (lignes 5-6)
 group('3. Ouvertures de porte', 40, 55)
@@ -757,11 +781,12 @@ def build_md():
         out.append('')
     out += [
         '## Terrains Tiled (autotiling)', '',
-        'Quatre terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dans Tiled : panneau '
+        'Cinq terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dans Tiled : panneau '
         '**Terrains**, choisir le terrain puis peindre avec le pinceau de terrain (T).', '',
         '| Terrain | Couleurs | Calque | Tuiles |', '| --- | --- | --- | --- |',
         '| `Murs` | `mur` (le reste = vide) | Murs | 16–30 |',
         '| `Trous` | `sol`, `trou` | Sol | 0–2 (sol), 58–66 |',
+        '| `Trous de passage` | `sol`, `passage` | Sol | 0–2 (sol), 31–39 |',
         '| `Eau` | `sol`, `eau` | Sol | 0–2 (sol), 80–92 |',
         '| `Eau profonde` | `eau`, `profonde` | Murs | 80 (eau), 96–108 |', '',
         '- **Murs** : une seule couleur, `mur`. Le sol n\'en fait pas partie (il est peint sur le calque Sol), '
@@ -773,6 +798,11 @@ def build_md():
         '- **Trous** : comme les murs, toutes les tuiles du terrain sont entièrement « trou » (on tombe partout '
         'dedans). Seules les formes rectangulaires sont prévues (pas de coin rentrant) ; les coins rentrants '
         'pourront être ajoutés dans la réserve 67–71 si besoin.',
+        '- **Trous de passage** : tuiles 31 à 39, même logique que les trous mortels (rectangles seulement), mais '
+        'décoratives : anneau de racines brunes, fond vert-bleu lumineux avec un petit sol de dalles très bas, '
+        'étincelles. Elles sont à peindre sur le calque Sol, sans collision, avec l\'objet `Chute` par-dessus ; '
+        '`HoleRules` ne les reconnaît pas (seules les tuiles 58 à 66 tuent). Pour un trou 2×2 : coin_hg, coin_hd '
+        'sur la ligne du haut, coin_bg, coin_bd sur celle du bas (ou le pinceau du terrain `Trous de passage`).',
         '- **Eau / Eau profonde** : le bord passe au **milieu** de la tuile (chaque quart de 16×16 est soit de '
         'l\'eau, soit l\'autre terrain). L\'eau peu profonde est sur le calque Sol, sans collision. L\'eau '
         'profonde est posée sur le calque **Murs** (par-dessus l\'eau peu profonde) car elle bloque : sa '
@@ -806,7 +836,8 @@ def build_md():
         '| Eau | `#3c5a8a` (peu profonde), `#263a5e` (profonde), `#b8a8c0` (écume) |',
         '| Ronces | `#241a22`, `#3a1a4a`, `#6a2a7a` |',
         '| Mousse, feuilles | `#5a8a3c`, `#6a9a48`, `#3a5a2c`, `#c8a050`, `#f08a28` |',
-        '| Vase | `#b06e40`, `#8a5a34`, `#d6c49c` |']
+        '| Vase | `#b06e40`, `#8a5a34`, `#d6c49c` |',
+        '| Trou de passage | `#c8fff0`, `#7fe8d0`, `#3fc0a8`, `#2a9a9c`, `#1d7488`, `#14566a`, `#58cdb4`, `#2a8a96` |']
     if not PLAN:
         out += ['| Nuances ajoutées (dessin final) | dalles `#aaa49a`, `#847e76` ; murs `#44384e`, `#2e2638`, '
                 '`#8a7a98`, `#645672` ; eau `#7a9ac0`, `#b8d0e8`, `#324d7a`, `#1e2e4e` ; vase `#c98250` |']
@@ -867,6 +898,9 @@ def build_preview():
             b = corner_resolve(prof, x, y)
             if any(b):
                 layers['Murs'][(x, y)] = by_bits('Eau profonde', tuple(2 if v else 1 for v in b))
+    # trou de passage 2x2 (4 tuiles de coin posees a la main, en haut a droite du cerf)
+    for pos, i in (((13, 1), 36), ((14, 1), 37), ((13, 2), 38), ((14, 2), 39)):
+        layers['Sol'][pos] = i
     # trou rectangulaire
     trous = {(x, y): 1 for x in range(13, 16) for y in range(6, 8)}
     for y in range(H):

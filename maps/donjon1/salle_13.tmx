@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="11">
+ <properties>
+  <property name="carte_x" type="int" value="3"/>
+  <property name="carte_y" type="int" value="2"/>
+  <property name="etage" value="sous_sol"/>
+ </properties>
+ <tileset firstgid="1" source="../tilesets/temple_racines_sous_sol.tsx"/>
+ <layer id="1" name="Sol" width="20" height="11">
+  <data encoding="csv">
+4,3,3,3,4,3,2,1,4,1,1,1,2,1,2,1,1,1,3,1,
+5,1,5,3,1,2,2,2,5,2,3,1,3,3,1,2,4,1,2,2,
+2,2,2,1,1,2,2,1,1,1,1,3,1,2,2,2,1,1,5,1,
+5,1,1,3,2,3,1,1,2,4,1,4,3,5,1,2,1,2,2,2,
+2,1,2,1,1,5,4,64,60,60,60,60,60,65,3,2,3,1,1,1,
+2,3,2,4,2,3,2,62,59,59,59,59,59,63,1,1,3,3,3,1,
+2,2,2,2,1,1,6,62,59,59,59,59,59,63,2,1,1,1,1,5,
+1,2,2,3,3,6,6,62,59,59,59,59,59,63,2,1,1,2,3,1,
+1,2,1,2,4,6,6,66,61,61,61,61,61,67,2,2,1,5,2,5,
+2,4,2,2,4,2,6,6,6,2,2,3,1,1,2,1,1,2,2,2,
+1,2,2,1,1,1,2,1,2,2,1,2,2,2,1,1,3,2,4,2
+</data>
+ </layer>
+ <layer id="2" name="Decor" width="20" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,9,0,0,0,9,0,0,0,0,0,9,0,0,118,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,119,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,119,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="3" name="Murs" width="20" height="11">
+  <data encoding="csv">
+21,17,17,17,17,17,17,17,17,41,17,17,17,17,17,17,17,17,17,22,
+19,0,0,0,29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,29,0,0,114,0,0,0,0,0,114,0,0,0,0,0,20,
+19,0,0,0,17,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,29,0,0,0,0,0,114,0,0,0,0,0,0,0,0,20,
+23,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,24
+</data>
+ </layer>
+ <objectgroup id="4" name="Objets">
+  <object id="1" type="Sortie" x="288" y="0" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/donjon1_salle_11_room.tscn"/>
+    <property name="cible_spawn" value="depuis_sud"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="2" type="Spawn" x="304" y="80">
+   <properties>
+    <property name="id" value="depuis_nord"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="3" type="Sortie" x="0" y="160" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/donjon1_salle_14_room.tscn"/>
+    <property name="cible_spawn" value="depuis_est"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="4" type="Porte" x="0" y="160" width="32" height="32">
+   <properties>
+    <property name="id" value="donjon1_porte_11"/>
+    <property name="type" value="cle"/>
+   </properties>
+  </object>
+  <object id="5" type="Spawn" x="80" y="176">
+   <properties>
+    <property name="id" value="depuis_ouest"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="6" type="Ennemi" x="528" y="272">
+   <properties>
+    <property name="type" value="ronceau"/>
+    <property name="variante" value="normal"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="7" type="Interrupteur" x="432" y="144">
+   <properties>
+    <property name="id" value="donjon1_interrupteur_03"/>
+    <property name="cible" value="donjon1_porte_12"/>
+    <property name="mode" value="fleche"/>
+    <property name="ordre" type="int" value="1"/>
+    <property name="symbole" value="gland"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="8" type="Interrupteur" x="336" y="272">
+   <properties>
+    <property name="id" value="donjon1_interrupteur_04"/>
+    <property name="cible" value="donjon1_porte_12"/>
+    <property name="mode" value="fleche"/>
+    <property name="ordre" type="int" value="2"/>
+    <property name="symbole" value="racine"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="9" type="Interrupteur" x="240" y="144">
+   <properties>
+    <property name="id" value="donjon1_interrupteur_05"/>
+    <property name="cible" value="donjon1_porte_12"/>
+    <property name="mode" value="fleche"/>
+    <property name="ordre" type="int" value="3"/>
+    <property name="symbole" value="feuille"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="10" type="Porte" x="128" y="160" width="32" height="32">
+   <properties>
+    <property name="id" value="donjon1_porte_12"/>
+    <property name="type" value="interrupteur"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer id="5" name="Dessus" width="20" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,45,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,113,0,0,0,0,0,113,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+47,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>
