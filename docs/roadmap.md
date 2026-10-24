@@ -114,7 +114,7 @@ Overworld de 5×4 écrans (3200×1760 px, 100×44 tuiles) :
 | Zone | Taille |
 | --- | --- |
 | Overworld (village 2, forêt 5, montagne 4, lac et rives 5, route/falaise/château 4) | 20 écrans |
-| Temple des Racines (donjon tutoriel) | 8 à 9 salles |
+| Temple des Racines (donjon tutoriel) | 16 salles sur 2 étages |
 | Mine Effondrée | 10 salles |
 | Sanctuaire Englouti | 12 salles |
 | Château final (couloir, 1-2 énigmes avec les 3 objets, combat contre Corvan) | 4 à 5 salles |
@@ -372,7 +372,7 @@ But : la boucle « je ramasse, j'équipe, je sauvegarde, je recharge » fonction
 
 ## Phase 4 — Premier donjon complet : la vertical slice (≈ 8 semaines)
 
-But : un donjon de 8 à 12 salles, jouable du début à la fin, avec son objet, ses énigmes et son boss. C'est le point de contrôle du projet.
+But : un donjon de 14 à 16 salles sur deux étages (décision du 2026-10-24 : 10 salles jugées trop courtes et trop simples), jouable du début à la fin, avec son objet, ses énigmes et son boss. C'est le point de contrôle du projet.
 
 **Briques d'énigmes (réutilisables partout)**
 
