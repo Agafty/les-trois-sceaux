@@ -14,7 +14,7 @@ La conception complète (scénario, personnages, carte, bestiaire, économie, ph
 
 ## Phase en cours
 
-**Phase 3 — Vie, inventaire, objets, sauvegarde.** (Mettre à jour cette ligne à chaque changement de phase.)
+**Phase 4 — Premier donjon complet (vertical slice).** (Mettre à jour cette ligne à chaque changement de phase.)
 
 ## Comment travailler avec moi
 
@@ -142,7 +142,7 @@ docs/           roadmap.md
 - Penser à recompiler (Build) après l'ajout d'un `[Export]` ou d'un `[Signal]`.
 - Pas d'allocations dans les boucles chaudes (`_Process`, `_PhysicsProcess`) : pas de LINQ ni de `new` à chaque frame.
 - Sauvegarde : JSON via `System.Text.Json` dans `user://saveN.json`, avec un numéro de version. Chaque coffre, porte ou objet unique a un identifiant unique en français (ex. `donjon1_coffre_03`), mémorisé dans `GameState` une fois utilisé.
-- Format de sauvegarde : classe `SaveData` (C# pur), écriture atomique via `System.IO` (fichier `.tmp` puis renommage). Tout nouvel état à persister passe par `GameState.CreateSaveData` / `ApplySaveData` avec un champ dans `SaveData`. **Toute modification du format incrémente `SaveData.CurrentVersion` et ajoute un `case` dans `SaveSerializer.Migrate`.** La position de reprise est une scène + un id de `Spawn`, jamais des coordonnées. Chaque salle (`Room`) a une `Zone` (ex. `donjon1`, `foret`, `village`) : la sauvegarde automatique se fait au changement de zone (pas de salle), à l'ouverture d'un coffre important et après un boss. Raccourcis de debug (build debug seulement) : F10 sauvegarde le slot 1, F11 le charge.
+- Format de sauvegarde : classe `SaveData` (C# pur), écriture atomique via `System.IO` (fichier `.tmp` puis renommage). Tout nouvel état à persister passe par `GameState.CreateSaveData` / `ApplySaveData` avec un champ dans `SaveData`. **Toute modification du format incrémente `SaveData.CurrentVersion` et ajoute un `case` dans `SaveSerializer.Migrate`.** La position de reprise est une scène + un id de `Spawn`, jamais des coordonnées. Chaque salle (`Room`) a une `Zone` (ex. `donjon1`, `foret`, `village`) : la sauvegarde automatique se fait au changement de zone (pas de salle), à l'ouverture d'un coffre important et après un boss. La scène principale est l'écran titre (`scenes/ui/ecran_titre.tscn`) ; une salle lancée seule avec F6 n'a pas d'emplacement choisi (`CurrentSlot == 0`) et la statue sauvegarde alors dans l'emplacement 1 seulement s'il est vide (sinon elle refuse). « Nouvelle partie » écrit l'emplacement dès l'arrivée dans la première salle. Statues du corbeau : `scenes/puzzles/statue_corbeau.tscn`, id `<zone>_statue_<lieu>` (ex. `donjon1_statue_entree`). Le signal `AutoSaved` (icône du HUD) ne concerne que la sauvegarde auto ; `GameSaved` couvre toutes les sauvegardes. Raccourcis de debug (build debug seulement) : F10 sauvegarde le slot 1, F11 le charge.
 - Textes du jeu : jamais en dur, toujours via `Tr()` et le fichier CSV de traduction (français et anglais).
 - Nommage : PascalCase pour les classes, méthodes et propriétés ; `_camelCase` pour les champs privés ; scènes et dossiers en `snake_case`.
 

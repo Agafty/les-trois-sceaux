@@ -3,10 +3,18 @@
 [ext_resource type="PackedScene" uid="uid://d4gi6xwn8b0vx" path="res://maps/donjon_test/salle_test.tmx" id="1_u1wtu"]
 [ext_resource type="Script" uid="uid://4enrxxpqo30o" path="res://scripts/world/Room.cs" id="2_pv064"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_qw0j1"]
+[ext_resource type="PackedScene" path="res://scenes/puzzles/statue_corbeau.tscn" id="3_statue"]
 
 [node name="salle_test" unique_id=377118666 instance=ExtResource("1_u1wtu")]
 script = ExtResource("2_pv064")
 Zone = "test"
 
-[node name="Player" parent="." index="5" unique_id=1579000947 instance=ExtResource("2_qw0j1")]
+[node name="Entites" type="Node2D" parent="." index="5"]
+y_sort_enabled = true
+
+[node name="Player" parent="Entites" unique_id=1579000947 instance=ExtResource("2_qw0j1")]
 position = Vector2(316, 179)
+
+[node name="StatueCorbeau" parent="Entites" instance=ExtResource("3_statue")]
+position = Vector2(192, 176)
+Id = "test_statue_corbeau"

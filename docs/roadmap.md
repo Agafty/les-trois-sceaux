@@ -366,7 +366,7 @@ But : la boucle « je ramasse, j'équipe, je sauvegarde, je recharge » fonction
 - [ ] Chaque coffre/porte a un identifiant unique (ex. `dungeon1_chest_03`) pour retrouver son état
 - [x] Sérialisation en JSON avec `System.Text.Json` dans `user://save1.json` ; 3 emplacements de sauvegarde
 - [x] Numéro de version dans la sauvegarde (pour migrer quand le format change)
-- [ ] Écran titre : Nouvelle partie / Continuer ; statues du corbeau (sauvegarde manuelle) et sauvegarde automatique aux changements de zone, coffres importants et boss (voir « Le système de sauvegarde »)
+- [x] Écran titre : Nouvelle partie / Continuer ; statues du corbeau (sauvegarde manuelle) et sauvegarde automatique aux changements de zone, coffres importants et boss (voir « Le système de sauvegarde »)
 
 **Livrable** : je joue, j'ouvre un coffre, je quitte, je relance : le coffre est toujours ouvert et l'objet dans mon inventaire.
 

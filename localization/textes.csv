@@ -15,3 +15,21 @@ OBJ_QUART_COEUR,un quart de cœur,a piece of heart
 OBJ_RECEPTACLE,un réceptacle de cœur,a heart container
 OBJ_COEUR,un cœur,a heart
 OBJ_FLECHES,5 flèches,5 arrows
+TITLE_GAME,Les Trois Sceaux,The Three Seals
+TITLE_NEW,Nouvelle partie,New game
+TITLE_CONTINUE,Continuer,Continue
+TITLE_QUIT,Quitter,Quit
+TITLE_BACK,Retour,Back
+TITLE_PICK_NEW,Choisissez un emplacement,Choose a slot
+TITLE_PICK_LOAD,Quelle partie continuer ?,Which game do you want to continue?
+SLOT_EMPTY,Emplacement {0} : vide,Slot {0}: empty
+SLOT_SUMMARY,"Emplacement {0} : {1} cœurs, {2}, {3}","Slot {0}: {1} hearts, {2}, {3}"
+SLOT_SUMMARY_ONE,"Emplacement {0} : {1} cœur, {2}, {3}","Slot {0}: {1} heart, {2}, {3}"
+SLOT_UNREADABLE,Emplacement {0} : illisible,Slot {0}: unreadable
+CONFIRM_OVERWRITE,Écraser la sauvegarde {0} ?,Overwrite save {0}?
+CONFIRM_YES,Oui,Yes
+CONFIRM_NO,Non,No
+TITLE_ERR_UNREADABLE,Sauvegarde illisible ou corrompue.,Save is unreadable or corrupted.
+TITLE_ERR_START,Impossible de lancer la partie.,Could not start the game.
+SAVE_DONE,Partie sauvegardée,Game saved
+SAVE_FAILED,Sauvegarde impossible,Could not save

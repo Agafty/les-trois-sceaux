@@ -13,6 +13,10 @@ public partial class SaveSystem : Node
     [Signal]
     public delegate void GameSavedEventHandler(int slot);
 
+    /// <summary>Une sauvegarde automatique vient de réussir (pas la statue ni F10) : le HUD affiche alors la petite icône de corbeau.</summary>
+    [Signal]
+    public delegate void AutoSavedEventHandler(int slot);
+
     private GameState _state;
     private SceneManager _sceneManager;
 
@@ -37,6 +41,8 @@ public partial class SaveSystem : Node
     // Vrai quand la prochaine arrivée en salle ne doit pas sauvegarder (après un Load ou une nouvelle partie).
     private bool _skipNextZoneSave;
     private bool _warnedEmptyZone;
+    // Nouvelle partie : une sauvegarde normale est faite à la fin de la transition vers la salle de départ.
+    private bool _newGameSavePending;
 
     private void InitZone()
     {
@@ -90,6 +96,7 @@ public partial class SaveSystem : Node
         _sceneManager.ResetSpawnId(); // pas de point d'entrée hérité de la partie précédente
         _lastZone = null;
         _skipNextZoneSave = true;
+        _newGameSavePending = true; // écrit l'emplacement dès l'arrivée dans la salle de départ
         CurrentSlot = slot;
         return true;
     }
@@ -152,7 +159,8 @@ public partial class SaveSystem : Node
     public bool Load(int slot)
     {
         if (!IsValidSlot(slot) || _sceneManager.IsTransitioning) return false;
-        if (!TryRead(slot, out var data)) return false;
+        _newGameSavePending = false; // un chargement annule toute sauvegarde de « nouvelle partie » en attente
+        if (!TryRead(slot, out var data, true)) return false;
 
         if (!IsValidScenePath(data.ScenePath))
         {
@@ -178,7 +186,17 @@ public partial class SaveSystem : Node
         });
     }
 
-    private bool TryRead(int slot, out SaveData data)
+    /// <summary>
+    /// Lit le contenu d'un emplacement sans rien modifier (ni GameState, ni emplacement courant) : sert à l'écran titre
+    /// pour afficher le résumé. Faux si l'emplacement est vide OU illisible (utiliser <see cref="HasSave"/> pour les distinguer).
+    /// </summary>
+    public bool TryPeek(int slot, out SaveData data)
+    {
+        data = null;
+        return IsValidSlot(slot) && TryRead(slot, out data, false); // simple aperçu : un fichier illisible n'est qu'un avertissement
+    }
+
+    private bool TryRead(int slot, out SaveData data, bool logAsError)
     {
         data = null;
         string path = RealPath(slot);
@@ -188,14 +206,23 @@ public partial class SaveSystem : Node
             string json = File.ReadAllText(path);
             if (SaveSerializer.TryDeserialize(json, out data, out string error))
                 return true;
-            GD.PushError($"Sauvegarde {slot} illisible ({path}) : {error}");
+            LogReadProblem($"Sauvegarde {slot} illisible ({path}) : {error}", logAsError);
         }
         catch (Exception e)
         {
-            GD.PushError($"Lecture de la sauvegarde {slot} impossible : {e.Message}");
+            LogReadProblem($"Lecture de la sauvegarde {slot} impossible : {e.Message}", logAsError);
         }
         return false;
     }
+
+    private static void LogReadProblem(string message, bool asError)
+    {
+        if (asError) GD.PushError(message);
+        else GD.PushWarning(message);
+    }
+
+    /// <summary>Annule la sauvegarde prévue à l'arrivée d'une nouvelle partie (le changement de salle a échoué).</summary>
+    public void CancelNewGame() => _newGameSavePending = false;
 
     // Écriture atomique : on écrit dans « .tmp » puis on remplace le vrai fichier d'un seul coup.
     // Si le jeu plante pendant l'écriture, l'ancienne sauvegarde reste intacte.
@@ -236,6 +263,11 @@ public partial class SaveSystem : Node
     // Rien après un Load, une nouvelle partie ou une réapparition (la zone ne change pas).
     private void OnTransitionFinished(string scenePath, string spawnId)
     {
+        if (_newGameSavePending)
+        {
+            _newGameSavePending = false;
+            RequestAutoSave();
+        }
         if (GetTree().CurrentScene is not Room room) return;
         string zone = room.Zone ?? "";
         if (zone.Length == 0)
@@ -273,7 +305,8 @@ public partial class SaveSystem : Node
         if (_sceneManager.IsTransitioning)
             return; // TransitionFinished redemandera une sauvegarde à la fin de la transition
         if (CurrentSlot == 0) return;
-        Save(CurrentSlot);
+        if (Save(CurrentSlot))
+            EmitSignal(SignalName.AutoSaved, CurrentSlot);
     }
 
     // --- Raccourcis de test (build debug uniquement) -------------------------------------------

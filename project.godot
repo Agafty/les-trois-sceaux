@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Les Trois Sceaux"
-run/main_scene="uid://bfsildqs526yp"
+run/main_scene="res://scenes/ui/ecran_titre.tscn"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 

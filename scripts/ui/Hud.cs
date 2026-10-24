@@ -10,6 +10,7 @@ public partial class Hud : CanvasLayer
     private const int HeartSize = 16;
     private const int DigitSize = 8;
     private const int ScreenWidth = 640;
+    private const int ScreenHeight = 360;
 
     private static readonly Vector2 FramePos = new(8, 4);
     private static readonly Vector2 RupeeIconPos = new(48, 6);
@@ -38,6 +39,18 @@ public partial class Hud : CanvasLayer
     private static readonly Vector2 EquippedDigitsPos = new(FramePos.X + 15, FramePos.Y + 23);
     private TextureRect _equippedIcon;
     private TextureRect[] _equippedDigits;
+
+    // Petite icône de corbeau en bas à droite, visible un instant après une sauvegarde automatique.
+    private const string SaveIconPath = "res://art/ui/icone_sauvegarde.png";
+    private const int SaveIconSize = 16;
+    private const int SaveIconMargin = 8;
+    private const float SaveIconHold = 1f;
+    private const float SaveIconFade = 0.5f;
+    private SaveSystem _saveSystem;
+    private TextureRect _saveIcon;
+    private Tween _saveIconTween;
+    private AtlasTexture _saveIconAtlas; // planche de 2 images 16x16 (ailes hautes / basses)
+    private bool _saveIconWingsUp;
 
     public override void _Ready()
     {
@@ -70,6 +83,8 @@ public partial class Hud : CanvasLayer
             _heartPieceTextures[i] = LoadTexture($"res://art/ui/quart_coeur_hud_{i}.png");
         _heartPieceRect = AddRect(null, Vector2.Zero);
 
+        CreateSaveIcon();
+
         _gameState.RupeesChanged += OnRupeesChanged;
         _gameState.HeartPiecesChanged += OnHeartPiecesChanged;
         _gameState.KeysChanged += OnKeysChanged;
@@ -93,6 +108,7 @@ public partial class Hud : CanvasLayer
 
     public override void _ExitTree()
     {
+        if (_saveSystem != null) _saveSystem.AutoSaved -= OnAutoSaved;
         if (_gameState == null) return;
         _gameState.RupeesChanged -= OnRupeesChanged;
         _gameState.HeartPiecesChanged -= OnHeartPiecesChanged;
@@ -103,6 +119,50 @@ public partial class Hud : CanvasLayer
     }
 
     private void OnEquippedItemChanged(string itemId) => RefreshEquipped();
+
+    // Seule la sauvegarde AUTOMATIQUE passe par ici : la statue affiche son propre message, F10 est un outil de test.
+    private void CreateSaveIcon()
+    {
+        var texture = ResourceLoader.Exists(SaveIconPath) ? GD.Load<Texture2D>(SaveIconPath) : null;
+        if (texture == null)
+        {
+            // Remplacement tant que le graphiste n'a pas livré icone_sauvegarde.png.
+            var image = Image.CreateEmpty(SaveIconSize * 2, SaveIconSize, false, Image.Format.Rgba8);
+            image.Fill(new Color(0.25f, 0.22f, 0.32f));
+            image.FillRect(new Rect2I(4, 4, 8, 8), new Color(0.75f, 0.7f, 0.9f));
+            image.FillRect(new Rect2I(20, 4, 8, 8), new Color(0.75f, 0.7f, 0.9f));
+            texture = ImageTexture.CreateFromImage(image);
+        }
+        _saveIconAtlas = new AtlasTexture { Atlas = texture, Region = new Rect2(0, 0, SaveIconSize, SaveIconSize) };
+        _saveIcon = AddRect(_saveIconAtlas, new Vector2(ScreenWidth - SaveIconMargin - SaveIconSize, ScreenHeight - SaveIconMargin - SaveIconSize));
+        _saveIcon.Visible = false;
+
+        _saveSystem = GetNodeOrNull<SaveSystem>("/root/SaveSystem");
+        if (_saveSystem != null) _saveSystem.AutoSaved += OnAutoSaved;
+    }
+
+    private void OnAutoSaved(int slot)
+    {
+        _saveIconTween?.Kill();
+        _saveIcon.Visible = true;
+        _saveIcon.Modulate = Colors.White;
+        _saveIconTween = CreateTween();
+        for (int i = 0; i < 4; i++) // le corbeau bat des ailes pendant la seconde où l'icône reste affichée
+        {
+            _saveIconTween.TweenCallback(Callable.From(FlapWings));
+            _saveIconTween.TweenInterval(SaveIconHold / 4f);
+        }
+        _saveIconTween.TweenProperty(_saveIcon, "modulate:a", 0f, SaveIconFade);
+        _saveIconTween.TweenCallback(Callable.From(HideSaveIcon));
+    }
+
+    private void FlapWings()
+    {
+        _saveIconWingsUp = !_saveIconWingsUp;
+        _saveIconAtlas.Region = new Rect2(_saveIconWingsUp ? SaveIconSize : 0, 0, SaveIconSize, SaveIconSize);
+    }
+
+    private void HideSaveIcon() => _saveIcon.Visible = false;
 
     private void RefreshEquipped()
     {
