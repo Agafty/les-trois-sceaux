@@ -78,6 +78,10 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 | `PNJ` | `id` (clé de ses dialogues) |
 | `Ramassable` | `id`, `contenu` (quart de cœur, plume de corbeau…) |
 
+**Éléments détruits par une bombe** (`MurFissure`…) : le nœud est dans le groupe Godot `destructible_bombe` et implémente l'interface C# `IBombDestructible` (`OnBombExplosion(Vector2 center)`). L'explosion appelle cette méthode sur chaque nœud du groupe à portée.
+
+**Objets utilisables** (`use_item`) : chaque `ItemData` utilisable référence une scène dans `UseScene`, dont le script hérite de `ItemUse` (`Begin(Player, direction)`). Le joueur ne connaît aucun objet en particulier.
+
 Ces conventions sont un point de départ, à ajuster en phase 1. Toute nouvelle convention est ajoutée ici avant d'être utilisée dans une carte ou dans le code.
 
 ## Architecture et conventions C#

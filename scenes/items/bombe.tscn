@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/Bomb.cs" id="1_bomb"]
+[ext_resource type="Texture2D" path="res://art/items/bombe.png" id="2_tex"]
+[ext_resource type="Texture2D" path="res://art/items/explosion.png" id="4_expl"]
+[ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="3_hitbox"]
+
+[node name="Bombe" type="Node2D"]
+script = ExtResource("1_bomb")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_tex")
+offset = Vector2(0, 8)
+hframes = 4
+
+[node name="Explosion" type="Sprite2D" parent="."]
+visible = false
+texture = ExtResource("4_expl")
+hframes = 6
+
+[node name="HitBoxEnnemis" type="Area2D" parent="."]
+script = ExtResource("3_hitbox")
+Team = 0
+Damage = 3
+CameraShakeStrength = 4.0
+CameraShakeDuration = 0.25
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxEnnemis"]
+
+[node name="HitBoxJoueur" type="Area2D" parent="."]
+script = ExtResource("3_hitbox")
+Team = 1
+Damage = 1
+CameraShakeStrength = 0.0
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxJoueur"]

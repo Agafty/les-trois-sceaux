@@ -356,7 +356,7 @@ But : la boucle « je ramasse, j'équipe, je sauvegarde, je recharge » fonction
 
 - [x] Définir chaque objet comme une `Resource` C# (`ItemData` : id, nom, icône, type, quantité max)
 - [x] Écran d'inventaire en pause (grille, sélection à la manette)
-- [ ] Objet assigné à la touche `use_item`
+- [x] Objet assigné à la touche `use_item`
 - [ ] Implémenter 2 objets « clés » qui servent aux énigmes : par exemple **arc** (activer des interrupteurs à distance) et **bombes** (ouvrir des murs fissurés)
 - [ ] Coffres (petit objet / objet clé) avec la petite animation « objet levé au-dessus de la tête »
 

@@ -31,6 +31,10 @@ public partial class Player : CharacterBody2D
     [Export]
     public float RespawnDelay { get; set; } = 1.0f;
 
+    /// <summary>Distance (px) à laquelle un objet utilisé est posé devant Brann, depuis ses pieds.</summary>
+    [Export]
+    public float UseDistance { get; set; } = 24f;
+
     private Direction _facing = Direction.Bas;
     private State _state = State.Deplacement;
     private float _attackTimer;
@@ -173,6 +177,46 @@ public partial class Player : CharacterBody2D
 
         if (Input.IsActionJustPressed("attack"))
             StartAttack();
+        else if (Input.IsActionJustPressed("use_item"))
+            TryUseItem();
+    }
+
+    private Vector2 FacingVector() => _facing switch
+    {
+        Direction.Haut => Vector2.Up,
+        Direction.Gauche => Vector2.Left,
+        Direction.Droite => Vector2.Right,
+        _ => Vector2.Down,
+    };
+
+    // use_item : l'objet équipé décrit son comportement par une scène (ItemData.UseScene) dont le script hérite de ItemUse.
+    // Appelé seulement depuis l'état Déplacement (ni attaque, ni touché, ni mort) ; la pause stoppe _PhysicsProcess.
+    private void TryUseItem()
+    {
+        if (_sceneManager.IsTransitioning) return; // pas d'objet posé pendant le fondu entre deux salles
+        var item = _gameState.EquippedItem;
+        if (item?.UseScene == null) return;
+        if (item.HasQuantity && _gameState.GetQuantity(item.Id) < item.UseCost) return;
+
+        var group = "use_" + item.Id; // allocation ponctuelle, à l'appui d'une touche seulement
+        if (item.MaxSimultaneous > 0 && GetTree().GetNodesInGroup(group).Count >= item.MaxSimultaneous) return;
+
+        var instance = item.UseScene.Instantiate();
+        if (instance is not ItemUse use)
+        {
+            instance.QueueFree(); // jamais ajoutée à l'arbre : on la libère
+            GD.PushError($"La scène d'utilisation de {item.Id} n'a pas de script ItemUse.");
+            return;
+        }
+
+        var direction = FacingVector();
+        GetParent().AddChild(use); // même parent que Brann : tri en profondeur (Y-sort) de la salle
+        use.GlobalPosition = GlobalPosition + new Vector2(0, 6) + direction * UseDistance;
+        use.AddToGroup(group);
+        use.Begin(this, direction);
+
+        if (item.HasQuantity)
+            _gameState.RemoveItem(item.Id, item.UseCost);
     }
 
     private void UpdateFacing(Vector2 input)
