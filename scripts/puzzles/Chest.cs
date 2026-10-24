@@ -60,6 +60,7 @@ public partial class Chest : StaticBody2D
     private bool _valid;
     private bool _canApply = true; // décidé à l'ouverture ; faux = le contenu n'est pas donné
     private bool _applied;
+    private bool _zoneConnected;
     private Node _temporaryIcon;
     private CanvasLayer _temporaryText;
 
@@ -94,6 +95,7 @@ public partial class Chest : StaticBody2D
         _sprite.Frame = ClosedFrame;
         _zone.BodyEntered += OnBodyEntered;
         _zone.BodyExited += OnBodyExited;
+        _zoneConnected = true;
     }
 
     // Grand coffre : autre planche et collision plus large (forme dupliquée : la scène la partage entre instances).
@@ -113,10 +115,12 @@ public partial class Chest : StaticBody2D
     public override void _ExitTree()
     {
         Candidates.Remove(this);
-        if (_zone != null)
+        // Un coffre déjà ouvert (ou sans Id) ne s'est jamais abonné : ne pas se désabonner.
+        if (_zoneConnected)
         {
             _zone.BodyEntered -= OnBodyEntered;
             _zone.BodyExited -= OnBodyExited;
+            _zoneConnected = false;
         }
         // Salle déchargée en pleine animation : on dépause, et la récompense n'est jamais perdue.
         if (_sequenceRunning)
