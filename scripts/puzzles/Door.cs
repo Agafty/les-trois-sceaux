@@ -108,6 +108,26 @@ public partial class Door : StaticBody2D
         EmitSignal(SignalName.Opened, Id);
     }
 
+    /// <summary>
+    /// Ouvre la porte « id » de la salle courante (groupe « portes »). Si cette salle n'a aucune face de cette porte,
+    /// l'ouverture est quand même mémorisée dans GameState (l'autre face la lira ouverte) et la méthode renvoie faux.
+    /// Sert aux interrupteurs, plaques de pression et torches.
+    /// </summary>
+    public static bool OpenById(SceneTree tree, GameState state, string id)
+    {
+        // Appelé une fois par résolution d'énigme : l'allocation de la liste de nœuds est sans importance.
+        foreach (var node in tree.GetNodesInGroup(GroupName))
+        {
+            if (node is Door door && door.Id == id)
+            {
+                door.Open();
+                return true;
+            }
+        }
+        state.MarkCollected(id);
+        return false;
+    }
+
     /// <summary>Appelé par la salle quand le dernier ennemi est mort : ouvre les portes « ennemis ».</summary>
     public void NotifyRoomCleared()
     {

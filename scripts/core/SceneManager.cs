@@ -10,7 +10,15 @@ public partial class SceneManager : CanvasLayer
     [Signal]
     public delegate void TransitionFinishedEventHandler(string scenePath, string spawnId);
 
+    /// <summary>
+    /// Un changement de salle commence. <paramref name="kind"/> : "" (porte ordinaire), "escalier" ou "chute".
+    /// Point d'accroche pour un futur gestionnaire de sons (bruit de pas dans l'escalier, chute...).
+    /// </summary>
+    [Signal]
+    public delegate void TransitionStartedEventHandler(string kind);
+
     private ColorRect _fade;
+    private float _fadeDuration = FadeDuration;
     private string _previousSpawnId = "";
     private bool _changeFailed;
     private string _pendingSpawnId = "";
@@ -35,12 +43,15 @@ public partial class SceneManager : CanvasLayer
     /// <summary>
     /// Change de salle avec un fondu. <paramref name="beforeChange"/> (optionnel) est appelé une fois l'écran noir,
     /// juste avant le changement de scène : c'est là que le chargement d'une sauvegarde applique l'état,
-    /// pour que l'ancienne salle ne puisse plus l'écraser.
+    /// pour que l'ancienne salle ne puisse plus l'écraser. <paramref name="kind"/> ("escalier", "chute"...) est annoncé par le
+    /// signal <see cref="TransitionStarted"/> ; <paramref name="fadeDuration"/> (s, 0 = durée normale) allonge le fondu.
     /// </summary>
-    public bool GoToScene(string scenePath, string spawnId = "", Action beforeChange = null)
+    public bool GoToScene(string scenePath, string spawnId = "", Action beforeChange = null, string kind = "", float fadeDuration = 0f)
     {
         if (_transitioning) return false;
         _transitioning = true;
+        _fadeDuration = fadeDuration > 0f ? fadeDuration : FadeDuration;
+        EmitSignal(SignalName.TransitionStarted, kind);
         _pendingSpawnId = spawnId;
         _previousSpawnId = LastSpawnId; // pour revenir en arrière si le changement échoue
         _changeFailed = false;
@@ -120,7 +131,7 @@ public partial class SceneManager : CanvasLayer
     private async Task FadeTo(float alpha)
     {
         var tween = CreateTween();
-        tween.TweenProperty(_fade, "color:a", alpha, FadeDuration);
+        tween.TweenProperty(_fade, "color:a", alpha, _fadeDuration);
         await ToSignal(tween, Tween.SignalName.Finished);
     }
 }

@@ -1,10 +1,12 @@
 using Godot;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Une salle de jeu : une carte Tiled importée + un conteneur « Entites » (tri en profondeur) où vit Brann.
 /// Au chargement, la salle lit le calque d'objets « Objets » de la carte (Spawn, Sortie, Ennemi, Coffre,
-/// StatueCorbeau, Ramassable, Porte, Interrupteur, BlocPoussable) et instancie les vraies scènes aux positions des marqueurs.
+/// StatueCorbeau, Ramassable, Porte, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable) et instancie les vraies scènes aux positions des marqueurs.
 /// La scène importée n'est jamais modifiée sur le disque : seuls les nœuds de l'arbre en cours sont retirés.
 /// </summary>
 public partial class Room : Node2D
@@ -23,6 +25,10 @@ public partial class Room : Node2D
     [Export(PropertyHint.File, "*.tscn")]
     public string MissingExitFallbackScene { get; set; } = "";
 
+    /// <summary>Durée (s) du fondu quand une Sortie a la propriété « transition » = « escalier » (plus lent qu'une porte).</summary>
+    [Export(PropertyHint.Range, "0.1,2,0.05")]
+    public float StairsFadeDuration { get; set; } = 0.6f;
+
     [ExportGroup("Variante rouge")]
     /// <summary>Multiplicateur de points de vie d'un ennemi de variante « rouge ».</summary>
     [Export(PropertyHint.Range, "1,5,0.5")]
@@ -36,6 +42,15 @@ public partial class Room : Node2D
     [Signal]
     public delegate void EnemiesClearedEventHandler();
 
+    /// <summary>Étage du donjon (propriété de carte « etage » : « rdc » ou « sous_sol »). Vide si la carte n'en a pas.</summary>
+    public string MapFloor { get; private set; } = "";
+
+    /// <summary>Position de la salle dans la grille du donjon (propriétés de carte « carte_x » et « carte_y »), pour la carte du menu pause.</summary>
+    public Vector2I MapCell { get; private set; } = Vector2I.Zero;
+
+    /// <summary>Vrai si la carte porte les trois propriétés etage, carte_x et carte_y.</summary>
+    public bool HasMapPosition { get; private set; }
+
     /// <summary>Nombre d'ennemis de la carte encore vivants.</summary>
     public int AliveEnemies => _aliveEnemies;
 
@@ -45,6 +60,10 @@ public partial class Room : Node2D
     private const string PickupScenePath = "res://scenes/items/objet_inventaire.tscn";
     private const string SwitchScenePath = "res://scenes/puzzles/interrupteur.tscn";
     private const string BlockScenePath = "res://scenes/puzzles/bloc_poussable.tscn";
+    private const string PlateScenePath = "res://scenes/puzzles/plaque_pression.tscn";
+    private const string TorchScenePath = "res://scenes/puzzles/torche.tscn";
+    private const string FallScenePath = "res://scenes/puzzles/chute.tscn";
+    private const float GridCell = 32f;
     private const int DessusZIndex = 2; // au-dessus des entités (0) et de l'icône d'un coffre (1)
     private static readonly Vector2 FootOffset = new(0f, 16f); // coffres et statues : posés au bas de leur case
 
@@ -59,6 +78,18 @@ public partial class Room : Node2D
     private HoleWatcher _holes;
     private PackedScene _switchScene;
     private PackedScene _blockScene;
+    private PackedScene _torchScene;
+    private PackedScene _plateScene;
+    private PackedScene _fallScene;
+    private HintBox _hintBox;
+    private readonly List<PushBlock> _blocks = new();
+
+    // Une Sortie « armée » se déclenche quand Brann y entre. Elle ne l'est pas tant que Brann, arrivé dessus, ne l'a pas quittée.
+    private sealed class SortieState
+    {
+        public Area2D Area;
+        public bool Armed;
+    }
 
     /// <summary>Position de Brann à l'arrivée dans la salle (son Spawn) : il y revient après une chute dans un trou.</summary>
     public Vector2 EntryPosition { get; private set; }
@@ -87,6 +118,7 @@ public partial class Room : Node2D
         }
 
         TreeExiting += OnRoomExiting;
+        ReadMapProperties();
         ConfigureLayers();
 
         // Brann d'abord sur son Spawn, puis les objets : rien n'apparaît sous ses pieds avant qu'il soit placé.
@@ -100,11 +132,22 @@ public partial class Room : Node2D
 
         SpawnObjects();
 
+        ShareForbiddenCells();
+
+        var sorties = new List<SortieState>();
         foreach (var sortie in FindAllByClass(this, "Sortie"))
         {
-            if (sortie is Area2D area)
-                area.BodyEntered += body => OnSortieEntered(area, body);
+            if (sortie is not Area2D area) continue;
+            var state = new SortieState { Area = area };
+            sorties.Add(state);
+            area.BodyEntered += body => OnSortieEntered(state, body);
+            area.BodyExited += body =>
+            {
+                if (body is Player) state.Armed = true;
+            };
         }
+        if (sorties.Count > 0)
+            _ = ArmSortiesAfterArrival(sorties, player);
 
         if (player != null)
             ConfigureCamera(player);
@@ -204,6 +247,9 @@ public partial class Room : Node2D
                 case "Ramassable": SpawnPickup(node); break;
                 case "Interrupteur": SpawnSwitch(node); break;
                 case "BlocPoussable": SpawnBlock(node); break;
+                case "PlaqueDePression": SpawnPlate(node); break;
+                case "Chute": SpawnFallPassage(node); break;
+                case "Torche": SpawnTorch(node); break;
                 case "Porte": portes.Add(node); break; // après les ennemis : elles ont besoin de leur nombre
                 default:
                     WarnOnce("class:" + node.GetMeta("class").AsString(),
@@ -220,11 +266,27 @@ public partial class Room : Node2D
     private void HandleUnclassed(Node node)
     {
         string name = node.Name;
-        if (name.StartsWith("indice", System.StringComparison.Ordinal) && node is StaticBody2D)
+        if (HintRules.IsHintName(name) && node is StaticBody2D)
         {
             // Zone d'indice : YATI en fait un corps solide qui boucherait le passage. On le retire (la carte reste intacte).
             WarnOnce("indice-solide", "Le rectangle « indice... » est importé comme un corps solide (il manque godot_node_type=area dans Tiled) : retiré à l'exécution.");
             RemoveMarker(node);
+            return;
+        }
+        if (HintRules.IsHintName(name) && node is Area2D hintArea)
+        {
+            string key = HintRules.KeyFor(name);
+            if (string.IsNullOrEmpty(key))
+                WarnOnce("indice-nom:" + name, $"Indice « {name} » : nom invalide ({Name}).");
+            else
+            {
+                if (_hintBox == null)
+                {
+                    _hintBox = new HintBox { Name = "BoiteIndices" }; // une seule boîte de texte pour toute la salle
+                    AddChild(_hintBox);
+                }
+                AddChild(new HintZone { Name = "Indice_" + key, Zone = hintArea, TextKey = key, Box = _hintBox });
+            }
             return;
         }
         if (node is Marker2D || node is not StaticBody2D)
@@ -404,6 +466,9 @@ public partial class Room : Node2D
         sw.Id = id;
         sw.Target = GetString(marker, "cible");
         sw.Mode = mode;
+        sw.Order = Mathf.Max(0, Mathf.RoundToInt(GetFloat(marker, "ordre")));
+        sw.Duration = Mathf.Max(0f, GetFloat(marker, "duree"));
+        sw.Symbol = GetString(marker, "symbole");
         sw.Position = _entities.ToLocal(ObjectCenter(marker));
         _entities.AddChild(sw);
         RemoveMarker(marker);
@@ -415,7 +480,150 @@ public partial class Room : Node2D
         var block = (_blockScene ??= GD.Load<PackedScene>(BlockScenePath)).Instantiate<PushBlock>();
         block.Position = _entities.ToLocal(ObjectCenter(marker));
         _entities.AddChild(block);
+        _blocks.Add(block);
         RemoveMarker(marker);
+    }
+
+    // Torche ou brasero : un point au centre de la case ; propriétés id, etat, permanente, duree, cible.
+    private void SpawnTorch(Node marker)
+    {
+        string id = GetString(marker, "id");
+        string stateValue = GetString(marker, "etat");
+        if (!TorchRules.TryParseLit(stateValue, out bool lit))
+            WarnOnce("torche-etat:" + stateValue, $"Torche « {id} » : etat inconnu « {stateValue} » (eteinte ou allumee) dans {Name}, traité comme « eteinte ».");
+
+        var torch = (_torchScene ??= GD.Load<PackedScene>(TorchScenePath)).Instantiate<Torch>();
+        torch.Id = id;
+        torch.Target = GetString(marker, "cible");
+        torch.Permanent = GetBool(marker, "permanente");
+        torch.StartLit = lit || torch.Permanent;
+        torch.Duration = Mathf.Max(0f, GetFloat(marker, "duree"));
+        torch.Position = _entities.ToLocal(ObjectCenter(marker));
+        _entities.AddChild(torch);
+        RemoveMarker(marker);
+    }
+
+    // Propriétés de carte Tiled (etage, carte_x, carte_y) : YATI les met en metadata sur la racine de la carte importée.
+    private void ReadMapProperties()
+    {
+        Node source = null;
+        foreach (var child in GetChildren())
+            if (child.HasMeta("etage") || child.HasMeta("carte_x") || child.HasMeta("carte_y"))
+            {
+                source = child;
+                break;
+            }
+        if (source == null) return;
+
+        MapFloor = GetString(source, "etage");
+        MapCell = new Vector2I(Mathf.RoundToInt(GetFloat(source, "carte_x")), Mathf.RoundToInt(GetFloat(source, "carte_y")));
+        HasMapPosition = source.HasMeta("etage") && source.HasMeta("carte_x") && source.HasMeta("carte_y");
+        if (MapFloor != "" && MapFloor != "rdc" && MapFloor != "sous_sol")
+            WarnOnce("etage:" + MapFloor, $"Carte {Name} : etage inconnu « {MapFloor} » (rdc ou sous_sol).");
+    }
+
+    // Plaque de pression : une case de 32x32 au sol, dessinée sous les entités (Brann et les blocs passent dessus).
+    private void SpawnPlate(Node marker)
+    {
+        string id = GetString(marker, "id");
+        string triggerValue = GetString(marker, "declencheur");
+        if (!PressurePlateRules.TryParseTrigger(triggerValue, out var trigger))
+            WarnOnce("plaque-declencheur:" + triggerValue, $"Plaque « {id} » : declencheur inconnu « {triggerValue} » (bloc, joueur ou tous) dans {Name}, traité comme « tous ».");
+
+        var plate = (_plateScene ??= GD.Load<PackedScene>(PlateScenePath)).Instantiate<PressurePlate>();
+        plate.Id = id;
+        plate.Target = GetString(marker, "cible");
+        plate.Trigger = trigger;
+        var center = ObjectCenter(marker);
+        center = new Vector2(
+            PushBlockRules.SnapToCellCenter(center.X, plate.CellSize),
+            PushBlockRules.SnapToCellCenter(center.Y, plate.CellSize));
+        AddUnderEntities(plate, center);
+        RemoveMarker(marker);
+    }
+
+    // Trou de passage : un rectangle (Area2D importée ou corps solide) remplacé par la scène « chute ».
+    private void SpawnFallPassage(Node marker)
+    {
+        string id = GetString(marker, "id");
+        var center = ObjectCenter(marker);
+        var size = new Vector2(32f, 32f);
+        foreach (var child in marker.GetChildren())
+            if (child is CollisionShape2D { Shape: RectangleShape2D rect })
+            {
+                size = rect.Size;
+                break;
+            }
+
+        var passage = (_fallScene ??= GD.Load<PackedScene>(FallScenePath)).Instantiate<FallPassage>();
+        passage.Id = id;
+        passage.TargetScene = GetString(marker, "cible_carte");
+        passage.TargetSpawn = GetString(marker, "cible_spawn");
+        if (string.IsNullOrEmpty(passage.TargetScene))
+            GD.PushError($"Chute « {id} » sans propriété « cible_carte » dans {Name}.");
+        // La forme de la scène est partagée entre instances : on la remplace par une copie à la bonne taille.
+        passage.GetNode<CollisionShape2D>("CollisionShape2D").Shape = new RectangleShape2D { Size = size };
+        AddUnderEntities(passage, center);
+        RemoveMarker(marker);
+    }
+
+    // Pose un nœud juste avant le conteneur d'entités : au-dessus de la carte, sous Brann et les ennemis.
+    private void AddUnderEntities(Node2D node, Vector2 globalCenter)
+    {
+        var parent = _entities.GetParent();
+        parent.AddChild(node);
+        parent.MoveChild(node, _entities.GetIndex());
+        node.GlobalPosition = globalCenter;
+    }
+
+    // Les blocs refusent de glisser sur ou à côté d'un Spawn, d'une Sortie ou d'une Porte (sinon ils pourraient enfermer Brann).
+    private void ShareForbiddenCells()
+    {
+        if (_blocks.Count == 0) return;
+        var forbidden = new HashSet<(int, int)>();
+        foreach (var spawn in FindAllByClass(this, "Spawn"))
+        {
+            if (spawn is not Node2D point) continue;
+            var p = point.GlobalPosition;
+            PushBlockRules.AddForbiddenAround(forbidden, PushBlockRules.CellIndex(p.X, GridCell), PushBlockRules.CellIndex(p.Y, GridCell));
+        }
+        foreach (var sortie in FindAllByClass(this, "Sortie"))
+            AddRectCells(forbidden, sortie);
+        foreach (var door in _doors)
+        {
+            if (!IsInstanceValid(door)) continue;
+            var p = door.GlobalPosition;
+            PushBlockRules.AddForbiddenAround(forbidden, PushBlockRules.CellIndex(p.X, GridCell), PushBlockRules.CellIndex(p.Y, GridCell));
+        }
+        foreach (var block in _blocks)
+            block.ForbiddenCells = forbidden;
+    }
+
+    // Ajoute (avec leurs voisines) toutes les cases couvertes par le rectangle d'un objet Tiled.
+    private static void AddRectCells(HashSet<(int, int)> forbidden, Node marker)
+    {
+        var center = MarkerPosition(marker);
+        var size = Vector2.Zero;
+        foreach (var child in marker.GetChildren())
+            if (child is CollisionShape2D { Shape: RectangleShape2D rect } shape)
+            {
+                center = shape.GlobalPosition;
+                size = rect.Size;
+                break;
+            }
+        if (size == Vector2.Zero)
+        {
+            PushBlockRules.AddForbiddenAround(forbidden, PushBlockRules.CellIndex(center.X, GridCell), PushBlockRules.CellIndex(center.Y, GridCell));
+            return;
+        }
+        // 0,5 px de marge : un rectangle exactement aligné sur la grille ne déborde pas sur la case voisine.
+        int x0 = PushBlockRules.CellIndex(center.X - size.X * 0.5f + 0.5f, GridCell);
+        int x1 = PushBlockRules.CellIndex(center.X + size.X * 0.5f - 0.5f, GridCell);
+        int y0 = PushBlockRules.CellIndex(center.Y - size.Y * 0.5f + 0.5f, GridCell);
+        int y1 = PushBlockRules.CellIndex(center.Y + size.Y * 0.5f - 0.5f, GridCell);
+        for (int cx = x0; cx <= x1; cx++)
+            for (int cy = y0; cy <= y1; cy++)
+                PushBlockRules.AddForbiddenAround(forbidden, cx, cy);
     }
 
     // Trous : surveillés d'après le calque « Sol » (voir HoleWatcher). Pas de calque Sol : pas de trous.
@@ -466,6 +674,20 @@ public partial class Room : Node2D
         return node.GetMeta(key).AsString();
     }
 
+    private static float GetFloat(Node node, string key, float fallback = 0f)
+    {
+        if (!node.HasMeta(key)) return fallback;
+        var value = node.GetMeta(key);
+        switch (value.VariantType)
+        {
+            case Variant.Type.Int: return (float)value.AsInt64();
+            case Variant.Type.Float: return (float)value.AsDouble();
+            case Variant.Type.String:
+                return float.TryParse(value.AsString(), NumberStyles.Float, CultureInfo.InvariantCulture, out float parsed) ? parsed : fallback;
+            default: return fallback;
+        }
+    }
+
     private static bool GetBool(Node node, string key)
     {
         if (!node.HasMeta(key)) return false;
@@ -513,8 +735,35 @@ public partial class Room : Node2D
         return null;
     }
 
-    private void OnSortieEntered(Node sortie, Node body)
+    // Règle générale : une Sortie ne se déclenche pas si Brann est déjà dans sa zone à l'arrivée (Spawn posé dessus, retour
+    // après une mort...). Elle s'arme quand il l'a quittée. Au départ aucune n'est armée ; après deux images physiques
+    // (le temps que les zones détectent Brann) on arme celles qui ne le touchent pas.
+    private async Task ArmSortiesAfterArrival(List<SortieState> sorties, Player player)
     {
+        try
+        {
+            var tree = GetTree();
+            await ToSignal(tree, SceneTree.SignalName.PhysicsFrame);
+            await ToSignal(tree, SceneTree.SignalName.PhysicsFrame);
+            if (!IsInstanceValid(this) || !IsInsideTree()) return;
+            foreach (var state in sorties)
+            {
+                if (!IsInstanceValid(state.Area)) continue;
+                if (player == null || !IsInstanceValid(player) || !state.Area.OverlapsBody(player))
+                    state.Armed = true;
+            }
+        }
+        catch (System.Exception e)
+        {
+            GD.PushError($"Armement des Sorties de {Name} : {e.Message}");
+            foreach (var state in sorties) state.Armed = true; // mieux vaut des sorties actives qu'une salle sans issue
+        }
+    }
+
+    private void OnSortieEntered(SortieState state, Node body)
+    {
+        if (!state.Armed) return;
+        var sortie = state.Area;
         if (body is not Player { IsDead: false }) return;
         if (!sortie.HasMeta("cible_carte")) return;
         if (IsBlockedByClosedDoor(sortie)) return; // recul ou poussée qui amènerait Brann sur la Sortie d'une porte fermée
@@ -533,7 +782,12 @@ public partial class Room : Node2D
             cibleCarte = MissingExitFallbackScene;
             cibleSpawn = "";
         }
-        GetNode<SceneManager>("/root/SceneManager").GoToScene(cibleCarte, cibleSpawn);
+
+        var sceneManager = GetNode<SceneManager>("/root/SceneManager");
+        if (GetString(sortie, "transition") == "escalier")
+            sceneManager.GoToScene(cibleCarte, cibleSpawn, null, "escalier", StairsFadeDuration); // signal TransitionStarted("escalier") : accroche du son
+        else
+            sceneManager.GoToScene(cibleCarte, cibleSpawn);
     }
 
     // Une Sortie est ignorée tant qu'une porte fermée occupe la même case (centres à 1 px près).

@@ -33,14 +33,14 @@ public partial class HoleWatcher : Node
 
     private readonly List<Tracked> _enemies = new();
     private SceneManager _sceneManager;
-    private int _holeSourceId = -1;
-    private int _columns = 8;
+    // Sources d'atlas qui sont des tilesets de trous (temple_racines et sa variante sous-sol, même numérotation) -> nombre de colonnes.
+    private readonly Dictionary<int, int> _holeSources = new();
 
     public override void _Ready()
     {
         _sceneManager = GetNode<SceneManager>("/root/SceneManager");
         FindHoleSource();
-        if (_holeSourceId < 0)
+        if (_holeSources.Count == 0)
         {
             SetPhysicsProcess(false); // cette salle n'utilise pas le tileset des trous
         }
@@ -55,11 +55,11 @@ public partial class HoleWatcher : Node
     /// <summary>Vrai si la position (monde) est au-dessus d'une tuile de trou.</summary>
     public bool IsHoleAt(Vector2 worldPosition)
     {
-        if (Floor == null || _holeSourceId < 0) return false;
+        if (Floor == null || _holeSources.Count == 0) return false;
         var cell = Floor.LocalToMap(Floor.ToLocal(worldPosition));
-        if (Floor.GetCellSourceId(cell) != _holeSourceId) return false;
+        if (!_holeSources.TryGetValue(Floor.GetCellSourceId(cell), out int columns)) return false;
         var atlas = Floor.GetCellAtlasCoords(cell);
-        return HoleRules.IsHoleTileId(HoleRules.TileId(atlas.X, atlas.Y, _columns));
+        return HoleRules.IsHoleTileId(HoleRules.TileId(atlas.X, atlas.Y, columns));
     }
 
     public override void _PhysicsProcess(double delta)
@@ -85,34 +85,10 @@ public partial class HoleWatcher : Node
         }
     }
 
-    // L'ennemi est figé, ne touche plus personne, rétrécit, puis est libéré SANS signal Died : pas de butin.
-    // La salle voit son nœud quitter l'arbre et le compte comme parti (porte « ennemis »).
-    private void StartEnemyFall(Node2D enemy)
-    {
-        enemy.ProcessMode = ProcessModeEnum.Disabled;
-        if (enemy is CollisionObject2D body)
-            body.CollisionLayer = 0;
-        foreach (var child in enemy.GetChildren())
-        {
-            if (child is Area2D area)
-            {
-                area.SetDeferred(Area2D.PropertyName.Monitoring, false);
-                area.SetDeferred(Area2D.PropertyName.Monitorable, false);
-            }
-        }
+    // L'ennemi est figé, rétrécit, puis disparaît sans butin (voir FallEffects.DropEnemy).
+    private void StartEnemyFall(Node2D enemy) => FallEffects.DropEnemy(this, enemy, EnemyFallDuration);
 
-        // Tween rattaché à ce nœud (pas à l'ennemi, dont le traitement est désactivé).
-        var tween = CreateTween();
-        tween.SetParallel(true);
-        tween.TweenProperty(enemy, "scale", new Vector2(0.1f, 0.1f), EnemyFallDuration);
-        tween.TweenProperty(enemy, "modulate:a", 0f, EnemyFallDuration);
-        tween.Chain().TweenCallback(Callable.From(() =>
-        {
-            if (IsInstanceValid(enemy)) enemy.QueueFree();
-        }));
-    }
-
-    // Cherche, dans le tileset du calque, la source d'atlas qui est le tileset des trous (temple_racines).
+    // Cherche, dans le tileset du calque, les sources d'atlas des trous (temple_racines et temple_racines_sous_sol).
     private void FindHoleSource()
     {
         var tileSet = Floor?.TileSet;
@@ -121,10 +97,9 @@ public partial class HoleWatcher : Node
         {
             int id = tileSet.GetSourceId(i);
             if (tileSet.GetSource(id) is not TileSetAtlasSource atlas || atlas.Texture == null) continue;
-            if (!atlas.Texture.ResourcePath.EndsWith("/temple_racines.png")) continue;
-            _holeSourceId = id;
-            _columns = atlas.GetAtlasGridSize().X;
-            return;
+            string path = atlas.Texture.ResourcePath;
+            if (!path.EndsWith("/temple_racines.png") && !path.EndsWith("/temple_racines_sous_sol.png")) continue;
+            _holeSources[id] = atlas.GetAtlasGridSize().X;
         }
     }
 }

@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/puzzles/PressurePlate.cs" id="1_plate"]
+
+[sub_resource type="RectangleShape2D" id="zone_shape"]
+size = Vector2(32, 32)
+
+[node name="PlaqueDePression" type="Area2D"]
+collision_layer = 0
+script = ExtResource("1_plate")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("zone_shape")

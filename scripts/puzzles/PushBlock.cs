@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 
 /// <summary>
@@ -28,6 +29,12 @@ public partial class PushBlock : AnimatableBody2D
     [Export(PropertyHint.Range, "8,32,1")] public float FreeCheckSize { get; set; } = 28f;
 
     public bool IsSliding => _sliding;
+
+    /// <summary>
+    /// Cases (colonne, ligne) où le bloc refuse de glisser : Spawn, Sortie, Porte et leurs 8 voisines. Réglé par la <see cref="Room"/> ;
+    /// null (bloc posé à la main dans une scène de test) = aucune restriction.
+    /// </summary>
+    public HashSet<(int, int)> ForbiddenCells { get; set; }
 
     private const int FrameSize = 32;
     private const string TexturePath = "res://art/puzzles/bloc_poussable.png";
@@ -127,6 +134,9 @@ public partial class PushBlock : AnimatableBody2D
     {
         if (_sliding) return false;
         var target = GlobalPosition + direction * CellSize;
+        if (ForbiddenCells != null
+            && ForbiddenCells.Contains((PushBlockRules.CellIndex(target.X, CellSize), PushBlockRules.CellIndex(target.Y, CellSize))))
+            return false;
         if (!IsCellFree(target)) return false;
 
         _sliding = true;

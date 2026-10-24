@@ -58,6 +58,10 @@ public partial class Player : CharacterBody2D
     private Camera2D _camera;
     private float _fallTimer;
     private Vector2 _fallRespawn;
+    private System.Func<bool> _fallLeave; // chute dans un trou de passage : lance le changement de salle (vrai quand accepté)
+    private bool _fallLeft;
+    private float _fallLeaveWait; // filet de sécurité : si le changement de salle n'arrive pas, Brann revient dans la salle
+    private const float FallLeaveTimeout = 3f;
     private SceneManager _sceneManager;
     private GameState _gameState;
 
@@ -92,6 +96,15 @@ public partial class Player : CharacterBody2D
         _hurtBox.Hit += OnHit;
         _health.Died += OnDied;
         _sprite.AnimationFinished += OnAnimationFinished;
+
+        // Arrivée par un trou de passage : invincibilité accordée par GameState (une seule fois).
+        if (_gameState.PendingArrivalInvincibility > 0f)
+        {
+            _invincibleTimer = _gameState.PendingArrivalInvincibility;
+            _blinkTimer = BlinkInterval;
+            _hurtBox.Invincible = true; // levée par UpdateInvincibility à la fin du délai
+            _gameState.PendingArrivalInvincibility = 0f;
+        }
     }
 
     public override void _ExitTree()
@@ -210,13 +223,29 @@ public partial class Player : CharacterBody2D
     /// Brann tombe dans un trou : il rétrécit, perd <see cref="FallDamage"/> PV (sans jamais mourir), puis réapparaît à
     /// <paramref name="respawnPosition"/> avec une brève invincibilité. Sans effet s'il est mort ou déjà en train de tomber.
     /// </summary>
-    public bool Fall(Vector2 respawnPosition)
+    public bool Fall(Vector2 respawnPosition) => BeginFall(respawnPosition, true, null);
+
+    /// <summary>
+    /// Brann tombe dans un trou de passage : même animation, mais aucun dégât, et il ne réapparaît pas dans la salle.
+    /// Une fois la chute finie, <paramref name="leave"/> est appelée à chaque image jusqu'à ce qu'elle renvoie vrai
+    /// (elle lance le changement de salle ; faux = transition déjà en cours, on réessaie). Brann reste figé et invisible entre-temps.
+    /// Si la nouvelle salle n'est pas arrivée au bout de quelques secondes (chargement échoué), Brann réapparaît à
+    /// <paramref name="respawnPosition"/> comme après une chute ordinaire, sans dégât. Sans effet (faux) s'il est mort ou déjà en train de tomber.
+    /// </summary>
+    public bool FallThrough(System.Func<bool> leave, Vector2 respawnPosition) => BeginFall(respawnPosition, false, leave);
+
+    /// <summary>Vrai pendant une chute dans un trou (mortel ou de passage).</summary>
+    public bool IsFalling => _state == State.Chute;
+
+    private bool BeginFall(Vector2 respawnPosition, bool applyDamage, System.Func<bool> leave)
     {
         if (_state == State.Mort || _state == State.Chute) return false;
 
         _state = State.Chute;
         _fallTimer = FallDuration;
         _fallRespawn = respawnPosition;
+        _fallLeave = leave;
+        _fallLeft = false;
         Velocity = Vector2.Zero;
         _knockbackVelocity = Vector2.Zero;
         _hurtBox.Invincible = true; // aucun ennemi ne peut le toucher pendant la chute
@@ -225,7 +254,7 @@ public partial class Player : CharacterBody2D
         _sprite.Visible = true;
         UpdateAnimation(false);
 
-        int damage = HoleRules.FallDamage(_health.CurrentHealth, FallDamage);
+        int damage = applyDamage ? HoleRules.FallDamage(_health.CurrentHealth, FallDamage) : 0;
         if (damage > 0)
             _health.Damage(damage); // HealthChanged -> GameState -> HUD
         GD.Print($"Brann tombe dans un trou (-{damage}) : {_health.CurrentHealth}/{_health.MaxHealth} PV");
@@ -234,6 +263,19 @@ public partial class Player : CharacterBody2D
 
     private void ProcessFall(float delta)
     {
+        if (_fallLeft)
+        {
+            // Trou de passage : le changement de salle est lancé, Brann attend la nouvelle salle (qui le remplacera).
+            _fallLeaveWait -= delta;
+            if (_fallLeaveWait > 0f) return;
+            GD.PushError("Chute de passage : la salle d'arrivée n'a pas été chargée, Brann reste dans la salle.");
+            _gameState.PendingArrivalInvincibility = 0f;
+            _fallLeft = false;
+            _sprite.Visible = true;
+            FinishFall(); // dénouement d'une chute ordinaire : retour à _fallRespawn, état Déplacement, invincibilité
+            return;
+        }
+
         _fallTimer -= delta;
         if (_fallTimer > 0f)
         {
@@ -242,6 +284,23 @@ public partial class Player : CharacterBody2D
             return;
         }
 
+        if (_fallLeave != null)
+        {
+            _sprite.Visible = false;
+            if (_fallLeave()) // faux : un fondu est déjà en cours, on réessaie à l'image suivante
+            {
+                _fallLeave = null;
+                _fallLeft = true;
+                _fallLeaveWait = FallLeaveTimeout;
+            }
+            return;
+        }
+
+        FinishFall();
+    }
+
+    private void FinishFall()
+    {
         _sprite.Scale = Vector2.One;
         GlobalPosition = _fallRespawn;
         _camera?.ResetSmoothing();

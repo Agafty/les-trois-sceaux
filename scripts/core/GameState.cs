@@ -12,6 +12,24 @@ public partial class GameState : Node
     public const int MaxPlayerHealth = 18; // plafond : 9 cœurs
     public const int RespawnHealth = 6; // reprise avec 3 cœurs
 
+    /// <summary>
+    /// Option d'aide (accessibilité) : multiplicateur des durées des énigmes chronométrées (cibles, plus tard torches).
+    /// 1 = normal, 2 = durées doublées, 0 = illimitées. C'est un réglage du joueur, pas un état de partie :
+    /// il n'est volontairement pas dans les sauvegardes (il ira dans un fichier d'options avec le menu d'options).
+    /// </summary>
+    public float PuzzleTimeMultiplier
+    {
+        get => _puzzleTimeMultiplier;
+        set => _puzzleTimeMultiplier = SwitchRules.ClampTimeMultiplier(value);
+    }
+    private float _puzzleTimeMultiplier = 1f;
+
+    /// <summary>
+    /// Invincibilité (s) à accorder à Brann à son arrivée dans la prochaine salle (chute dans un trou de passage).
+    /// Lue et remise à zéro par <see cref="Player"/> à son _Ready.
+    /// </summary>
+    public float PendingArrivalInvincibility { get; set; }
+
     /// <summary>Id de l'objet « arc » : ses flèches sont sa quantité (butin garanti, tir).</summary>
     public const string BowItemId = "arc";
 

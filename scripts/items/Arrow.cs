@@ -15,7 +15,18 @@ public partial class Arrow : ItemUse
     /// <summary>Distance maximale parcourue (pixels) avant disparition.</summary>
     [Export(PropertyHint.Range, "32,1000,8")] public float MaxDistance { get; set; } = 320f;
 
+    /// <summary>La flèche est enflammée : elle l'est restée jusqu'à la fin de son vol et peut allumer une torche.</summary>
+    public bool IsBurning => _burning;
+
+    private const string BurningTexturePath = "res://art/items/fleche_enflammee.png";
+    private const int FlameFrameSize = 32;
+    private const float FlameFrameRate = 12f;
+    private static Texture2D _burningTexture;
+
     private HitBox _hitBox;
+    private Sprite2D _sprite;
+    private bool _burning;
+    private float _animTime;
     private Vector2 _direction = Vector2.Right;
     private float _travelled;
     private bool _done;
@@ -29,6 +40,7 @@ public partial class Arrow : ItemUse
     public override void _Ready()
     {
         _hitBox = GetNode<HitBox>("HitBox");
+        _sprite = GetNodeOrNull<Sprite2D>("Sprite");
         _hitBox.Damage = Damage;
         // Le script HitBox blesse déjà les HurtBox ennemies ; on s'abonne en plus pour savoir quand la flèche a touché.
         _hitBox.HitLanded += Despawn;
@@ -50,13 +62,47 @@ public partial class Arrow : ItemUse
         float step = Speed * (float)delta;
         Position += _direction * step;
         _travelled += step;
+        if (_burning && _sprite != null && _sprite.Hframes > 1)
+        {
+            _animTime += (float)delta;
+            _sprite.Frame = (int)(_animTime * FlameFrameRate) % _sprite.Hframes;
+        }
         if (_travelled >= MaxDistance) Despawn();
+    }
+
+    /// <summary>
+    /// Enflamme la flèche pour le reste de son vol (sprite art/items/fleche_enflammee.png, 3 images en boucle ;
+    /// à défaut, la flèche normale est teintée en orange). Sans effet si elle brûle déjà.
+    /// </summary>
+    public void Ignite()
+    {
+        if (_burning) return;
+        _burning = true;
+        if (_sprite == null) return;
+        if (_burningTexture == null && ResourceLoader.Exists(BurningTexturePath))
+            _burningTexture = GD.Load<Texture2D>(BurningTexturePath);
+        if (_burningTexture != null)
+        {
+            _sprite.Texture = _burningTexture;
+            _sprite.Hframes = Mathf.Max(1, _burningTexture.GetWidth() / FlameFrameSize);
+            _sprite.Frame = 0;
+        }
+        else
+        {
+            _sprite.Modulate = new Color(1f, 0.6f, 0.2f);
+        }
     }
 
     private void OnAreaEntered(Area2D area) => TryHitTarget(area);
 
     private void OnBodyEntered(Node2D body)
     {
+        if (body is IArrowInteractor)
+        {
+            // Retour anticipé voulu : le test « mur » plus bas arrêterait la flèche, or une torche allumée doit la laisser passer.
+            TryHitTarget(body); // c'est lui qui décide si la flèche s'arrête (torche éteinte) ou passe (torche allumée)
+            return;
+        }
         TryHitTarget(body);
         // Les CharacterBody2D (Brann, ennemis) ne sont pas des murs : les ennemis sont gérés par leur HurtBox
         // (zone), Brann est ignoré. Tout le reste (TileMapLayer, StaticBody2D) arrête la flèche.
@@ -66,7 +112,13 @@ public partial class Arrow : ItemUse
 
     private void TryHitTarget(Node2D node)
     {
-        if (_done || !node.IsInGroup(TargetGroup) || node is not IArrowTarget target) return;
+        if (_done) return;
+        if (node is IArrowInteractor interactor)
+        {
+            if (interactor.OnArrowTouch(this)) Despawn(); // torche allumée : la flèche passe (et s'enflamme)
+            return;
+        }
+        if (!node.IsInGroup(TargetGroup) || node is not IArrowTarget target) return;
         target.OnArrowHit(GlobalPosition, _direction);
         Despawn();
     }

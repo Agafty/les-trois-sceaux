@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 /// <summary>Règles pures du bloc poussable (sans Godot) : direction de poussée et alignement sur la grille.</summary>
 public static class PushBlockRules
@@ -29,5 +30,19 @@ public static class PushBlockRules
     public static float SnapToCellCenter(float value, float cell)
     {
         return (float)Math.Floor(value / cell) * cell + cell * 0.5f;
+    }
+
+    /// <summary>Indice de la case de grille (de côté <paramref name="cell"/>) qui contient la coordonnée.</summary>
+    public static int CellIndex(float value, float cell) => (int)Math.Floor(value / cell);
+
+    /// <summary>
+    /// Ajoute la case (cellX, cellY) et ses 8 voisines à l'ensemble des cases interdites au bloc
+    /// (un Spawn, une Sortie ou une Porte : un bloc posé là ou à côté enfermerait Brann).
+    /// </summary>
+    public static void AddForbiddenAround(HashSet<(int, int)> forbidden, int cellX, int cellY)
+    {
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dy = -1; dy <= 1; dy++)
+                forbidden.Add((cellX + dx, cellY + dy));
     }
 }
