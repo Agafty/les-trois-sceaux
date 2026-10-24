@@ -4,7 +4,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Une salle de jeu : une carte Tiled importée + un conteneur « Entites » (tri en profondeur) où vit Brann.
 /// Au chargement, la salle lit le calque d'objets « Objets » de la carte (Spawn, Sortie, Ennemi, Coffre,
-/// StatueCorbeau, Ramassable, Porte) et instancie les vraies scènes aux positions des marqueurs.
+/// StatueCorbeau, Ramassable, Porte, Interrupteur, BlocPoussable) et instancie les vraies scènes aux positions des marqueurs.
 /// La scène importée n'est jamais modifiée sur le disque : seuls les nœuds de l'arbre en cours sont retirés.
 /// </summary>
 public partial class Room : Node2D
@@ -43,6 +43,8 @@ public partial class Room : Node2D
     private const string StatueScenePath = "res://scenes/puzzles/statue_corbeau.tscn";
     private const string DoorScenePath = "res://scenes/puzzles/porte.tscn";
     private const string PickupScenePath = "res://scenes/items/objet_inventaire.tscn";
+    private const string SwitchScenePath = "res://scenes/puzzles/interrupteur.tscn";
+    private const string BlockScenePath = "res://scenes/puzzles/bloc_poussable.tscn";
     private const int DessusZIndex = 2; // au-dessus des entités (0) et de l'icône d'un coffre (1)
     private static readonly Vector2 FootOffset = new(0f, 16f); // coffres et statues : posés au bas de leur case
 
@@ -54,6 +56,12 @@ public partial class Room : Node2D
     private readonly Dictionary<Health, EnemyTrack> _trackedEnemies = new();
     private bool _leaving;
     private readonly List<Door> _doors = new();
+    private HoleWatcher _holes;
+    private PackedScene _switchScene;
+    private PackedScene _blockScene;
+
+    /// <summary>Position de Brann à l'arrivée dans la salle (son Spawn) : il y revient après une chute dans un trou.</summary>
+    public Vector2 EntryPosition { get; private set; }
 
     /// <summary>Zone de la salle courante (chaîne vide hors d'une salle).</summary>
     public static string ZoneOf(Node node)
@@ -86,6 +94,9 @@ public partial class Room : Node2D
         var spawn = FindSpawnById(this, sceneManager.ConsumeSpawnId());
         if (player != null && spawn != null)
             player.GlobalPosition = spawn.GlobalPosition;
+
+        EntryPosition = player?.GlobalPosition ?? Vector2.Zero;
+        SetupHoles(player);
 
         SpawnObjects();
 
@@ -191,6 +202,8 @@ public partial class Room : Node2D
                 case "Coffre": SpawnChest(node); break;
                 case "StatueCorbeau": SpawnStatue(node); break;
                 case "Ramassable": SpawnPickup(node); break;
+                case "Interrupteur": SpawnSwitch(node); break;
+                case "BlocPoussable": SpawnBlock(node); break;
                 case "Porte": portes.Add(node); break; // après les ennemis : elles ont besoin de leur nombre
                 default:
                     WarnOnce("class:" + node.GetMeta("class").AsString(),
@@ -241,6 +254,7 @@ public partial class Room : Node2D
         else if (variant != "normal")
             WarnOnce("ennemi-variante:" + variant, $"Variante d'ennemi inconnue « {variant} » : traité comme « normal ».");
         _entities.AddChild(enemy);
+        _holes?.Track(enemy);
 
         var health = enemy.GetNodeOrNull<Health>("Health");
         if (health != null)
@@ -376,6 +390,42 @@ public partial class Room : Node2D
         RemoveMarker(marker);
     }
 
+    // Interrupteur : propriétés id, cible, mode (fleche par défaut, car les premières cartes n'ont pas « mode »).
+    private void SpawnSwitch(Node marker)
+    {
+        string id = GetString(marker, "id");
+        string modeValue = GetString(marker, "mode");
+        if (!SwitchRules.TryParseMode(modeValue, out var mode))
+            WarnOnce("interrupteur-mode:" + modeValue, $"Interrupteur « {id} » : mode inconnu « {modeValue} » (fleche ou epee) dans {Name}, traité comme « fleche ».");
+        else if (string.IsNullOrEmpty(modeValue))
+            WarnOnce("interrupteur-sans-mode", "Interrupteur sans propriété « mode » dans Tiled : traité comme « fleche ».");
+
+        var sw = (_switchScene ??= GD.Load<PackedScene>(SwitchScenePath)).Instantiate<Switch>();
+        sw.Id = id;
+        sw.Target = GetString(marker, "cible");
+        sw.Mode = mode;
+        sw.Position = _entities.ToLocal(ObjectCenter(marker));
+        _entities.AddChild(sw);
+        RemoveMarker(marker);
+    }
+
+    // Bloc poussable : posé au centre de la case du marqueur ; revient là à chaque chargement (rien n'est sauvegardé).
+    private void SpawnBlock(Node marker)
+    {
+        var block = (_blockScene ??= GD.Load<PackedScene>(BlockScenePath)).Instantiate<PushBlock>();
+        block.Position = _entities.ToLocal(ObjectCenter(marker));
+        _entities.AddChild(block);
+        RemoveMarker(marker);
+    }
+
+    // Trous : surveillés d'après le calque « Sol » (voir HoleWatcher). Pas de calque Sol : pas de trous.
+    private void SetupHoles(Player player)
+    {
+        if (player == null || FindNodeByName(this, "Sol") is not TileMapLayer floor) return;
+        _holes = new HoleWatcher { Name = "Trous", Floor = floor, Player = player, RespawnPosition = EntryPosition };
+        AddChild(_holes);
+    }
+
     private PickupEffect LoadPickupEffect(string content, string owner)
     {
         if (!RoomObjectCatalog.IsSafeName(content))
@@ -397,6 +447,15 @@ public partial class Room : Node2D
     {
         marker.GetParent()?.RemoveChild(marker);
         marker.QueueFree();
+    }
+
+    // Centre d'un objet Tiled : le point lui-même, ou le centre de la forme si l'objet est un rectangle.
+    private static Vector2 ObjectCenter(Node marker)
+    {
+        foreach (var child in marker.GetChildren())
+            if (child is CollisionShape2D shape)
+                return shape.GlobalPosition;
+        return MarkerPosition(marker);
     }
 
     private static Vector2 MarkerPosition(Node marker) => marker is Node2D n ? n.GlobalPosition : Vector2.Zero;

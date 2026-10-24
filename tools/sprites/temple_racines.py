@@ -1,13 +1,16 @@
-"""PLAN du tileset du Temple des Racines (donjon 1) — Les Trois Sceaux.
+"""Tileset du Temple des Racines (donjon 1) — Les Trois Sceaux.
 
-Usage : python tools/sprites/temple_racines.py
+Usage : python tools/sprites/temple_racines.py          -> DESSIN FINAL (tools/sprites/temple_racines_final.py)
+        python tools/sprites/temple_racines.py --plan   -> PLAN (aplats + flèches), pour régénérer le plan
+Le catalogue (ids, collisions, terrains) ne change pas entre les deux : seule l'image change.
 Produit, à partir de la liste TILES ci-dessous (seule source de vérité) :
   art/tilesets/temple_racines.png          planche 8 colonnes x 16 lignes de tuiles 32x32, sans marge
   maps/tilesets/temple_racines.tsx         tileset Tiled (collisions + terrains)
   art/tilesets/temple_racines_plan.md      tableau de chaque tuile (id, rôle, calque, collision)
   art/tilesets/temple_racines_apercu.png   salle d'exemple 20x11 agrandie x3 (contrôle des raccords)
 
-C'est un PLAN : aplats lisibles par famille, contour sombre, flèche = côté où se trouve le sol.
+Le PLAN (option --plan) : aplats lisibles par famille, contour sombre, flèche = côté où se trouve le sol.
+Le DESSIN FINAL est dans temple_racines_final.py (une fonction par famille de tuiles).
 RÈGLE : ne jamais déplacer une tuile. Pour redessiner, modifier la fonction de dessin d'une
 tuile en gardant son id ; pour en ajouter, utiliser une case « réserve » ou ajouter des lignes.
 
@@ -19,12 +22,14 @@ import math
 import os
 import random
 import struct
+import sys
 import zlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..'))
 NAME = 'temple_racines'
 T, COLS, ROWS = 32, 8, 16
+PLAN = '--plan' in sys.argv      # True : image = plan (aplats + flèches) ; False : dessin final
 
 # Palette : reprise des sprites existants (tools/sprites/engine.py, enemies.py, coffres.py)
 HEX = dict(
@@ -725,11 +730,16 @@ def build_md():
            f'de tuiles 32×32, sans marge ni espacement ({COLS * ROWS} cases).',
            f'- Tileset Tiled : `maps/tilesets/{NAME}.tsx` (collisions et terrains déjà définis).',
            '- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de '
-           'numéro : le dessin final sera fait au même emplacement. Les cases « réserve » sont vides et '
-           'serviront aux ajouts.',
-           '- C\'est un **plan** : aplats par famille (gris = sol, violet-gris = murs, noir = trous, bleu = eau, '
-           'noir-violet = ronces), contour sombre. La **flèche** sur les murs, portes, escaliers et trous montre '
-           'le côté où se trouve le sol (ou la direction de sortie).',
+           'numéro : le dessin est fait au même emplacement que le plan d\'origine. Les cases « réserve » sont '
+           'vides et serviront aux ajouts.',
+           ('- C\'est un **plan** : aplats par famille (gris = sol, violet-gris = murs, noir = trous, bleu = eau, '
+            'noir-violet = ronces), contour sombre. La **flèche** sur les murs, portes, escaliers et trous montre '
+            'le côté où se trouve le sol (ou la direction de sortie).') if PLAN else
+           ('- **Dessin final** (vue de dessus 3/4, lumière en haut à gauche, contour sombre d\'1 px) : dalles de '
+            'pierre grises usées, murs de pierre taillée violet-gris (dessus sombre + face avant claire visible), '
+            'racines brunes, ronces noires-violettes épineuses, trous avec bord de dalle clair, eau bleue, '
+            'mousse et feuilles. Le dessin est dans `tools/sprites/temple_racines_final.py` ; '
+            '`python tools/sprites/temple_racines.py --plan` régénère l\'ancien plan à flèches.'),
            '- Collision : en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche).', '']
     for titre, a, b in GROUPS:
         out += [f'## {titre}', '', '| N° | Nom | Rôle | Calque | Collision |', '| --- | --- | --- | --- | --- |']
@@ -784,8 +794,10 @@ def build_md():
         '- **Détection des trous** (développeur) : proposer une convention, par exemple une propriété de tuile '
         '`trou` (bool) dans le `.tsx`, lue en jeu via les custom data du TileSet importé, ou un objet `Trou` '
         'dans le calque Objets. Rien n\'est encore défini dans `CLAUDE.md`, donc rien n\'est mis dans le `.tsx`.',
-        '- **Palette** : la palette actuelle n\'a pas de bleu clair ; l\'eau peu profonde utilise le bleu des '
-        'sprites (`#3c5a8a`) et l\'eau profonde le bleu sombre (`#263a5e`). Un bleu clair serait utile au dessin final.', '',
+        '- **Palette** : le dessin final ajoute quelques nuances (reflets et ombres de dalle et de mur, bleus clairs '
+        'de l\'eau, voir « Palette utilisée ») ; à reporter dans `art/palette.png` quand la palette du jeu sera figée.',
+        '- **Murs** : `mur_plein` (28) n\'a pas de bord clair ; à utiliser à l\'intérieur d\'un mur épais, pas au '
+        'contact du sol (utiliser les tuiles de bord via le terrain `Murs`).', '',
         '## Palette utilisée', '',
         '| Rôle | Couleurs |', '| --- | --- |',
         '| Contour | `#1b1420`, `#241a22` |', '| Dalles | `#9a948c`, `#5c5650`, `#d8d4cc` |',
@@ -794,7 +806,11 @@ def build_md():
         '| Eau | `#3c5a8a` (peu profonde), `#263a5e` (profonde), `#b8a8c0` (écume) |',
         '| Ronces | `#241a22`, `#3a1a4a`, `#6a2a7a` |',
         '| Mousse, feuilles | `#5a8a3c`, `#6a9a48`, `#3a5a2c`, `#c8a050`, `#f08a28` |',
-        '| Vase | `#b06e40`, `#8a5a34`, `#d6c49c` |', '']
+        '| Vase | `#b06e40`, `#8a5a34`, `#d6c49c` |']
+    if not PLAN:
+        out += ['| Nuances ajoutées (dessin final) | dalles `#aaa49a`, `#847e76` ; murs `#44384e`, `#2e2638`, '
+                '`#8a7a98`, `#645672` ; eau `#7a9ac0`, `#b8d0e8`, `#324d7a`, `#1e2e4e` ; vase `#c98250` |']
+    out += ['']
     return '\n'.join(out)
 
 
@@ -879,7 +895,19 @@ def build_preview():
     return img
 
 
+def apply_final():
+    """Remplace les images du plan par le dessin final (mêmes ids, mêmes cases)."""
+    sys.path.insert(0, HERE)
+    import temple_racines_final
+    imgs = temple_racines_final.build()
+    assert set(imgs) == set(TILES), sorted(set(imgs) ^ set(TILES))
+    for i, img in imgs.items():
+        TILES[i]['img'] = img
+
+
 def main():
+    if '--plan' not in sys.argv:
+        apply_final()
     os.makedirs(os.path.join(ROOT, 'art', 'tilesets'), exist_ok=True)
     save_png(os.path.join(ROOT, 'art', 'tilesets', f'{NAME}.png'), build_sheet())
     with open(os.path.join(ROOT, 'maps', 'tilesets', f'{NAME}.tsx'), 'w', encoding='utf-8', newline='\n') as f:
@@ -887,7 +915,11 @@ def main():
     with open(os.path.join(ROOT, 'art', 'tilesets', f'{NAME}_plan.md'), 'w', encoding='utf-8', newline='\n') as f:
         f.write(build_md())
     save_png(os.path.join(ROOT, 'art', 'tilesets', f'{NAME}_apercu.png'), build_preview(), scale=3)
-    print(f'{len(TILES)} tuiles dessinées sur {COLS * ROWS} cases.')
+    if not PLAN:
+        import temple_racines_final
+        os.makedirs(os.path.join(ROOT, 'art', 'puzzles'), exist_ok=True)
+        save_png(os.path.join(ROOT, 'art', 'puzzles', 'bloc_poussable.png'), temple_racines_final.bloc_poussable())
+    print(f'{len(TILES)} tuiles dessinées sur {COLS * ROWS} cases ({"plan" if "--plan" in sys.argv else "final"}).')
 
 
 if __name__ == '__main__':

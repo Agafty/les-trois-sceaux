@@ -25,6 +25,10 @@ public partial class HitBox : Area2D
     [Export]
     public bool SingleHit { get; set; }
 
+    /// <summary>Vrai pour l'épée : cette HitBox prévient aussi les zones <see cref="IMeleeTarget"/> (interrupteur à l'épée...) qu'elle chevauche.</summary>
+    [Export]
+    public bool Melee { get; set; }
+
     private bool _hasHit;
     private static bool _hitStopActive;
 
@@ -35,6 +39,11 @@ public partial class HitBox : Area2D
 
     private void OnAreaEntered(Area2D area)
     {
+        if (Melee && area is IMeleeTarget meleeTarget)
+        {
+            meleeTarget.OnMeleeHit(GlobalPosition);
+            return;
+        }
         if (area is not HurtBox hurtBox) return;
         if (hurtBox.Team == Team) return;
         if (SingleHit && _hasHit) return;

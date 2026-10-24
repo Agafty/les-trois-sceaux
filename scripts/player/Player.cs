@@ -3,7 +3,7 @@ using Godot;
 public partial class Player : CharacterBody2D
 {
     private enum Direction { Bas, Haut, Gauche, Droite }
-    private enum State { Deplacement, Attaque, Touche, Mort }
+    private enum State { Deplacement, Attaque, Touche, Mort, Chute }
 
     private static readonly StringName DeathAnim = "death";
     private static readonly StringName LiftAnim = "lift";
@@ -32,6 +32,14 @@ public partial class Player : CharacterBody2D
     [Export]
     public float RespawnDelay { get; set; } = 1.0f;
 
+    /// <summary>Durée (s) de l'animation de chute dans un trou.</summary>
+    [Export(PropertyHint.Range, "0.1,2,0.05")]
+    public float FallDuration { get; set; } = 0.5f;
+
+    /// <summary>PV perdus en tombant dans un trou (1 PV = un demi-cœur). Une chute ne tue jamais : il reste au moins 1 PV.</summary>
+    [Export(PropertyHint.Range, "0,6,1")]
+    public int FallDamage { get; set; } = 1;
+
     /// <summary>Distance (px) à laquelle un objet utilisé est posé devant Brann, depuis ses pieds.</summary>
     [Export]
     public float UseDistance { get; set; } = 24f;
@@ -47,8 +55,14 @@ public partial class Player : CharacterBody2D
     private float _blinkTimer;
     private Vector2 _knockbackVelocity;
     private float _respawnTimer = -1f;
+    private Camera2D _camera;
+    private float _fallTimer;
+    private Vector2 _fallRespawn;
     private SceneManager _sceneManager;
     private GameState _gameState;
+
+    /// <summary>Décalage (px) entre l'origine de Brann et le centre de ses pieds (centre de sa capsule de collision).</summary>
+    public static readonly Vector2 FeetOffset = new(0f, 6f);
 
     public bool IsDead => _state == State.Mort;
 
@@ -69,6 +83,7 @@ public partial class Player : CharacterBody2D
         _swordSprite = GetNode<AnimatedSprite2D>("SwordSlash");
         _swordHitBox = GetNode<HitBox>("SwordSlash/HitBox");
         _health = GetNode<Health>("Health");
+        _camera = GetNodeOrNull<Camera2D>("Camera2D");
         _hurtBox = GetNode<HurtBox>("HurtBox");
         _gameState = GetNode<GameState>("/root/GameState");
         // Les _Ready des enfants passent avant celui du parent : Health a déjà fait son init par défaut.
@@ -153,6 +168,12 @@ public partial class Player : CharacterBody2D
             return;
         }
 
+        if (_state == State.Chute)
+        {
+            ProcessFall((float)delta);
+            return;
+        }
+
         UpdateInvincibility((float)delta);
 
         if (_state == State.Attaque)
@@ -183,6 +204,52 @@ public partial class Player : CharacterBody2D
             StartAttack();
         else if (Input.IsActionJustPressed("use_item"))
             TryUseItem();
+    }
+
+    /// <summary>
+    /// Brann tombe dans un trou : il rétrécit, perd <see cref="FallDamage"/> PV (sans jamais mourir), puis réapparaît à
+    /// <paramref name="respawnPosition"/> avec une brève invincibilité. Sans effet s'il est mort ou déjà en train de tomber.
+    /// </summary>
+    public bool Fall(Vector2 respawnPosition)
+    {
+        if (_state == State.Mort || _state == State.Chute) return false;
+
+        _state = State.Chute;
+        _fallTimer = FallDuration;
+        _fallRespawn = respawnPosition;
+        Velocity = Vector2.Zero;
+        _knockbackVelocity = Vector2.Zero;
+        _hurtBox.Invincible = true; // aucun ennemi ne peut le toucher pendant la chute
+        _swordSprite.Visible = false;
+        _swordHitBox.Monitoring = false;
+        _sprite.Visible = true;
+        UpdateAnimation(false);
+
+        int damage = HoleRules.FallDamage(_health.CurrentHealth, FallDamage);
+        if (damage > 0)
+            _health.Damage(damage); // HealthChanged -> GameState -> HUD
+        GD.Print($"Brann tombe dans un trou (-{damage}) : {_health.CurrentHealth}/{_health.MaxHealth} PV");
+        return true;
+    }
+
+    private void ProcessFall(float delta)
+    {
+        _fallTimer -= delta;
+        if (_fallTimer > 0f)
+        {
+            float shrink = Mathf.Lerp(1f, 0.1f, 1f - _fallTimer / FallDuration);
+            _sprite.Scale = new Vector2(shrink, shrink);
+            return;
+        }
+
+        _sprite.Scale = Vector2.One;
+        GlobalPosition = _fallRespawn;
+        _camera?.ResetSmoothing();
+        _state = State.Deplacement;
+        _invincibleTimer = InvincibleDuration;
+        _blinkTimer = BlinkInterval;
+        _hurtBox.Invincible = true; // levée par UpdateInvincibility à la fin du délai
+        UpdateAnimation(false);
     }
 
     /// <summary>Vrai quand Brann peut agir (ni attaque, ni touché, ni mort) : utilisé pour interagir avec un coffre.</summary>

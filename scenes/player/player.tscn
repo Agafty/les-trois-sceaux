@@ -51,6 +51,7 @@ animation = &"slash_down"
 script = ExtResource("script_hitbox")
 Team = 0
 Damage = 1
+Melee = true
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SwordSlash/HitBox"]

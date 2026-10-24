@@ -4,8 +4,8 @@
 
 - Image : `art/tilesets/temple_racines.png`, 256×512 px, 8 colonnes × 16 lignes de tuiles 32×32, sans marge ni espacement (128 cases).
 - Tileset Tiled : `maps/tilesets/temple_racines.tsx` (collisions et terrains déjà définis).
-- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro : le dessin final sera fait au même emplacement. Les cases « réserve » sont vides et serviront aux ajouts.
-- C'est un **plan** : aplats par famille (gris = sol, violet-gris = murs, noir = trous, bleu = eau, noir-violet = ronces), contour sombre. La **flèche** sur les murs, portes, escaliers et trous montre le côté où se trouve le sol (ou la direction de sortie).
+- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro : le dessin est fait au même emplacement que le plan d'origine. Les cases « réserve » sont vides et serviront aux ajouts.
+- **Dessin final** (vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px) : dalles de pierre grises usées, murs de pierre taillée violet-gris (dessus sombre + face avant claire visible), racines brunes, ronces noires-violettes épineuses, trous avec bord de dalle clair, eau bleue, mousse et feuilles. Le dessin est dans `tools/sprites/temple_racines_final.py` ; `python tools/sprites/temple_racines.py --plan` régénère l'ancien plan à flèches.
 - Collision : en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche).
 
 ## 1. Sol
@@ -159,7 +159,8 @@ Quatre terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dan
 ## Besoins et propositions
 
 - **Détection des trous** (développeur) : proposer une convention, par exemple une propriété de tuile `trou` (bool) dans le `.tsx`, lue en jeu via les custom data du TileSet importé, ou un objet `Trou` dans le calque Objets. Rien n'est encore défini dans `CLAUDE.md`, donc rien n'est mis dans le `.tsx`.
-- **Palette** : la palette actuelle n'a pas de bleu clair ; l'eau peu profonde utilise le bleu des sprites (`#3c5a8a`) et l'eau profonde le bleu sombre (`#263a5e`). Un bleu clair serait utile au dessin final.
+- **Palette** : le dessin final ajoute quelques nuances (reflets et ombres de dalle et de mur, bleus clairs de l'eau, voir « Palette utilisée ») ; à reporter dans `art/palette.png` quand la palette du jeu sera figée.
+- **Murs** : `mur_plein` (28) n'a pas de bord clair ; à utiliser à l'intérieur d'un mur épais, pas au contact du sol (utiliser les tuiles de bord via le terrain `Murs`).
 
 ## Palette utilisée
 
@@ -173,3 +174,4 @@ Quatre terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dan
 | Ronces | `#241a22`, `#3a1a4a`, `#6a2a7a` |
 | Mousse, feuilles | `#5a8a3c`, `#6a9a48`, `#3a5a2c`, `#c8a050`, `#f08a28` |
 | Vase | `#b06e40`, `#8a5a34`, `#d6c49c` |
+| Nuances ajoutées (dessin final) | dalles `#aaa49a`, `#847e76` ; murs `#44384e`, `#2e2638`, `#8a7a98`, `#645672` ; eau `#7a9ac0`, `#b8d0e8`, `#324d7a`, `#1e2e4e` ; vase `#c98250` |
