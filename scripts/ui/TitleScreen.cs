@@ -9,9 +9,13 @@ using Godot;
 /// </summary>
 public partial class TitleScreen : Control
 {
-    /// <summary>Salle où commence une nouvelle partie (premier Spawn de la carte).</summary>
+    /// <summary>Salle où commence une nouvelle partie.</summary>
     [Export(PropertyHint.File, "*.tscn")]
-    public string NewGameScenePath { get; set; } = "res://scenes/rooms/salle_test_room.tscn";
+    public string NewGameScenePath { get; set; } = "res://scenes/rooms/foret_temple_room.tscn";
+
+    /// <summary>Spawn d'arrivée d'une nouvelle partie (vide = premier Spawn de la carte).</summary>
+    [Export]
+    public string NewGameSpawnId { get; set; } = "depuis_village";
 
     private enum Page { Main, Slots, Confirm }
     private enum SlotState { Empty, Ok, Unreadable }
@@ -256,7 +260,7 @@ public partial class TitleScreen : Control
         }
         // La remise à zéro de l'état n'a lieu qu'une fois l'écran noir (beforeChange), comme pour Load :
         // si la transition échoue, rien n'a été modifié.
-        if (!_sceneManager.GoToScene(NewGameScenePath, "", () => _saveSystem.StartNewGame(slot)))
+        if (!_sceneManager.GoToScene(NewGameScenePath, NewGameSpawnId, () => _saveSystem.StartNewGame(slot)))
         {
             ShowError(Tr("TITLE_ERR_START"));
             return;
