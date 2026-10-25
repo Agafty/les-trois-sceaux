@@ -762,8 +762,10 @@ def build_md():
            ('- **Dessin final** (vue de dessus 3/4, lumière en haut à gauche, contour sombre d\'1 px) : dalles de '
             'pierre grises usées, murs de pierre taillée violet-gris (dessus sombre + face avant claire visible), '
             'racines brunes, ronces noires-violettes épineuses, trous avec bord de dalle clair, eau bleue, '
-            'mousse et feuilles. Le dessin est dans `tools/sprites/temple_racines_final.py` ; '
-            '`python tools/sprites/temple_racines.py --plan` régénère l\'ancien plan à flèches.'),
+            'mousse et feuilles. **Dessin v2** dans `tools/sprites/temple_racines_v2.py` : dalles en pierres '
+            'irrégulières qui se raccordent d\'une tuile à l\'autre, bords d\'eau, de terre et d\'eau profonde '
+            'irréguliers et fondus (tramage), murs retexturés, tuiles de décor ajoutées dans les réserves. La '
+            'géométrie des murs, portes, escaliers et colonnes vient toujours de `temple_racines_final.py`.'),
            '- Collision : en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche).', '']
     for titre, a, b in GROUPS:
         out += [f'## {titre}', '', '| N° | Nom | Rôle | Calque | Collision |', '| --- | --- | --- | --- | --- |']
@@ -781,14 +783,22 @@ def build_md():
         out.append('')
     out += [
         '## Terrains Tiled (autotiling)', '',
-        'Cinq terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dans Tiled : panneau '
+        'Six terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dans Tiled : panneau '
         '**Terrains**, choisir le terrain puis peindre avec le pinceau de terrain (T).', '',
         '| Terrain | Couleurs | Calque | Tuiles |', '| --- | --- | --- | --- |',
         '| `Murs` | `mur` (le reste = vide) | Murs | 16–30 |',
         '| `Trous` | `sol`, `trou` | Sol | 0–2 (sol), 58–66 |',
         '| `Trous de passage` | `sol`, `passage` | Sol | 0–2 (sol), 31–39 |',
         '| `Eau` | `sol`, `eau` | Sol | 0–2 (sol), 80–92 |',
-        '| `Eau profonde` | `eau`, `profonde` | Murs | 80 (eau), 96–108 |', '',
+        '| `Eau profonde` | `eau`, `profonde` | Murs | 80 (eau), 96–108 |',
+        '| `Terre` | `sol`, `terre` | Sol | 0–2 (sol), 5 (terre), 48–55, 67–71 |', '',
+        '- **Terre** : peindre la terre avec ce terrain plutôt que de poser la tuile 5 seule : les tuiles de bord '
+        '(48–55, 67–71) font une transition irrégulière et fondue vers les dalles (la terre déborde d\'une '
+        'demi-tuile sur les cases voisines). La tuile 5 seule reste valable au milieu d\'une zone de terre.',
+        '- **Ombres** (12–14, calque Decor) : sous un mur du haut (12), à droite d\'un mur de gauche (13), '
+        'dans l\'angle haut-gauche (14). Elles fondent la jonction mur/sol.',
+        '- **Variantes de sol** 124 (racine qui perce) et 125 (dalle moussue) : à mélanger avec 0–4, elles se '
+        'raccordent à toutes les dalles.', '',
         '- **Murs** : une seule couleur, `mur`. Le sol n\'en fait pas partie (il est peint sur le calque Sol), '
         'pour que le pinceau ne pose jamais de dalle sur le calque Murs. Pour une salle de 20×11 entourée d\'un '
         'mur d\'une tuile, peindre `mur` sur tous les coins du pourtour : on obtient exactement l\'anneau '
@@ -808,7 +818,7 @@ def build_md():
         'profonde est posée sur le calque **Murs** (par-dessus l\'eau peu profonde) car elle bloque : sa '
         'collision couvre exactement ses quarts d\'eau profonde. Il manque volontairement les deux tuiles en '
         'diagonale (deux quarts opposés) : éviter de les demander au pinceau.',
-        '- Les dalles fissurées (3, 4) et la terre (5) ne sont pas dans les terrains : à poser à la main.', '',
+        '- Les dalles fissurées (3, 4) ne sont pas dans les terrains : à poser à la main.', '',
         '## Comment assembler', '',
         '- **Porte** : remplacer la tuile de mur par `porte_<côté>` (calque Murs), poser `porte_<côté>_dessus` '
         'dans la **même case** du calque Dessus, puis l\'objet `Porte` (calque Objets) par-dessus. La porte '
@@ -929,11 +939,23 @@ def build_preview():
     return img
 
 
-def apply_final():
-    """Remplace les images du plan par le dessin final (mêmes ids, mêmes cases)."""
+def apply_final(theme='temple', thick_roots=False):
+    """Remplace les images du plan par le dessin (mêmes ids, mêmes cases).
+    Dessin v2 (tools/sprites/temple_racines_v2.py) : pierres irrégulières, bords fondus, plus de décor ;
+    il ajoute aussi des tuiles dans les cases de réserve (terrain Terre, décor)."""
     sys.path.insert(0, HERE)
-    import temple_racines_final
-    imgs = temple_racines_final.build()
+    import temple_racines_v2 as V
+    imgs = V.build(theme, thick_roots)
+    for i, nom, role, calque in V.NEW_TILES:
+        if i not in TILES:
+            add(i, nom, role, calque, None, None)
+    if 'Terre' not in WANG:
+        WANG['Terre'] = dict(colors=[('sol', '#9a948c'), ('terre', '#8a5a34')], tile=5, tiles={})
+        for v in (0, 1, 2):
+            WANG['Terre']['tiles'][v] = (1, 1, 1, 1)
+        WANG['Terre']['tiles'][5] = (2, 2, 2, 2)
+        for i, nom, role, bits in V.TERRE_TILES:
+            add(i, nom, role, 'Sol', None, None, ('Terre', tuple(2 if b else 1 for b in bits)))
     assert set(imgs) == set(TILES), sorted(set(imgs) ^ set(TILES))
     for i, img in imgs.items():
         TILES[i]['img'] = img

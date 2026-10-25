@@ -127,10 +127,15 @@ def fresque(k):
     return t
 
 
+# Tuiles reprises de temple_racines_final.py sans retexture v2 : recolorees en sous-sol
+F_DECOR = list(range(31, 40)) + [56, 57, 112, 113, 114, 115, 116]
+
+
 def build_images():
-    TR.apply_final()
-    out = {i: recolor(d['img']) for i, d in TR.TILES.items()}
-    out[6], out[7], out[8] = racine_epaisse('h'), racine_epaisse('v'), racine_epaisse('t')
+    TR.apply_final('sous_sol', thick_roots=True)        # dessin v2, theme sous-sol (pierre bleu-vert, racines epaisses)
+    out = {i: d['img'] for i, d in TR.TILES.items()}
+    for i in F_DECOR:
+        out[i] = recolor(out[i])
     out[9], out[10], out[11] = fresque(0), fresque(1), fresque(2)   # deja recolorees
     return out
 

@@ -298,5 +298,26 @@
    <wangtile tileid="38" wangid="0,2,0,1,0,1,0,1"/>
    <wangtile tileid="39" wangid="0,1,0,1,0,1,0,2"/>
   </wangset>
+  <wangset name="Terre" type="corner" tile="5">
+   <wangcolor name="sol" color="#9a948c" tile="-1" probability="1"/>
+   <wangcolor name="terre" color="#8a5a34" tile="-1" probability="1"/>
+   <wangtile tileid="0" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="1" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="2" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="5" wangid="0,2,0,2,0,2,0,2"/>
+   <wangtile tileid="48" wangid="0,1,0,2,0,2,0,1"/>
+   <wangtile tileid="49" wangid="0,2,0,1,0,1,0,2"/>
+   <wangtile tileid="50" wangid="0,2,0,2,0,1,0,1"/>
+   <wangtile tileid="51" wangid="0,1,0,1,0,2,0,2"/>
+   <wangtile tileid="52" wangid="0,2,0,2,0,2,0,1"/>
+   <wangtile tileid="53" wangid="0,1,0,2,0,2,0,2"/>
+   <wangtile tileid="54" wangid="0,2,0,2,0,1,0,2"/>
+   <wangtile tileid="55" wangid="0,2,0,1,0,2,0,2"/>
+   <wangtile tileid="67" wangid="0,1,0,2,0,1,0,1"/>
+   <wangtile tileid="68" wangid="0,1,0,1,0,2,0,1"/>
+   <wangtile tileid="69" wangid="0,2,0,1,0,1,0,1"/>
+   <wangtile tileid="70" wangid="0,1,0,1,0,1,0,2"/>
+   <wangtile tileid="71" wangid="0,1,0,2,0,1,0,2"/>
+  </wangset>
  </wangsets>
 </tileset>

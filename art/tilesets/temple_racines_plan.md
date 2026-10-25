@@ -5,7 +5,7 @@
 - Image : `art/tilesets/temple_racines.png`, 256×512 px, 8 colonnes × 16 lignes de tuiles 32×32, sans marge ni espacement (128 cases).
 - Tileset Tiled : `maps/tilesets/temple_racines.tsx` (collisions et terrains déjà définis).
 - **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro : le dessin est fait au même emplacement que le plan d'origine. Les cases « réserve » sont vides et serviront aux ajouts.
-- **Dessin final** (vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px) : dalles de pierre grises usées, murs de pierre taillée violet-gris (dessus sombre + face avant claire visible), racines brunes, ronces noires-violettes épineuses, trous avec bord de dalle clair, eau bleue, mousse et feuilles. Le dessin est dans `tools/sprites/temple_racines_final.py` ; `python tools/sprites/temple_racines.py --plan` régénère l'ancien plan à flèches.
+- **Dessin final** (vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px) : dalles de pierre grises usées, murs de pierre taillée violet-gris (dessus sombre + face avant claire visible), racines brunes, ronces noires-violettes épineuses, trous avec bord de dalle clair, eau bleue, mousse et feuilles. **Dessin v2** dans `tools/sprites/temple_racines_v2.py` : dalles en pierres irrégulières qui se raccordent d'une tuile à l'autre, bords d'eau, de terre et d'eau profonde irréguliers et fondus (tramage), murs retexturés, tuiles de décor ajoutées dans les réserves. La géométrie des murs, portes, escaliers et colonnes vient toujours de `temple_racines_final.py`.
 - Collision : en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche).
 
 ## 1. Sol
@@ -21,7 +21,11 @@
 | 6 | `racine_h` | Racine horizontale (se raccorde à gauche et à droite) | Decor | aucune |
 | 7 | `racine_v` | Racine verticale (se raccorde en haut et en bas) | Decor | aucune |
 | 8 | `racine_touffe` | Nœud de racines (départ ou fin d'une racine) | Decor | aucune |
-| 9–15 | — | réserve (vide) | — | — |
+| 12 | `ombre_mur_haut` | Ombre portée d'un mur du haut sur le sol (trame), sous un mur_haut | Decor | aucune |
+| 13 | `ombre_mur_gauche` | Ombre portée d'un mur de gauche sur le sol | Decor | aucune |
+| 14 | `ombre_mur_coin` | Ombre portée dans un angle haut-gauche (mur en haut et à gauche) | Decor | aucune |
+| 15 | `gravats` | Petit tas de gravats et poussière | Decor | aucune |
+| 9–11 | — | réserve (vide) | — | — |
 
 ## 2. Murs
 
@@ -69,7 +73,14 @@
 | 45 | `porte_bas_dessus` | Haut de l'encadrement de porte_bas, même case que porte_bas | Dessus | aucune |
 | 46 | `porte_gauche_dessus` | Haut de l'encadrement de porte_gauche, même case que porte_gauche | Dessus | aucune |
 | 47 | `porte_droite_dessus` | Haut de l'encadrement de porte_droite, même case que porte_droite | Dessus | aucune |
-| 48–55 | — | réserve (vide) | — | — |
+| 48 | `terre_bord_haut` | Terre : bord haut (dalles au-dessus) | Sol | aucune |
+| 49 | `terre_bord_bas` | Terre : bord bas (dalles en dessous) | Sol | aucune |
+| 50 | `terre_bord_gauche` | Terre : bord gauche (dalles à gauche) | Sol | aucune |
+| 51 | `terre_bord_droite` | Terre : bord droite (dalles à droite) | Sol | aucune |
+| 52 | `terre_creux_hg` | Terre : coin rentrant, dalles seulement en haut-gauche | Sol | aucune |
+| 53 | `terre_creux_hd` | Terre : coin rentrant, dalles seulement en haut-droite | Sol | aucune |
+| 54 | `terre_creux_bg` | Terre : coin rentrant, dalles seulement en bas-gauche | Sol | aucune |
+| 55 | `terre_creux_bd` | Terre : coin rentrant, dalles seulement en bas-droite | Sol | aucune |
 
 ## 4. Escaliers et trous
 
@@ -86,7 +97,11 @@
 | 64 | `trou_coin_hd` | Coin haut-droite d'un trou rectangulaire | Sol | aucune |
 | 65 | `trou_coin_bg` | Coin bas-gauche d'un trou rectangulaire | Sol | aucune |
 | 66 | `trou_coin_bd` | Coin bas-droite d'un trou rectangulaire | Sol | aucune |
-| 67–71 | — | réserve (vide) | — | — |
+| 67 | `terre_coin_hg` | Terre : coin haut-gauche d'une zone de terre (terre seulement en bas-droite) | Sol | aucune |
+| 68 | `terre_coin_hd` | Terre : coin haut-droite d'une zone de terre (terre seulement en bas-gauche) | Sol | aucune |
+| 69 | `terre_coin_bg` | Terre : coin bas-gauche d'une zone de terre (terre seulement en haut-droite) | Sol | aucune |
+| 70 | `terre_coin_bd` | Terre : coin bas-droite d'une zone de terre (terre seulement en haut-gauche) | Sol | aucune |
+| 71 | `terre_diag` | Terre : deux coins opposés (terre en haut-gauche et bas-droite) | Sol | aucune |
 
 ## 5. Ronces noires de Morvath
 
@@ -96,7 +111,10 @@
 | 73 | `ronces_bloc_b` | Bloc de ronces noires, variante | Murs | pleine |
 | 74 | `ronces_sol_a` | Ronces rampantes au sol (décor) | Decor | aucune |
 | 75 | `ronces_sol_b` | Ronces rampantes au sol, variante | Decor | aucune |
-| 76–79 | — | réserve (vide) | — | — |
+| 76 | `cailloux` | Quelques cailloux épars | Decor | aucune |
+| 77 | `herbe` | Touffes d'herbe entre les dalles | Decor | aucune |
+| 78 | `champignons` | Champignons rouges (spores claires) | Decor | aucune |
+| 79 | `flaque` | Petite flaque d'eau (sans effet) | Decor | aucune |
 
 ## 6. Eau
 
@@ -143,11 +161,17 @@
 | 118 | `mousse_b` | Mousse au sol, variante | Decor | aucune |
 | 119 | `feuilles_a` | Feuilles tombées | Decor | aucune |
 | 120 | `feuilles_b` | Feuilles mortes, variante | Decor | aucune |
-| 121–127 | — | réserve (vide) | — | — |
+| 121 | `racines_pendantes` | Racines qui pendent d'un mur (à poser sur une tuile de mur haut) | Dessus | aucune |
+| 122 | `lierre` | Lierre qui retombe sur un mur (à poser sur une tuile de mur) | Dessus | aucune |
+| 123 | `toile_araignee` | Toile d'araignée dans un angle (coin haut-gauche de la case) | Decor | aucune |
+| 124 | `dalle_racine` | Dalle soulevée par une racine qui perce (variante de sol) | Sol | aucune |
+| 125 | `dalle_mousse` | Dalle envahie de mousse dans les joints (variante de sol) | Sol | aucune |
+| 126 | `ronces_coupees` | Souches de ronces tranchées net (indice : outil de forge) | Decor | aucune |
+| 127 | `vase_brise` | Éclats d'un vase brisé | Decor | aucune |
 
 ## Terrains Tiled (autotiling)
 
-Cinq terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dans Tiled : panneau **Terrains**, choisir le terrain puis peindre avec le pinceau de terrain (T).
+Six terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dans Tiled : panneau **Terrains**, choisir le terrain puis peindre avec le pinceau de terrain (T).
 
 | Terrain | Couleurs | Calque | Tuiles |
 | --- | --- | --- | --- |
@@ -156,12 +180,17 @@ Cinq terrains « par coins » (*corner set*) sont définis dans le `.tsx`. Dans 
 | `Trous de passage` | `sol`, `passage` | Sol | 0–2 (sol), 31–39 |
 | `Eau` | `sol`, `eau` | Sol | 0–2 (sol), 80–92 |
 | `Eau profonde` | `eau`, `profonde` | Murs | 80 (eau), 96–108 |
+| `Terre` | `sol`, `terre` | Sol | 0–2 (sol), 5 (terre), 48–55, 67–71 |
+
+- **Terre** : peindre la terre avec ce terrain plutôt que de poser la tuile 5 seule : les tuiles de bord (48–55, 67–71) font une transition irrégulière et fondue vers les dalles (la terre déborde d'une demi-tuile sur les cases voisines). La tuile 5 seule reste valable au milieu d'une zone de terre.
+- **Ombres** (12–14, calque Decor) : sous un mur du haut (12), à droite d'un mur de gauche (13), dans l'angle haut-gauche (14). Elles fondent la jonction mur/sol.
+- **Variantes de sol** 124 (racine qui perce) et 125 (dalle moussue) : à mélanger avec 0–4, elles se raccordent à toutes les dalles.
 
 - **Murs** : une seule couleur, `mur`. Le sol n'en fait pas partie (il est peint sur le calque Sol), pour que le pinceau ne pose jamais de dalle sur le calque Murs. Pour une salle de 20×11 entourée d'un mur d'une tuile, peindre `mur` sur tous les coins du pourtour : on obtient exactement l'anneau mur_haut / mur_bas / mur_gauche / mur_droite + les 4 coins intérieurs. Un seul coin peint au milieu de la salle donne un bloc de 2×2 tuiles (les 4 coins extérieurs). Les tuiles de mur sont entières : toute la case bloque.
 - **Trous** : comme les murs, toutes les tuiles du terrain sont entièrement « trou » (on tombe partout dedans). Seules les formes rectangulaires sont prévues (pas de coin rentrant) ; les coins rentrants pourront être ajoutés dans la réserve 67–71 si besoin.
 - **Trous de passage** : tuiles 31 à 39, même logique que les trous mortels (rectangles seulement), mais décoratives : anneau de racines brunes, fond vert-bleu lumineux avec un petit sol de dalles très bas, étincelles. Elles sont à peindre sur le calque Sol, sans collision, avec l'objet `Chute` par-dessus ; `HoleRules` ne les reconnaît pas (seules les tuiles 58 à 66 tuent). Pour un trou 2×2 : coin_hg, coin_hd sur la ligne du haut, coin_bg, coin_bd sur celle du bas (ou le pinceau du terrain `Trous de passage`).
 - **Eau / Eau profonde** : le bord passe au **milieu** de la tuile (chaque quart de 16×16 est soit de l'eau, soit l'autre terrain). L'eau peu profonde est sur le calque Sol, sans collision. L'eau profonde est posée sur le calque **Murs** (par-dessus l'eau peu profonde) car elle bloque : sa collision couvre exactement ses quarts d'eau profonde. Il manque volontairement les deux tuiles en diagonale (deux quarts opposés) : éviter de les demander au pinceau.
-- Les dalles fissurées (3, 4) et la terre (5) ne sont pas dans les terrains : à poser à la main.
+- Les dalles fissurées (3, 4) ne sont pas dans les terrains : à poser à la main.
 
 ## Comment assembler
 
