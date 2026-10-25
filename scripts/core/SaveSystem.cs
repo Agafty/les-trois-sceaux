@@ -31,6 +31,8 @@ public partial class SaveSystem : Node
         _state = GetNode<GameState>("/root/GameState");
         _sceneManager = GetNode<SceneManager>("/root/SceneManager");
         _state.ImportantChestOpened += OnImportantChestOpened;
+        _state.BossDefeated += OnBossDefeated;
+        _state.SealRestored += OnSealRestored;
         _sceneManager.TransitionFinished += OnTransitionFinished;
         // La salle de départ (lancée sans transition) donne la zone initiale ; on attend que l'arbre soit prêt.
         Callable.From(InitZone).CallDeferred();
@@ -52,7 +54,12 @@ public partial class SaveSystem : Node
 
     public override void _ExitTree()
     {
-        if (_state != null) _state.ImportantChestOpened -= OnImportantChestOpened;
+        if (_state != null)
+        {
+            _state.ImportantChestOpened -= OnImportantChestOpened;
+            _state.BossDefeated -= OnBossDefeated;
+            _state.SealRestored -= OnSealRestored;
+        }
         if (_sceneManager != null) _sceneManager.TransitionFinished -= OnTransitionFinished;
     }
 
@@ -258,6 +265,11 @@ public partial class SaveSystem : Node
     private bool _autoSavePending;
 
     private void OnImportantChestOpened(string chestId) => RequestAutoSave();
+
+    // Après un boss, et quand un sceau est restauré (ramassé) : sauvegarde automatique, comme pour un coffre important.
+    private void OnBossDefeated(string bossId) => RequestAutoSave();
+
+    private void OnSealRestored(string sealId) => RequestAutoSave();
 
     // Sauvegarde auto seulement quand la zone change (entrée dans un donjon, forêt -> village...).
     // Rien après un Load, une nouvelle partie ou une réapparition (la zone ne change pas).

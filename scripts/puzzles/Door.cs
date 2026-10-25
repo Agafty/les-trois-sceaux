@@ -37,6 +37,9 @@ public partial class Door : StaticBody2D
 
     public bool IsOpen => _open;
 
+    /// <summary>Porte ouverte refermée le temps d'un combat de boss (voir <see cref="LockForEncounter"/>).</summary>
+    public bool IsLockedForEncounter => _locked;
+
     private static readonly StringName PlayerGroup = "player";
     private static readonly StringName MoveLeft = "move_left";
     private static readonly StringName MoveRight = "move_right";
@@ -55,6 +58,8 @@ public partial class Door : StaticBody2D
     private Player _player;
     private float _pushTime;
     private bool _open;
+    private bool _locked;
+    private Tween _fadeTween;
     private bool _contactConnected;
 
     public override void _Ready()
@@ -98,10 +103,36 @@ public partial class Door : StaticBody2D
         }
     }
 
+    /// <summary>
+    /// Referme une porte ouverte pour la durée d'un combat de boss : solide et visible de nouveau, la Sortie derrière est ignorée.
+    /// Rien n'est mémorisé (l'état « ouverte » reste dans GameState) : si la salle est rechargée, la porte est ouverte.
+    /// Sans effet si la porte n'est pas ouverte.
+    /// </summary>
+    public void LockForEncounter()
+    {
+        if (!_open || _locked) return;
+        _locked = true;
+        _open = false;
+        _fadeTween?.Kill();
+        _shape.SetDeferred(CollisionShape2D.PropertyName.Disabled, false);
+        _sprite.Visible = true;
+        _sprite.Modulate = Colors.White;
+        _sprite.Frame = 0;
+    }
+
+    /// <summary>Rouvre la porte refermée par <see cref="LockForEncounter"/> (victoire). Sans effet sinon.</summary>
+    public void UnlockAfterEncounter()
+    {
+        if (!_locked) return;
+        _locked = false;
+        ApplyOpen(true);
+        EmitSignal(SignalName.Opened, Id);
+    }
+
     /// <summary>Ouvre la porte quelle que soit sa nature (interrupteur, cinématique...). Sans effet si elle est déjà ouverte.</summary>
     public void Open()
     {
-        if (_open) return;
+        if (_open || _locked) return; // refermée pour un combat : seule la victoire la rouvre
         if (!string.IsNullOrEmpty(Id))
             _state.MarkCollected(Id);
         ApplyOpen(true);
@@ -209,9 +240,10 @@ public partial class Door : StaticBody2D
             _sprite.Visible = false;
             return;
         }
-        var tween = CreateTween();
-        tween.TweenProperty(_sprite, "modulate:a", 0f, FadeDuration);
-        tween.TweenCallback(Callable.From(() => _sprite.Visible = false));
+        _fadeTween?.Kill();
+        _fadeTween = CreateTween();
+        _fadeTween.TweenProperty(_sprite, "modulate:a", 0f, FadeDuration);
+        _fadeTween.TweenCallback(Callable.From(() => _sprite.Visible = false));
     }
 
     // Les formes de la scène sont partagées entre instances : on les duplique avant de changer la taille.

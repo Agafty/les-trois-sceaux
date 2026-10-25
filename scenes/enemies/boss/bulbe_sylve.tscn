@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/boss/BossBulb.cs" id="1_bulb"]
+
+[sub_resource type="CircleShape2D" id="bulb_shape"]
+radius = 10.0
+
+[node name="Bulbe" type="Area2D"]
+script = ExtResource("1_bulb")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+hframes = 5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("bulb_shape")

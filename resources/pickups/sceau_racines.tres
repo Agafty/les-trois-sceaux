@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SealEffect" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/effects/SealEffect.cs" id="1_effect"]
+[ext_resource type="Texture2D" path="res://art/items/sceau_racines.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_effect")
+SealId = "racines"
+Icon = ExtResource("2_icon")
+NameKey = "OBJ_SCEAU_RACINES"
+ShowNameOnPickup = true
+DescriptionKey = "OBJ_SCEAU_RACINES_DESC"

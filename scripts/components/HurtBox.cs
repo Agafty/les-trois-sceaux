@@ -5,6 +5,10 @@ public partial class HurtBox : Area2D
     [Signal]
     public delegate void HitEventHandler(int damage, Vector2 fromPosition);
 
+    /// <summary>Un coup est arrivé alors que la zone était invincible : rien n'est infligé (retour visuel « rien ne passe » d'un boss).</summary>
+    [Signal]
+    public delegate void BlockedEventHandler(int damage, Vector2 fromPosition);
+
     [Export]
     public Team Team { get; set; } = Team.Ennemi;
 
@@ -24,7 +28,11 @@ public partial class HurtBox : Area2D
 
     public void ReceiveHit(int damage, Vector2 fromPosition)
     {
-        if (Invincible) return;
+        if (Invincible)
+        {
+            EmitSignal(SignalName.Blocked, damage, fromPosition);
+            return;
+        }
 
         _health?.Damage(damage);
         EmitSignal(SignalName.Hit, damage, fromPosition);

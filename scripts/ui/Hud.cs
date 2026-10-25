@@ -52,6 +52,71 @@ public partial class Hud : CanvasLayer
     private AtlasTexture _saveIconAtlas; // planche de 2 images 16x16 (ailes hautes / basses)
     private bool _saveIconWingsUp;
 
+    // Barre de vie du boss : en haut au centre, entre le coin des rubis et les cœurs ; visible seulement pendant le combat.
+    private const string ThemePath = "res://resources/ui/theme_jeu.tres";
+    private const float BossBarX = 120f;
+    private const float BossBarWidth = 300f;
+    private const float BossBarY = 22f;
+    private const float BossBarHeight = 8f;
+    private Control _bossBar;
+    private ColorRect _bossFill;
+    private Label _bossName;
+
+    /// <summary>Montre la barre de vie du boss (clé de traduction de son nom), pleine.</summary>
+    public void ShowBossBar(string nameKey)
+    {
+        if (_bossBar == null) BuildBossBar();
+        _bossName.Text = string.IsNullOrEmpty(nameKey) ? "" : Tr(nameKey);
+        SetBossBar(1f);
+        _bossBar.Visible = true;
+    }
+
+    /// <summary>Remplissage de la barre : 1 = pleine, 0 = vide.</summary>
+    public void SetBossBar(float fraction)
+    {
+        if (_bossFill == null) return;
+        _bossFill.Size = new Vector2((BossBarWidth - 2f) * Mathf.Clamp(fraction, 0f, 1f), BossBarHeight - 2f);
+    }
+
+    public void HideBossBar()
+    {
+        if (_bossBar != null) _bossBar.Visible = false;
+    }
+
+    /// <summary>Vrai tant que la barre du boss est visible.</summary>
+    public bool IsBossBarShown => _bossBar != null && _bossBar.Visible;
+
+    private void BuildBossBar()
+    {
+        _bossBar = new Control { MouseFilter = Control.MouseFilterEnum.Ignore, Visible = false };
+        var back = new ColorRect
+        {
+            Color = new Color(0.1f, 0.08f, 0.13f, 0.9f),
+            Position = new Vector2(BossBarX, BossBarY),
+            Size = new Vector2(BossBarWidth, BossBarHeight),
+            MouseFilter = Control.MouseFilterEnum.Ignore,
+        };
+        _bossFill = new ColorRect
+        {
+            Color = new Color(0.75f, 0.2f, 0.7f),
+            Position = new Vector2(BossBarX + 1f, BossBarY + 1f),
+            MouseFilter = Control.MouseFilterEnum.Ignore,
+        };
+        _bossName = new Label
+        {
+            Position = new Vector2(BossBarX, BossBarY - 14f),
+            Size = new Vector2(BossBarWidth, 12f),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            MouseFilter = Control.MouseFilterEnum.Ignore,
+        };
+        var theme = GD.Load<Theme>(ThemePath);
+        if (theme != null) _bossName.Theme = theme;
+        _bossBar.AddChild(back);
+        _bossBar.AddChild(_bossFill);
+        _bossBar.AddChild(_bossName);
+        AddChild(_bossBar);
+    }
+
     public override void _Ready()
     {
         Layer = 5; // sous le fondu du SceneManager (10)

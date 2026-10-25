@@ -46,6 +46,8 @@ public static class SaveSerializer
         d.CollectedIds.RemoveAll(string.IsNullOrEmpty);
         d.DungeonItems ??= new();
         d.DungeonItems.RemoveAll(string.IsNullOrEmpty);
+        d.Seals ??= new();
+        d.Seals.RemoveAll(string.IsNullOrEmpty);
         if (d.RavenFeathers < 0) d.RavenFeathers = 0;
         d.EquippedItemId ??= "";
         d.ScenePath ??= "";
@@ -75,6 +77,11 @@ public static class SaveSerializer
                 data.Version = 2;
                 goto case 2;
             case 2:
+                // Version 2 -> 3 : ajout des sceaux restaurés (absents = aucun).
+                data.Seals = new();
+                data.Version = 3;
+                goto case 3;
+            case 3:
                 return true; // rien à migrer
             case 0:
                 error = "numéro de version absent";

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 /// <summary>
 /// Une salle de jeu : une carte Tiled importée + un conteneur « Entites » (tri en profondeur) où vit Brann.
 /// Au chargement, la salle lit le calque d'objets « Objets » de la carte (Spawn, Sortie, Ennemi, Coffre,
-/// StatueCorbeau, Ramassable, Porte, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable) et instancie les vraies scènes aux positions des marqueurs.
+/// StatueCorbeau, Ramassable, Porte, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable, plus les rectangles nommés « boss_<nom> » et « pilier ») et instancie les vraies scènes aux positions des marqueurs.
 /// La scène importée n'est jamais modifiée sur le disque : seuls les nœuds de l'arbre en cours sont retirés.
 /// </summary>
 public partial class Room : Node2D
@@ -82,6 +82,9 @@ public partial class Room : Node2D
     private PackedScene _plateScene;
     private PackedScene _fallScene;
     private HintBox _hintBox;
+    private Hud _hud;
+    private readonly List<Node> _bossMarkers = new();
+    private readonly List<Rect2> _pillars = new();
     private readonly List<PushBlock> _blocks = new();
 
     // Une Sortie « armée » se déclenche quand Brann y entre. Elle ne l'est pas tant que Brann, arrivé dessus, ne l'a pas quittée.
@@ -105,7 +108,10 @@ public partial class Room : Node2D
         // Le HUD vit avec la salle (pas d'autoload supplémentaire) ; il ne dépend que de GameState.
         var hudScene = GD.Load<PackedScene>("res://scenes/ui/hud.tscn"); // mis en cache par Godot
         if (hudScene != null)
-            AddChild(hudScene.Instantiate());
+        {
+            _hud = hudScene.Instantiate<Hud>();
+            AddChild(_hud);
+        }
         else
             GD.PushError("HUD introuvable : res://scenes/ui/hud.tscn");
 
@@ -260,12 +266,28 @@ public partial class Room : Node2D
 
         foreach (var node in portes)
             SpawnDoor(node);
+
+        // Le boss après les portes (il referme celles de la salle) et après les piliers (il s'y assomme).
+        foreach (var marker in _bossMarkers)
+            SpawnBoss(marker);
     }
 
     // Rectangles ou points nommés sans classe (indice_ronces_coupees, boss_sylve, pilier...).
     private void HandleUnclassed(Node node)
     {
         string name = node.Name;
+        string baseName = BaseName(name);
+        if (baseName.StartsWith(BossRules.PillarName, System.StringComparison.Ordinal))
+        {
+            // Pilier de l'arène : reste un corps solide (YATI) ; on retient son rectangle pour que le boss s'y assomme.
+            RegisterPillar(node);
+            return;
+        }
+        if (BossRules.TryParseMarker(baseName, out _))
+        {
+            _bossMarkers.Add(node); // instancié après les portes
+            return;
+        }
         if (HintRules.IsHintName(name) && node is StaticBody2D)
         {
             // Zone d'indice : YATI en fait un corps solide qui boucherait le passage. On le retire (la carte reste intacte).
@@ -291,6 +313,128 @@ public partial class Room : Node2D
         }
         if (node is Marker2D || node is not StaticBody2D)
             WarnOnce("nom:" + BaseName(name), $"Objet Tiled « {BaseName(name)} » sans classe pas encore géré : ignoré.");
+    }
+
+    private void RegisterPillar(Node marker)
+    {
+        foreach (var child in marker.GetChildren())
+        {
+            if (child is CollisionShape2D { Shape: RectangleShape2D rect } shape)
+            {
+                _pillars.Add(new Rect2(shape.GlobalPosition - rect.Size * 0.5f, rect.Size));
+                return;
+            }
+        }
+        WarnOnce("pilier-forme", $"Rectangle « pilier » sans forme rectangulaire ({Name}) : ignoré.");
+    }
+
+    // --- Boss -----------------------------------------------------------------------------------
+
+    // Rectangle ou point « boss_<nom> » : instancie scenes/enemies/boss/<nom>.tscn. Boss déjà vaincu : pas de boss, la salle est calme
+    // et les récompenses pas encore ramassées sont posées au sol.
+    private void SpawnBoss(Node marker)
+    {
+        BossRules.TryParseMarker(BaseName(marker.Name), out string bossName);
+        string path = BossRules.ScenePath(bossName);
+        if (!ResourceLoader.Exists(path))
+        {
+            WarnOnce("boss-scene:" + bossName, $"Boss « {bossName} » : scène introuvable ({path}).");
+            RemoveMarker(marker);
+            return;
+        }
+
+        var state = GetNode<GameState>("/root/GameState");
+        string bossId = BossRules.BossId(Zone, bossName);
+        var boss = GD.Load<PackedScene>(path).Instantiate<Boss>();
+        var spot = MarkerPosition(marker);
+        var center = spot;
+        if (_pillars.Count > 0)
+        {
+            center = Vector2.Zero;
+            foreach (var pillar in _pillars) center += pillar.GetCenter();
+            center /= _pillars.Count; // récompenses au milieu des piliers
+        }
+
+        if (state.IsCollected(bossId))
+        {
+            SpawnBossRewards(bossId, boss.DropsHeartContainer, boss.SealPickupName, center, false);
+            boss.Free(); // jamais ajouté à l'arbre
+            RemoveMarker(marker);
+            return;
+        }
+
+        boss.BossId = bossId;
+        boss.Pillars = _pillars.ToArray();
+        boss.ArenaDoors = _doors;
+        boss.ArenaBounds = ComputeArenaBounds();
+        boss.EntryPoint = EntryPosition;
+        boss.Position = _entities.ToLocal(spot);
+        _entities.AddChild(boss);
+        boss.EncounterStarted += () => _hud?.ShowBossBar(boss.NameKey);
+        boss.ProgressChanged += fraction => _hud?.SetBossBar(fraction);
+        boss.EncounterEnded += () => _hud?.HideBossBar();
+        boss.Defeated += () => OnBossDefeated(boss, center);
+        RemoveMarker(marker);
+    }
+
+    // Limites où le centre du boss peut aller : la carte entière moins l'épaisseur des murs et son rayon.
+    private Rect2 ComputeArenaBounds()
+    {
+        const float inset = 58f;
+        if (FindNodeByName(this, "Sol") is not TileMapLayer floor || floor.TileSet == null)
+            return new Rect2();
+        var used = floor.GetUsedRect();
+        var tile = floor.TileSet.TileSize;
+        var pos = floor.GlobalPosition + new Vector2(used.Position.X * tile.X, used.Position.Y * tile.Y);
+        var size = new Vector2(used.Size.X * tile.X, used.Size.Y * tile.Y);
+        return new Rect2(pos + new Vector2(inset, inset), size - new Vector2(inset * 2f, inset * 2f));
+    }
+
+    private void OnBossDefeated(Boss boss, Vector2 center)
+    {
+        if (!string.IsNullOrEmpty(boss.FarewellKey))
+            DialogueBox.Open(this, boss.NameKey, boss.FarewellKey);
+        SpawnBossRewards(boss.BossId, boss.DropsHeartContainer, boss.SealPickupName, center, true);
+    }
+
+    // Réceptacle de cœur et sceau : deux ramassables uniques (id <boss>_receptacle / <boss>_sceau), mémorisés une fois ramassés.
+    private void SpawnBossRewards(string bossId, bool heart, string sealName, Vector2 center, bool animate)
+    {
+        const float gap = 28f;
+        if (heart)
+        {
+            var heartScene = GD.Load<PackedScene>("res://scenes/items/receptacle.tscn");
+            if (heartScene == null)
+                GD.PushError("Réceptacle de cœur introuvable : res://scenes/items/receptacle.tscn");
+            else
+            {
+                var pickup = heartScene.Instantiate<Pickup>();
+                pickup.UniqueId = BossRules.RewardId(bossId, "receptacle");
+                PlaceReward(pickup, center + new Vector2(-gap, 0f), animate);
+            }
+        }
+        if (!string.IsNullOrEmpty(sealName))
+        {
+            var effect = LoadPickupEffect(sealName, "Sceau de " + bossId);
+            if (effect != null)
+            {
+                var pickup = GD.Load<PackedScene>(PickupScenePath).Instantiate<ItemPickup>();
+                pickup.UniqueId = BossRules.RewardId(bossId, "sceau");
+                pickup.Effect = effect;
+                PlaceReward(pickup, center + new Vector2(gap, 0f), animate);
+            }
+        }
+    }
+
+    private void PlaceReward(Pickup pickup, Vector2 worldPosition, bool animate)
+    {
+        pickup.Position = _entities.ToLocal(worldPosition);
+        _entities.AddChild(pickup);
+        var sprite = pickup.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+        if (!animate || sprite == null) return;
+        sprite.Position = new Vector2(0f, -48f); // l'objet tombe du ciel en rebondissant
+        pickup.CreateTween().TweenProperty(sprite, "position", Vector2.Zero, 0.6)
+            .SetTrans(Tween.TransitionType.Bounce).SetEase(Tween.EaseType.Out);
     }
 
     private void SpawnEnemy(Node marker)

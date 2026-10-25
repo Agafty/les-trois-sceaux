@@ -40,3 +40,7 @@ OBJ_PLUME_CORBEAU,une plume de corbeau,a raven feather
 OBJ_PLUME_CORBEAU_DESC,"D'autres plumes sont cachées un peu partout. Garde-les précieusement.","More feathers are hidden here and there. Keep them safe."
 INDICE_ORDRE_CIBLES,"Sur la fresque, trois symboles se suivent : le gland, la racine, puis la feuille.","On the mural, three symbols follow one another: the acorn, the root, then the leaf."
 INDICE_RONCES_COUPEES,"Les ronces noires ont été coupées net, comme par une lame. Quelqu'un est passé par ici.","The black brambles were cut cleanly, as if by a blade. Someone came this way."
+BOSS_SYLVE_NOM,"Sylve, le Cerf des Racines","Sylve, the Stag of the Roots"
+BOSS_SYLVE_REPLIQUE,"Méfie-toi de ceux qui coupent les racines.","Beware of those who cut the roots."
+OBJ_SCEAU_RACINES,le sceau des Racines,the Seal of the Roots
+OBJ_SCEAU_RACINES_DESC,"Le premier des trois sceaux est restauré.","The first of the three seals is restored."

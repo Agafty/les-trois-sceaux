@@ -60,6 +60,16 @@ public partial class GameState : Node
 
     public void NotifyImportantChestOpened(string chestId) => EmitSignal(SignalName.ImportantChestOpened, chestId);
 
+    /// <summary>Un boss vient d'être vaincu (son id est déjà mémorisé). Point d'accroche de la sauvegarde automatique.</summary>
+    [Signal]
+    public delegate void BossDefeatedEventHandler(string bossId);
+
+    public void NotifyBossDefeated(string bossId) => EmitSignal(SignalName.BossDefeated, bossId);
+
+    /// <summary>Un sceau vient d'être restauré (ramassé). Point d'accroche de la sauvegarde automatique.</summary>
+    [Signal]
+    public delegate void SealRestoredEventHandler(string sealId);
+
     public const int HeartPiecesPerHeart = 4;
     private const string ItemsFolder = "res://resources/items/";
 
@@ -206,6 +216,34 @@ public partial class GameState : Node
 
     public void AddRavenFeather() => RavenFeathers++;
 
+    private readonly List<string> _seals = new();
+
+    /// <summary>Sceaux restaurés (« racines »...), dans l'ordre d'obtention : le compteur de progression du jeu.</summary>
+    public IReadOnlyList<string> Seals => _seals;
+
+    public int SealCount => _seals.Count;
+
+    public bool HasSeal(string id) => !string.IsNullOrEmpty(id) && _seals.Contains(id);
+
+    /// <summary>Restaure un sceau. Faux s'il est vide ou déjà possédé. Prévient la sauvegarde automatique.</summary>
+    public bool AddSeal(string id)
+    {
+        if (string.IsNullOrEmpty(id) || _seals.Contains(id)) return false;
+        _seals.Add(id);
+        EmitSignal(SignalName.SealRestored, id);
+        return true;
+    }
+
+    /// <summary>Restaure les sceaux depuis une sauvegarde (sans signal).</summary>
+    public void LoadSeals(IEnumerable<string> ids)
+    {
+        _seals.Clear();
+        if (ids == null) return;
+        foreach (var id in ids)
+            if (!string.IsNullOrEmpty(id) && !_seals.Contains(id))
+                _seals.Add(id);
+    }
+
     /// <summary>Restaure les objets de donjon et les plumes depuis une sauvegarde.</summary>
     public void LoadProgress(IEnumerable<string> dungeonItems, int ravenFeathers)
     {
@@ -256,6 +294,7 @@ public partial class GameState : Node
             EquippedItemId = EquippedItemId,
             RavenFeathers = RavenFeathers,
         };
+        data.Seals.AddRange(_seals);
         data.DungeonItems.AddRange(_dungeonItems);
         data.DungeonItems.Sort(string.CompareOrdinal);
         foreach (var id in _inventory.Ids)
@@ -307,6 +346,7 @@ public partial class GameState : Node
         LoadInventory(ids, quantities, data.EquippedItemId);
         LoadCollected(data.CollectedIds, data.HeartPieces);
         LoadProgress(data.DungeonItems, data.RavenFeathers);
+        LoadSeals(data.Seals);
     }
 
     public int Rupees { get; private set; }
