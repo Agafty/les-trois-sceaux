@@ -1,6 +1,11 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/puzzles/Torch.cs" id="1_torch"]
+
+[ext_resource type="Script" path="res://scripts/puzzles/TorchArrowZone.cs" id="2_zone"]
+
+[sub_resource type="RectangleShape2D" id="zone_shape"]
+size = Vector2(32, 32)
 
 [sub_resource type="RectangleShape2D" id="body_shape"]
 size = Vector2(16, 16)
@@ -12,3 +17,11 @@ script = ExtResource("1_torch")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("body_shape")
+
+[node name="ZoneFleche" type="Area2D" parent="."]
+collision_mask = 0
+script = ExtResource("2_zone")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ZoneFleche"]
+position = Vector2(0, 4)
+shape = SubResource("zone_shape")

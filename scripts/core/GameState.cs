@@ -77,7 +77,7 @@ public partial class GameState : Node
         LoadItemRegistry();
     }
 
-    // Registre Id -> ItemData : tous les .tres de resources/items/. Un nouvel objet = un nouveau fichier, sans code.
+    // Registre Id -> ItemData (sert aussi de référence C# forte : ResourceKeeper est inutile ici) : tous les .tres de resources/items/. Un nouvel objet = un nouveau fichier, sans code.
     private void LoadItemRegistry()
     {
         using var dir = DirAccess.Open(ItemsFolder);

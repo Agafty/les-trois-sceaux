@@ -45,6 +45,8 @@ public partial class Torch : StaticBody2D, IArrowInteractor
     private float _remaining; // > 0 : compte à rebours en cours
     private float _animTime;
     private bool _hasFlame;
+    private ulong _lastArrowId;
+    private bool _lastArrowResult;
 
     public override void _Ready()
     {
@@ -80,7 +82,17 @@ public partial class Torch : StaticBody2D, IArrowInteractor
         }
     }
 
+    // Le corps et la zone élargie (TorchArrowZone) peuvent tous deux toucher la même flèche : on ne traite qu'une fois par flèche.
     public bool OnArrowTouch(Arrow arrow)
+    {
+        ulong id = arrow.GetInstanceId();
+        if (id == _lastArrowId) return _lastArrowResult;
+        _lastArrowId = id;
+        _lastArrowResult = ComputeArrowTouch(arrow);
+        return _lastArrowResult;
+    }
+
+    private bool ComputeArrowTouch(Arrow arrow)
     {
         if (_lit)
         {

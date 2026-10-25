@@ -32,6 +32,7 @@ public partial class Pickup : Area2D
 
     public override void _Ready()
     {
+        ResourceKeeper.Pin(Effect); // référence C# forte (voir ResourceKeeper)
         _state = GetNode<GameState>("/root/GameState");
         if (IsUnique && _state.IsCollected(UniqueId))
         {

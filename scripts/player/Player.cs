@@ -338,6 +338,8 @@ public partial class Player : CharacterBody2D
 
     // use_item : l'objet équipé décrit son comportement par une scène (ItemData.UseScene) dont le script hérite de ItemUse.
     // Appelé seulement depuis l'état Déplacement (ni attaque, ni touché, ni mort) ; la pause stoppe _PhysicsProcess.
+    private const int MaxRayAttempts = 8;
+
     private void TryUseItem()
     {
         if (_sceneManager.IsTransitioning) return; // pas d'objet posé pendant le fondu entre deux salles
@@ -366,15 +368,26 @@ public partial class Player : CharacterBody2D
         // Pour un objet qui s'annule contre un mur, le rayon est prolongé de la longueur de sa pointe.
         var rayEnd = item.CancelIfBlocked ? target + direction * item.BlockCheckExtra : target;
         var query = PhysicsRayQueryParameters2D.Create(from, rayEnd);
-        query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
+        var excluded = new Godot.Collections.Array<Rid> { GetRid() };
+        query.Exclude = excluded;
         var space = GetWorld2D().DirectSpaceState;
-        for (int attempt = 0; attempt < 4; attempt++)
+        bool settled = false; // vrai si la boucle a conclu (rien devant, ou mur trouvé)
+        for (int attempt = 0; attempt < MaxRayAttempts; attempt++)
         {
             var hit = space.IntersectRay(query);
-            if (hit.Count == 0) break;
-            if (hit["collider"].AsGodotObject() is CharacterBody2D body)
+            if (hit.Count == 0) { settled = true; break; }
+            var collider = hit["collider"].AsGodotObject();
+            if (collider is CharacterBody2D body)
             {
-                query.Exclude.Add(body.GetRid());
+                excluded.Add(body.GetRid());
+                query.Exclude = excluded; // la propriété renvoie une copie : on la réassigne
+                continue;
+            }
+            // Torche / brasero (objet qui s'annule contre un mur, donc l'arc) : ce n'est pas un mur, c'est la flèche qui décide en la touchant (traverse si allumée, s'arrête sinon).
+            if (item.CancelIfBlocked && collider is IArrowInteractor and CollisionObject2D interactorBody)
+            {
+                excluded.Add(interactorBody.GetRid());
+                query.Exclude = excluded;
                 continue;
             }
             if (item.CancelIfBlocked)
@@ -386,7 +399,13 @@ public partial class Player : CharacterBody2D
             // Mur déjà plus près que la marge : on pose au point de départ, jamais derrière Brann.
             var impact = hit["position"].AsVector2();
             target = from.DistanceTo(impact) <= WallPoseMargin ? from : impact - direction * WallPoseMargin;
+            settled = true;
             break;
+        }
+        if (!settled && item.CancelIfBlocked)
+        {
+            use.QueueFree(); // trop d'obstacles « traversables » d'affilée : on considère le tir bloqué
+            return;
         }
 
         GetParent().AddChild(use); // même parent que Brann : tri en profondeur (Y-sort) de la salle

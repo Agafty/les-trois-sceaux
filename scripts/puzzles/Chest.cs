@@ -66,6 +66,7 @@ public partial class Chest : StaticBody2D
 
     public override void _Ready()
     {
+        ResourceKeeper.Pin(Effect); // référence C# forte (voir ResourceKeeper)
         SetPhysicsProcess(false); // activé seulement quand Brann est dans la zone
         _sprite = GetNode<Sprite2D>("Sprite2D");
         _zone = GetNode<Area2D>("ZoneInteraction");

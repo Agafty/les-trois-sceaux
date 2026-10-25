@@ -647,7 +647,7 @@ public partial class Room : Node2D
             GD.PushError($"{owner} : contenu « {content} » introuvable ({path}).");
             return null;
         }
-        return GD.Load<PickupEffect>(path);
+        return ResourceKeeper.Load<PickupEffect>(path); // référence forte gardée (voir ResourceKeeper) ; erreur claire si null
     }
 
     // Retire le marqueur importé de l'arbre (pas du fichier) : il est remplacé par la vraie scène.

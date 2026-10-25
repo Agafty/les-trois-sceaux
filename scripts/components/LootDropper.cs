@@ -25,8 +25,18 @@ public partial class LootDropper : Node
     public override void _Ready()
     {
         _state = GetNodeOrNull<GameState>("/root/GameState");
+        PinTable(Table); // ressources C# : référence forte contre le ramasse-miettes (voir ResourceKeeper)
         _health = GetParent().GetNodeOrNull<Health>("Health");
         if (_health != null) _health.Died += OnDied;
+    }
+
+    private static void PinTable(LootTable table)
+    {
+        if (table == null) return;
+        ResourceKeeper.Pin(table);
+        if (table.Entries == null) return;
+        for (int i = 0; i < table.Entries.Count; i++)
+            ResourceKeeper.Pin(table.Entries[i]);
     }
 
     public override void _ExitTree()
