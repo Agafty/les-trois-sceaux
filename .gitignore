@@ -22,3 +22,6 @@ obj/
 Thumbs.db
 
 __pycache__/
+
+# Copies de travail des agents
+.claude/worktrees/
