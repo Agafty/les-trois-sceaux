@@ -44,3 +44,5 @@ BOSS_SYLVE_NOM,"Sylve, le Cerf des Racines","Sylve, the Stag of the Roots"
 BOSS_SYLVE_REPLIQUE,"Méfie-toi de ceux qui coupent les racines.","Beware of those who cut the roots."
 OBJ_SCEAU_RACINES,le sceau des Racines,the Seal of the Roots
 OBJ_SCEAU_RACINES_DESC,"Le premier des trois sceaux est restauré.","The first of the three seals is restored."
+BOSS_SYLVE_CONSEIL_1,"L'épée ne peut rien contre lui pour l'instant. Vise les bulbes lumineux sur ses bois avec l'arc !","Your sword is useless against him for now. Shoot the glowing bulbs on his antlers with your bow!"
+BOSS_SYLVE_CONSEIL_2,"Fais-le charger contre un pilier (tiens-toi derrière) : étourdi, frappe-le à l'épée !","Make him charge into a pillar (stand behind it): when he is dazed, strike him with your sword!"

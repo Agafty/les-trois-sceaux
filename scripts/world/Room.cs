@@ -373,6 +373,15 @@ public partial class Room : Node2D
         boss.EncounterStarted += () => _hud?.ShowBossBar(boss.NameKey);
         boss.ProgressChanged += fraction => _hud?.SetBossBar(fraction);
         boss.EncounterEnded += () => _hud?.HideBossBar();
+        boss.HintRequested += (key, seconds) =>
+        {
+            if (_hintBox == null)
+            {
+                _hintBox = new HintBox { Name = "BoiteIndices" };
+                AddChild(_hintBox);
+            }
+            _hintBox.ShowTimed(key, seconds);
+        };
         boss.Defeated += () => OnBossDefeated(boss, center);
         RemoveMarker(marker);
     }

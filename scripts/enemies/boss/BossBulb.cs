@@ -64,6 +64,13 @@ public partial class BossBulb : Area2D, IArrowTarget, IMeleeTarget
         if (!IsDestroyed)
         {
             _sprite.Frame = Mathf.Min(step % Mathf.Max(1, BurstFirstFrame), _sprite.Hframes - 1);
+            if (_armed) // le combat a commencé : les bulbes pulsent pour dire « tire ici »
+            {
+                float pulse = 0.5f + 0.5f * Mathf.Sin(_animTime * 7f);
+                _sprite.Scale = Vector2.One * (1f + 0.25f * pulse);
+                if (_flash == null || !_flash.IsRunning())
+                    _sprite.Modulate = new Color(1f + 0.6f * pulse, 1f + 0.3f * pulse, 1f + 0.6f * pulse);
+            }
             return;
         }
         int frame = BurstFirstFrame + step;
@@ -79,6 +86,8 @@ public partial class BossBulb : Area2D, IArrowTarget, IMeleeTarget
     {
         if (!_armed || IsDestroyed) return;
         IsDestroyed = true;
+        _sprite.Scale = Vector2.One;
+        _sprite.Modulate = Colors.White;
         _animTime = 0f; // l'éclatement repart de sa première case
         RemoveFromGroup(Arrow.TargetGroup);
         SetDeferred(Area2D.PropertyName.Monitorable, false);

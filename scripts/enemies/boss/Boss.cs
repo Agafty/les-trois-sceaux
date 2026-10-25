@@ -24,6 +24,10 @@ public abstract partial class Boss : CharacterBody2D
     [Signal]
     public delegate void DefeatedEventHandler();
 
+    /// <summary>Le boss veut afficher un conseil bref au joueur (clé de traduction, durée en secondes), sans pause.</summary>
+    [Signal]
+    public delegate void HintRequestedEventHandler(string textKey, float seconds);
+
     /// <summary>Clé de traduction du nom affiché au-dessus de la barre de vie et devant la réplique.</summary>
     [Export] public string NameKey { get; set; } = "";
 

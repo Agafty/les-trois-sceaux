@@ -30,6 +30,25 @@ public partial class HintBox : Node
         Refresh();
     }
 
+    /// <summary>Affiche un texte quelques secondes (conseil du boss), sauf si Brann est dans une zone d'indice qui garde la main.</summary>
+    public void ShowTimed(string textKey, float seconds)
+    {
+        if (_occupied.Count > 0) return;
+        if (_layer == null) Build();
+        string text = Tr(textKey);
+        if (text == textKey) GD.PushWarning($"Conseil « {textKey} » : pas de traduction dans textes.csv.");
+        _label.Text = text;
+        _layer.Visible = true;
+        _timedToken++;
+        int token = _timedToken;
+        GetTree().CreateTimer(seconds).Timeout += () =>
+        {
+            if (token == _timedToken && _occupied.Count == 0 && _layer != null && IsInsideTree()) _layer.Visible = false;
+        };
+    }
+
+    private int _timedToken;
+
     /// <summary>Brann sort de la zone : le texte de la zone occupée précédente revient, ou la boîte se cache.</summary>
     public void Leave(HintZone zone)
     {

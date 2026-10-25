@@ -140,6 +140,11 @@ public partial class SylveBoss : Boss
     private Texture2D _frontBody, _frontThorns, _sideBody, _sideThorns;
     private Tween _flash;
     private Tween _blink;
+    private BossShield _shield;
+    private PillarHighlight _pillarMarks;
+    private float _hintCooldown;
+    private Vector2 _sparkPos;
+    private float _sparkTime;
     private int _lastFrame = -1;
     private bool _ready;
 
@@ -173,6 +178,8 @@ public partial class SylveBoss : Boss
         _hurtBox.Hit += OnHit;
         _hurtBox.Blocked += OnBlocked;
         _hitBox = GetNode<HitBox>("HitBox");
+        _shield = GetNode<BossShield>("Bouclier");
+        _shield.SwordBounced += OnSwordBounced;
 
         _thornScene = GD.Load<PackedScene>("res://scenes/enemies/boss/ronces_sol.tscn");
         _arrowPackScene = GD.Load<PackedScene>("res://scenes/items/fleches.tscn");
@@ -203,7 +210,9 @@ public partial class SylveBoss : Boss
     public override void _ExitTree()
     {
         if (!_ready) return;
+        HidePillarMarks();
         if (_health != null) _health.Died -= OnDied;
+        if (_shield != null) _shield.SwordBounced -= OnSwordBounced;
         if (_hurtBox != null)
         {
             _hurtBox.Hit -= OnHit;
@@ -221,6 +230,12 @@ public partial class SylveBoss : Boss
         if (!_ready || _state == State.Done) return;
         float dt = (float)delta;
         _animTime += dt;
+        if (_hintCooldown > 0f) _hintCooldown -= dt;
+        if (_sparkTime > 0f)
+        {
+            _sparkTime -= dt;
+            QueueRedraw();
+        }
         FindPlayer();
 
         if (_player != null && _player.IsDead && _state != State.Purify)
@@ -280,6 +295,7 @@ public partial class SylveBoss : Boss
         foreach (var bulb in _bulbs) bulb.Armed = true;
         AddCollisionExceptionWith(_player); // Sylve traverse Brann (le contact le blesse) : il ne s'arrête que sur les murs et les piliers
         EmitSignal(Boss.SignalName.EncounterStarted);
+        EmitSignal(Boss.SignalName.HintRequested, "BOSS_SYLVE_CONSEIL_1", 7f);
         EmitProgress();
         ShakeCamera(3f, 0.6f);
         SetState(State.Intro, IntroDuration);
@@ -327,6 +343,8 @@ public partial class SylveBoss : Boss
         if (_timer > 0f) return;
         _visual.Position = DefaultVisualPos;
         _phase2 = true;
+        ShowPillarMarks();
+        EmitSignal(Boss.SignalName.HintRequested, "BOSS_SYLVE_CONSEIL_2", 7f);
         SetState(State.Recover, RecoverSeconds + 0.5f);
     }
 
@@ -491,6 +509,8 @@ public partial class SylveBoss : Boss
         bool bodyTouchable = _phase2 && _state != State.Transition && _state != State.Purify && _state != State.Done;
         _hurtBox.SetDeferred(Area2D.PropertyName.Monitorable, bodyTouchable);
         _hurtBox.Invincible = _state != State.Stunned;
+        // Quand le corps n'est pas touchable, le bouclier attrape quand même le coup d'épée pour montrer qu'il rebondit.
+        _shield?.SetDeferred(Area2D.PropertyName.Monitorable, !bodyTouchable && _state != State.Purify && _state != State.Done && _state != State.Dormant);
 
         bool dangerous = _state == State.Patrol || _state == State.Cast || _state == State.Windup
             || _state == State.Charge || _state == State.Reposition || (_state == State.Recover && _grace <= 0f);
@@ -611,7 +631,40 @@ public partial class SylveBoss : Boss
     }
 
     // Invincible : un petit éclat bleuté montre que le coup n'a rien fait.
-    private void OnBlocked(int damage, Vector2 fromPosition) => FlashVisual(new Color(0.65f, 0.75f, 1.4f), 0.15f);
+    private void OnBlocked(int damage, Vector2 fromPosition) => ShowBounce(fromPosition);
+
+    private void OnSwordBounced(Vector2 position)
+    {
+        ShowBounce(position);
+        // Un joueur qui découvre le combat : on lui rappelle (sans spammer) que l'épée ne marche pas encore.
+        if (_hintCooldown <= 0f && !_phase2 && _state != State.Dormant)
+        {
+            _hintCooldown = 8f;
+            EmitSignal(Boss.SignalName.HintRequested, "BOSS_SYLVE_CONSEIL_1", 6f);
+        }
+    }
+
+    // « Rien ne passe » : éclat bleu bien visible et petites étincelles à l'endroit du coup.
+    private void ShowBounce(Vector2 worldPosition)
+    {
+        FlashVisual(new Color(0.3f, 0.6f, 3f), 0.3f);
+        _sparkPos = ToLocal(worldPosition);
+        _sparkTime = 0.25f;
+        QueueRedraw();
+    }
+
+    private void ShowPillarMarks()
+    {
+        if (_pillarMarks != null || Pillars.Count == 0) return;
+        _pillarMarks = new PillarHighlight { Pillars = Pillars };
+        GetParent().AddChild(_pillarMarks);
+    }
+
+    private void HidePillarMarks()
+    {
+        if (_pillarMarks != null && IsInstanceValid(_pillarMarks)) _pillarMarks.QueueFree();
+        _pillarMarks = null;
+    }
 
     private void OnDied()
     {
@@ -624,6 +677,7 @@ public partial class SylveBoss : Boss
 
     private void BeginPurify()
     {
+        HidePillarMarks();
         ClearThorns();
         _blink?.Kill();
         SetState(State.Purify, PurifySeconds);
@@ -751,6 +805,15 @@ public partial class SylveBoss : Boss
         {
             bool locked = (WindupSeconds - _timer) >= WindupSeconds * AimTrackFraction;
             DrawLine(Vector2.Zero, _aim * _aimLength, locked ? AimLocked : AimWarn, locked ? 18f : 10f);
+        }
+        if (_sparkTime > 0f)
+        {
+            float k = _sparkTime / 0.25f;
+            for (int i = 0; i < 6; i++)
+            {
+                var d = Vector2.Right.Rotated(i * Mathf.Tau / 6f + 0.3f);
+                DrawLine(_sparkPos + d * (4f + 10f * (1f - k)), _sparkPos + d * (10f + 14f * (1f - k)), new Color(0.8f, 0.9f, 1f, k), 2f);
+            }
         }
         if (_state == State.Stunned)
         {

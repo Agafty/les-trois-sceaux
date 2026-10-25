@@ -1,16 +1,17 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/boss/SylveBoss.cs" id="1_sylve"]
 [ext_resource type="Script" path="res://scripts/components/Health.cs" id="2_health"]
 [ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="3_hurtbox"]
 [ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="4_hitbox"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/boss/bulbe_sylve.tscn" id="5_bulb"]
+[ext_resource type="Script" path="res://scripts/enemies/boss/BossShield.cs" id="6_shield"]
 
 [sub_resource type="CircleShape2D" id="body_shape"]
 radius = 26.0
 
-[sub_resource type="CircleShape2D" id="hurt_shape"]
-radius = 30.0
+[sub_resource type="RectangleShape2D" id="hurt_shape"]
+size = Vector2(72, 100)
 
 [sub_resource type="CircleShape2D" id="contact_shape"]
 radius = 34.0
@@ -63,6 +64,14 @@ script = ExtResource("3_hurtbox")
 Team = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(0, -24)
+shape = SubResource("hurt_shape")
+
+[node name="Bouclier" type="Area2D" parent="."]
+script = ExtResource("6_shield")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bouclier"]
+position = Vector2(0, -24)
 shape = SubResource("hurt_shape")
 
 [node name="HitBox" type="Area2D" parent="."]
