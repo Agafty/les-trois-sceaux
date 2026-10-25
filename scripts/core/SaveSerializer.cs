@@ -46,6 +46,8 @@ public static class SaveSerializer
         d.CollectedIds.RemoveAll(string.IsNullOrEmpty);
         d.DungeonItems ??= new();
         d.DungeonItems.RemoveAll(string.IsNullOrEmpty);
+        d.VisitedRooms ??= new();
+        d.VisitedRooms.RemoveAll(string.IsNullOrEmpty);
         d.Seals ??= new();
         d.Seals.RemoveAll(string.IsNullOrEmpty);
         if (d.RavenFeathers < 0) d.RavenFeathers = 0;
@@ -82,6 +84,11 @@ public static class SaveSerializer
                 data.Version = 3;
                 goto case 3;
             case 3:
+                // Version 3 -> 4 : ajout des salles visitées (absentes = aucune ; la carte se remplit en rejouant).
+                data.VisitedRooms = new();
+                data.Version = 4;
+                goto case 4;
+            case 4:
                 return true; // rien à migrer
             case 0:
                 error = "numéro de version absent";

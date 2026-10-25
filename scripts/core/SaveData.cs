@@ -15,7 +15,7 @@ public class SaveInventoryEntry
 public class SaveData
 {
     /// <summary>Version du format écrite par cette version du jeu. À incrémenter quand le format change.</summary>
-    public const int CurrentVersion = 3;
+    public const int CurrentVersion = 4;
 
     /// <summary>0 = absente du fichier : sera rejetée par la migration. SaveSystem écrit CurrentVersion à la sauvegarde.</summary>
     public int Version { get; set; }
@@ -43,6 +43,9 @@ public class SaveData
 
     /// <summary>Version 3. Sceaux restaurés (ex. « racines »), dans l'ordre d'obtention.</summary>
     public List<string> Seals { get; set; } = new();
+
+    /// <summary>Version 4. Salles de donjon visitées, sous la forme « zone/id de salle » (ex. « donjon1/donjon1_salle_01_room »).</summary>
+    public List<string> VisitedRooms { get; set; } = new();
 
     /// <summary>Position de reprise : chemin de la scène (carte) et id du Spawn, jamais des coordonnées.</summary>
     public string ScenePath { get; set; } = "";
