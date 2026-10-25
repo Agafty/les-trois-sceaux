@@ -125,6 +125,8 @@ public partial class Room : Node2D
 
         TreeExiting += OnRoomExiting;
         ReadMapProperties();
+        if (HasMapPosition && !string.IsNullOrEmpty(SceneFilePath))
+            GetNode<GameState>("/root/GameState").MarkRoomVisited(Zone, System.IO.Path.GetFileNameWithoutExtension(SceneFilePath));
         ConfigureLayers();
 
         // Brann d'abord sur son Spawn, puis les objets : rien n'apparaît sous ses pieds avant qu'il soit placé.

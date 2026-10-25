@@ -22,6 +22,7 @@ public partial class InventoryMenu : Control
     private static readonly StringName ActionDown = "move_down";
     private static readonly StringName ActionLeft = "move_left";
     private static readonly StringName ActionRight = "move_right";
+    private static readonly StringName ActionMapPage = "map_page";
     private static readonly StringName PanelStyleName = "panel";
 
     private static readonly Vector2 PanelPos = new(140, 50);
@@ -34,6 +35,8 @@ public partial class InventoryMenu : Control
     private Label _title;
     private Label _name;
     private Label _description;
+    private Label _mapHint;
+    private DungeonMapPage _mapPage;
     private Control _cursor;
     private readonly TextureRect[] _frames = new TextureRect[SlotCount];
     private readonly TextureRect[] _icons = new TextureRect[SlotCount];
@@ -43,6 +46,7 @@ public partial class InventoryMenu : Control
 
     private bool _open;
     private bool _pausedByMenu;
+    private bool _mapOpen;
     private int _selected;
     private Vector2I _heldDirection = Vector2I.Zero;
     private float _repeatTimer;
@@ -89,6 +93,19 @@ public partial class InventoryMenu : Control
     // Actif seulement quand le menu est ouvert (SetProcess).
     public override void _Process(double delta)
     {
+        if (Input.IsActionJustPressed(ActionMapPage))
+        {
+            if (_mapOpen) ShowInventoryPage();
+            else ShowMapPage();
+            return;
+        }
+        if (_mapOpen)
+        {
+            // Page carte : haut = rez-de-chaussée, bas = sous-sol. L'inventaire ne réagit pas.
+            if (Input.IsActionJustPressed(ActionUp)) _mapPage.SetFloor(DungeonMapPage.FloorGround);
+            else if (Input.IsActionJustPressed(ActionDown)) _mapPage.SetFloor(DungeonMapPage.FloorBasement);
+            return;
+        }
         ProcessNavigation((float)delta);
         if (Input.IsActionJustPressed(ActionAttack) || Input.IsActionJustPressed(ActionInteract))
             ValidateSelection();
@@ -102,6 +119,8 @@ public partial class InventoryMenu : Control
 
         Engine.TimeScale = 1f; // sécurité : jamais de menu au ralenti (hit-stop en cours)
         _open = true;
+        _mapOpen = false;
+        _mapPage.Close();
         _heldDirection = Vector2I.Zero;
         Visible = true;
         GetTree().Paused = true;
@@ -113,6 +132,8 @@ public partial class InventoryMenu : Control
     private void Close()
     {
         _open = false;
+        _mapOpen = false;
+        _mapPage.Close();
         Visible = false;
         SetProcess(false);
         if (_pausedByMenu)
@@ -157,6 +178,20 @@ public partial class InventoryMenu : Control
         UpdateCursor();
     }
 
+    private void ShowMapPage()
+    {
+        _mapOpen = true;
+        _heldDirection = Vector2I.Zero;
+        _mapPage.Open(_gameState, GetTree().CurrentScene as Room);
+    }
+
+    private void ShowInventoryPage()
+    {
+        _mapOpen = false;
+        _heldDirection = Vector2I.Zero;
+        _mapPage.Close();
+    }
+
     private void ValidateSelection()
     {
         var item = _slotItems[_selected];
@@ -174,6 +209,7 @@ public partial class InventoryMenu : Control
     private void Refresh()
     {
         _title.Text = Tr("MENU_INVENTAIRE");
+        _mapHint.Text = Tr("INVENTAIRE_AIDE_CARTE");
         var ids = _gameState.InventoryIds;
         for (int i = 0; i < SlotCount; i++)
         {
@@ -244,6 +280,12 @@ public partial class InventoryMenu : Control
         _name = CreateLabel(new Vector2(PanelPos.X + 16, 200), PanelSize.X - 32, 12);
         _description = CreateLabel(new Vector2(PanelPos.X + 16, 218), PanelSize.X - 32, 60);
         _description.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        _mapHint = CreateLabel(new Vector2(PanelPos.X + 16, PanelPos.Y + PanelSize.Y - 18), PanelSize.X - 32, 12);
+        _mapHint.HorizontalAlignment = HorizontalAlignment.Right;
+
+        // Page carte : en dernier pour être dessinée par-dessus l'inventaire.
+        _mapPage = new DungeonMapPage { Position = PanelPos, Size = PanelSize };
+        AddChild(_mapPage);
     }
 
     private Control CreatePanel()

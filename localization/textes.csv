@@ -46,3 +46,14 @@ OBJ_SCEAU_RACINES,le sceau des Racines,the Seal of the Roots
 OBJ_SCEAU_RACINES_DESC,"Le premier des trois sceaux est restauré.","The first of the three seals is restored."
 BOSS_SYLVE_CONSEIL_1,"L'épée ne peut rien contre lui pour l'instant. Vise les bulbes lumineux sur ses bois avec l'arc !","Your sword is useless against him for now. Shoot the glowing bulbs on his antlers with your bow!"
 BOSS_SYLVE_CONSEIL_2,"Fais-le charger contre un pilier (tiens-toi derrière) : étourdi, frappe-le à l'épée !","Make him charge into a pillar (stand behind it): when he is dazed, strike him with your sword!"
+MENU_CARTE,Carte du donjon,Dungeon map
+CARTE_AUCUNE,Pas de carte ici,No map here
+CARTE_ETAGE_RDC,Rez-de-chaussée,Ground floor
+CARTE_ETAGE_SOUS_SOL,Sous-sol,Basement
+CARTE_SANS_CARTE,Tu n'as pas trouvé la carte de ce donjon.,You haven't found this dungeon's map.
+CARTE_LEG_BRANN,Brann,Brann
+CARTE_LEG_BOSS,Boss,Boss
+CARTE_LEG_ESCALIER,Escalier,Stairs
+CARTE_LEG_TROU,Trou,Hole
+CARTE_AIDE,Haut/Bas : étage - Tab/Select : inventaire,Up/Down: floor - Tab/Select: inventory
+INVENTAIRE_AIDE_CARTE,Tab/Select : carte,Tab/Select: map

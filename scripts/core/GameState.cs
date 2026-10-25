@@ -197,6 +197,28 @@ public partial class GameState : Node
         EmitSignal(SignalName.HeartPiecesChanged, HeartPieces);
     }
 
+    private readonly HashSet<string> _visitedRooms = new();
+
+    /// <summary>Salles de donjon déjà visitées, sous la forme « zone/id de salle » (carte du menu pause).</summary>
+    public IReadOnlyCollection<string> VisitedRoomKeys => _visitedRooms;
+
+    public bool IsRoomVisited(string zone, string roomId) => _visitedRooms.Contains(DungeonMap.MakeVisitedKey(zone, roomId));
+
+    /// <summary>Note une salle comme visitée. Faux si zone ou id est vide, ou si elle l'était déjà.</summary>
+    public bool MarkRoomVisited(string zone, string roomId)
+    {
+        if (string.IsNullOrEmpty(zone) || string.IsNullOrEmpty(roomId)) return false;
+        return _visitedRooms.Add(DungeonMap.MakeVisitedKey(zone, roomId));
+    }
+
+    public void LoadVisitedRooms(IEnumerable<string> keys)
+    {
+        _visitedRooms.Clear();
+        if (keys == null) return;
+        foreach (var key in keys)
+            if (!string.IsNullOrEmpty(key)) _visitedRooms.Add(key);
+    }
+
     private readonly HashSet<string> _dungeonItems = new();
 
     /// <summary>Objets de donjon possédés (carte, boussole, grande clé), sous la forme « zone/type » (pour la sauvegarde).</summary>
@@ -297,6 +319,8 @@ public partial class GameState : Node
         data.Seals.AddRange(_seals);
         data.DungeonItems.AddRange(_dungeonItems);
         data.DungeonItems.Sort(string.CompareOrdinal);
+        data.VisitedRooms.AddRange(_visitedRooms);
+        data.VisitedRooms.Sort(string.CompareOrdinal);
         foreach (var id in _inventory.Ids)
             data.Inventory.Add(new SaveInventoryEntry { Id = id, Quantity = _inventory.GetQuantity(id) });
         data.CollectedIds.AddRange(_collected);
@@ -347,6 +371,7 @@ public partial class GameState : Node
         LoadCollected(data.CollectedIds, data.HeartPieces);
         LoadProgress(data.DungeonItems, data.RavenFeathers);
         LoadSeals(data.Seals);
+        LoadVisitedRooms(data.VisitedRooms);
     }
 
     public int Rupees { get; private set; }
