@@ -51,6 +51,13 @@ public partial class Room : Node2D
     /// <summary>Vrai si la carte porte les trois propriétés etage, carte_x et carte_y.</summary>
     public bool HasMapPosition { get; private set; }
 
+    /// <summary>
+    /// Mode de caméra (propriété de carte Tiled « camera »). « suivre » (défaut) : la caméra suit Brann, limitée à la carte
+    /// (une salle d'un écran ne bouge donc jamais). « ecran » : défilement par écran façon ALttP, la caméra se cale sur
+    /// l'écran de 20x11 cases où se trouve Brann et glisse d'un écran à l'autre.
+    /// </summary>
+    public string CameraMode { get; private set; } = "suivre";
+
     /// <summary>Nombre d'ennemis de la carte encore vivants.</summary>
     public int AliveEnemies => _aliveEnemies;
 
@@ -70,7 +77,15 @@ public partial class Room : Node2D
     // Avertissements « type inconnu » : une seule fois par session, pas à chaque chargement de salle.
     private static readonly HashSet<string> WarnedKeys = new();
 
+    private const int ScreenTilesX = 20;
+    private const int ScreenTilesY = 11;
+
     private Node2D _entities;
+    private Camera2D _screenCamera;
+    private Player _screenPlayer;
+    private Vector2I _screenSize;
+    private Rect2I _screenArea; // zone de la carte en pixels (mode « ecran »)
+    private Vector2I _screenCell = new(int.MinValue, int.MinValue);
     private int _aliveEnemies;
     private readonly Dictionary<Health, EnemyTrack> _trackedEnemies = new();
     private bool _leaving;
@@ -105,6 +120,7 @@ public partial class Room : Node2D
 
     public override void _Ready()
     {
+        SetPhysicsProcess(false); // activé seulement par le mode caméra « ecran »
         // Le HUD vit avec la salle (pas d'autoload supplémentaire) ; il ne dépend que de GameState.
         var hudScene = GD.Load<PackedScene>("res://scenes/ui/hud.tscn"); // mis en cache par Godot
         if (hudScene != null)
@@ -218,7 +234,45 @@ public partial class Room : Node2D
         camera.LimitRight = (usedRect.Position.X + usedRect.Size.X) * tileSize.X;
         camera.LimitBottom = (usedRect.Position.Y + usedRect.Size.Y) * tileSize.Y;
         camera.PositionSmoothingEnabled = true;
+
+        if (CameraMode == "ecran")
+        {
+            // Défilement par écran : _PhysicsProcess recale les limites sur l'écran de Brann ; LimitSmoothed fait glisser la caméra.
+            _screenCamera = camera;
+            _screenPlayer = player;
+            _screenArea = new Rect2I(
+                usedRect.Position.X * tileSize.X, usedRect.Position.Y * tileSize.Y,
+                usedRect.Size.X * tileSize.X, usedRect.Size.Y * tileSize.Y);
+            _screenSize = new Vector2I(ScreenTilesX * tileSize.X, ScreenTilesY * tileSize.Y);
+            camera.LimitSmoothed = true;
+            SetPhysicsProcess(true);
+            UpdateScreenLimits();
+        }
         camera.ResetSmoothing(); // Brann vient d'être placé au Spawn : pas de glissement depuis l'ancienne position
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        if (_screenCamera != null && IsInstanceValid(_screenCamera) && IsInstanceValid(_screenPlayer))
+            UpdateScreenLimits();
+    }
+
+    // Limites de la caméra = l'écran (640x352) qui contient Brann, borné à la carte. Aucune allocation.
+    private void UpdateScreenLimits()
+    {
+        int w = _screenSize.X, h = _screenSize.Y;
+        var pos = _screenPlayer.GlobalPosition;
+        int cx = Mathf.Clamp(Mathf.FloorToInt((pos.X - _screenArea.Position.X) / w), 0, Mathf.Max(0, (_screenArea.Size.X - 1) / w));
+        int cy = Mathf.Clamp(Mathf.FloorToInt((pos.Y - _screenArea.Position.Y) / h), 0, Mathf.Max(0, (_screenArea.Size.Y - 1) / h));
+        if (cx == _screenCell.X && cy == _screenCell.Y) return;
+        _screenCell = new Vector2I(cx, cy);
+        // Dernier écran calé sur la fin de la carte si elle n'est pas un multiple d'un écran (jamais plus petit que le viewport).
+        int left = Mathf.Min(_screenArea.Position.X + cx * w, Mathf.Max(_screenArea.Position.X, _screenArea.End.X - w));
+        int top = Mathf.Min(_screenArea.Position.Y + cy * h, Mathf.Max(_screenArea.Position.Y, _screenArea.End.Y - h));
+        _screenCamera.LimitLeft = left;
+        _screenCamera.LimitTop = top;
+        _screenCamera.LimitRight = Mathf.Min(left + w, _screenArea.End.X);
+        _screenCamera.LimitBottom = Mathf.Min(top + h, _screenArea.End.Y);
     }
 
     // --- Objets du calque « Objets » ------------------------------------------------------------
@@ -661,12 +715,18 @@ public partial class Room : Node2D
     {
         Node source = null;
         foreach (var child in GetChildren())
-            if (child.HasMeta("etage") || child.HasMeta("carte_x") || child.HasMeta("carte_y"))
+            if (child.HasMeta("etage") || child.HasMeta("carte_x") || child.HasMeta("carte_y") || child.HasMeta("camera"))
             {
                 source = child;
                 break;
             }
         if (source == null) return;
+
+        string camera = GetString(source, "camera").Trim().ToLowerInvariant();
+        if (camera == "ecran" || camera == "suivre")
+            CameraMode = camera;
+        else if (camera != "")
+            WarnOnce("camera:" + camera, $"Carte {Name} : camera inconnue « {camera} » (ecran ou suivre), « suivre » utilisé.");
 
         MapFloor = GetString(source, "etage");
         MapCell = new Vector2I(Mathf.RoundToInt(GetFloat(source, "carte_x")), Mathf.RoundToInt(GetFloat(source, "carte_y")));
@@ -923,7 +983,7 @@ public partial class Room : Node2D
 
         var cibleCarte = (string)sortie.GetMeta("cible_carte");
         var cibleSpawn = sortie.HasMeta("cible_spawn") ? (string)sortie.GetMeta("cible_spawn") : "";
-        if (!ResourceLoader.Exists(cibleCarte))
+        if (!SceneIsAvailable(cibleCarte))
         {
             // Scène pas encore créée (ex. la forêt devant le temple) : repli provisoire ou rien.
             if (string.IsNullOrEmpty(MissingExitFallbackScene))
@@ -941,6 +1001,28 @@ public partial class Room : Node2D
             sceneManager.GoToScene(cibleCarte, cibleSpawn, null, "escalier", StairsFadeDuration); // signal TransitionStarted("escalier") : accroche du son
         else
             sceneManager.GoToScene(cibleCarte, cibleSpawn);
+    }
+
+    // Une scène est utilisable si son fichier existe ET que ses dépendances directes existent (ex. foret_temple_room.tscn
+    // existe avant que le .tmx de la carte ait été peint). Chaque dépendance : « uid://...::type::chemin » ; on teste l'uid
+    // d'abord (le fichier a pu être déplacé), puis le chemin.
+    private static bool SceneIsAvailable(string path)
+    {
+        if (!ResourceLoader.Exists(path)) return false;
+        foreach (var dep in ResourceLoader.GetDependencies(path))
+        {
+            if (dep.StartsWith("uid://", System.StringComparison.Ordinal))
+            {
+                int end = dep.IndexOf("::", System.StringComparison.Ordinal);
+                string uid = end >= 0 ? dep.Substring(0, end) : dep;
+                long id = ResourceUid.TextToId(uid);
+                if (id != ResourceUid.InvalidId && ResourceUid.HasId(id)) continue;
+            }
+            int cut = dep.LastIndexOf("::", System.StringComparison.Ordinal);
+            string depPath = cut >= 0 ? dep.Substring(cut + 2) : dep;
+            if (depPath.Length > 0 && !ResourceLoader.Exists(depPath)) return false;
+        }
+        return true;
     }
 
     // Une Sortie est ignorée tant qu'une porte fermée occupe la même case (centres à 1 px près).
