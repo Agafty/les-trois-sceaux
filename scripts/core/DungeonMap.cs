@@ -122,12 +122,4 @@ public static class DungeonMap
     /// </summary>
     public static bool ShowLink(MapRoomState a, MapRoomState b) =>
         (a == MapRoomState.Visited || b == MapRoomState.Visited) && a != MapRoomState.Hidden && b != MapRoomState.Hidden;
-
-    /// <summary>Vrai si l'étage contient au moins une salle affichée.</summary>
-    public static bool FloorHasContent(DungeonLayout layout, string floor, System.Func<MapRoom, MapRoomState> stateOf)
-    {
-        foreach (var room in layout.Rooms)
-            if (room.Floor == floor && stateOf(room) != MapRoomState.Hidden) return true;
-        return false;
-    }
 }

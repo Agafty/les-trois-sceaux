@@ -60,7 +60,7 @@ public static class SaveSerializer
     /// <summary>
     /// Met à niveau les données jusqu'à <see cref="SaveData.CurrentVersion"/>.
     /// Chaque ancienne version a son case qui adapte les champs, monte Version d'un cran puis fait « goto » vers le suivant.
-    /// Pour un futur format 3 : « case 2: ...adapter...; data.Version = 3; goto case 3; » puis « case 3: return true; ».
+    /// Pour un futur format 5 : « case 4: ...adapter...; data.Version = 5; goto case 5; » puis « case 5: return true; ».
     /// </summary>
     public static bool Migrate(SaveData data, out string error)
     {
