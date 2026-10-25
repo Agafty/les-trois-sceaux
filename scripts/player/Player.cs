@@ -133,6 +133,7 @@ public partial class Player : CharacterBody2D
         _hurtBox.Invincible = true;
         _hurtBox.SetDeferred(Area2D.PropertyName.Monitorable, false);
         _swordSprite.Visible = false;
+        GetNodeOrNull<PickupBanner>("PickupBanner")?.HideBanner();
         _swordHitBox.SetDeferred(Area2D.PropertyName.Monitoring, false);
         _sprite.Visible = true;
         _sprite.Play(DeathAnim);

@@ -9,3 +9,4 @@ script = ExtResource("1_effect")
 BonusMaxHealth = 2
 Icon = ExtResource("2_icon")
 NameKey = "OBJ_QUART_COEUR"
+ShowNameOnPickup = true

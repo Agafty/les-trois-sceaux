@@ -9,3 +9,4 @@ script = ExtResource("1_effect")
 Amount = 2
 Icon = ExtResource("2_icon")
 NameKey = "OBJ_RECEPTACLE"
+ShowNameOnPickup = true

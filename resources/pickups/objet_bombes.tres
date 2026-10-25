@@ -7,3 +7,4 @@
 script = ExtResource("1_effect")
 Item = ExtResource("2_item")
 Quantity = 5
+ShowNameOnPickup = true

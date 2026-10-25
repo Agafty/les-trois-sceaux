@@ -126,7 +126,9 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 - **Image d'une porte** : `art/puzzles/porte_<cle|grande_cle|ennemis|interrupteur>.png`, 32 px par image (fermée, puis ouverte en option) ; sans fichier, un placeholder est dessiné par le code.
 - **Calque `Dessus`** : la `Room` lui donne `z_index = 2` pour qu'il passe devant Brann.
 - **Sortie vers une scène pas encore créée** : `Room.MissingExitFallbackScene` (provisoire) ; sinon avertissement et rien ne se passe.
-- **Butin de flèches garanti** : `LootDropper.GuaranteeArrows` (vrai par défaut) lâche des flèches quand Brann a l'arc et moins de `ArrowsBelow` (5) flèches.
+- **Butin de flèches garanti** : le coffre de l'arc donne 20 flèches ; `LootDropper.ArrowsBelow` vaut 10 : sous ce seuil, chaque ennemi vaincu lâche EN PLUS du tirage normal un paquet de 5 flèches (20 s au sol).
+- **Corps des interrupteurs** : le `Switch` (levier et cibles) a un corps solide `Corps` (`SwitchBody`, 20×16 à la base de la case) qui bloque Brann et les blocs et arrête la flèche en activant l'interrupteur ; une cible ou un levier ne doit pas barrer un couloir d'une case, ni être posé sur ou à côté d'une case de `Sortie` ou de `Porte`. Une flèche s'arrête sur un interrupteur en mode `epee` (comme sur un mur) et traverse un interrupteur déjà résolu.
+- **Nom des objets ramassés** : `PickupEffect.ShowNameOnPickup` affiche « Vous obtenez : … » (+ `DescriptionKey` facultative) au ramassage d'un objet au sol, sans pause ; à activer pour tout objet non courant (pas les rubis, petits cœurs, flèches).
 
 **Propriétés de carte (donjons)** : `etage` (`rdc` ou `sous_sol`), `carte_x`, `carte_y` (position dans la grille du donjon, pour la carte du menu pause). **Règles de conception** : un déclencheur (interrupteur, plaque, torche) est toujours dans la même salle qu'une face de sa porte ; un bloc ne peut pas être poussé sur ou à côté (8 voisines) d'un Spawn, d'une `Sortie` ou d'une `Porte` ; option d'aide = multiplicateur des `duree` (torches, cibles) pour le jeune joueur.
 

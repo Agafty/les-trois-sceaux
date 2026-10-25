@@ -13,6 +13,16 @@ public abstract partial class PickupEffect : Resource
     /// <summary>Clé de traduction du nom montré dans un coffre (« Vous obtenez : ... »).</summary>
     [Export] public string NameKey { get; set; } = "";
 
+    /// <summary>
+    /// Vrai : quand Brann ramasse cet objet au sol, un bandeau montre brièvement son nom (plume, quart de cœur, clé, arc...).
+    /// Faux pour les objets courants (rubis, petits cœurs, paquets de flèches). Sans effet dans un coffre (qui a sa propre annonce).
+    /// </summary>
+    [ExportGroup("Annonce au ramassage")]
+    [Export] public bool ShowNameOnPickup { get; set; }
+
+    /// <summary>Clé de traduction d'une courte phrase d'explication sous le nom (facultatif).</summary>
+    [Export] public string DescriptionKey { get; set; } = "";
+
     public virtual Texture2D GetIcon() => Icon;
 
     public virtual string GetNameKey() => NameKey;

@@ -9,6 +9,7 @@ using Godot;
 /// Id = Target) s'ouvre quand tous sont actifs ensemble. <see cref="Order"/> impose un ordre (hors ordre : tout le groupe revient
 /// à zéro), <see cref="Duration"/> fait redevenir inactif un interrupteur touché au bout de N secondes (multipliées par
 /// l'option d'aide <see cref="GameState.PuzzleTimeMultiplier"/>), <see cref="Symbol"/> choisit l'image de la cible.
+/// Il a un corps solide (enfant « Corps », <see cref="SwitchBody"/>) : Brann et les blocs ne le traversent pas, l'épée et les flèches l'atteignent quand même.
 /// Un interrupteur isolé, permanent et sans ordre garde le comportement d'origine : son Id est mémorisé dans GameState.
 /// Sinon seul l'état de la porte est mémorisé : l'interrupteur repart de zéro quand la salle est rechargée
 /// (et apparaît activé si sa porte est déjà ouverte).
@@ -37,6 +38,9 @@ public partial class Switch : Area2D, IArrowTarget, IMeleeTarget
     [Export] public string Symbol { get; set; } = "";
 
     public bool IsActive => _active;
+
+    /// <summary>Résolu pour de bon (porte ouverte) : plus de détection, les flèches passent ; le corps reste solide pour Brann.</summary>
+    public bool IsFrozen => _frozen;
 
     /// <summary>Groupe Godot de tous les interrupteurs (sert à retrouver ses camarades de groupe).</summary>
     public static readonly StringName AllGroup = "interrupteurs";
@@ -173,7 +177,7 @@ public partial class Switch : Area2D, IArrowTarget, IMeleeTarget
         ApplyFrame();
     }
 
-    /// <summary>Résolu : actif pour de bon, plus de compte à rebours, les flèches passent au travers.</summary>
+    /// <summary>Résolu : actif pour de bon, plus de compte à rebours, plus de détection ; les flèches passent au travers (y compris du corps), mais le corps reste solide pour Brann.</summary>
     internal void Freeze()
     {
         _frozen = true;

@@ -121,6 +121,8 @@ public partial class Pickup : Area2D
     {
         _collected = true;
         Effect.Apply(player, _state);
+        if (Effect.ShowNameOnPickup)
+            PickupBanner.Announce(player, Effect);
         if (IsUnique)
             _state.MarkCollected(UniqueId);
         QueueFree();

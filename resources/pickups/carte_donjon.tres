@@ -8,3 +8,4 @@ script = ExtResource("1_effect")
 Kind = "carte"
 Icon = ExtResource("2_icon")
 NameKey = "OBJ_CARTE_DONJON"
+ShowNameOnPickup = true

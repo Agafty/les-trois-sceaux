@@ -7,3 +7,5 @@
 script = ExtResource("1_effect")
 Icon = ExtResource("2_icon")
 NameKey = "OBJ_PLUME_CORBEAU"
+ShowNameOnPickup = true
+DescriptionKey = "OBJ_PLUME_CORBEAU_DESC"

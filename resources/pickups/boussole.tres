@@ -8,3 +8,4 @@ script = ExtResource("1_effect")
 Kind = "boussole"
 Icon = ExtResource("2_icon")
 NameKey = "OBJ_BOUSSOLE"
+ShowNameOnPickup = true

@@ -8,3 +8,4 @@ script = ExtResource("1_effect")
 Kind = "grande_cle"
 Icon = ExtResource("2_icon")
 NameKey = "OBJ_GRANDE_CLE"
+ShowNameOnPickup = true
