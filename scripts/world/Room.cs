@@ -51,6 +51,13 @@ public partial class Room : Node2D
     /// <summary>Vrai si la carte porte les trois propriétés etage, carte_x et carte_y.</summary>
     public bool HasMapPosition { get; private set; }
 
+    /// <summary>
+    /// Mode de caméra (propriété de carte Tiled « camera »). « suivre » (défaut) : la caméra suit Brann, limitée à la carte
+    /// (une salle d'un écran ne bouge donc jamais). « ecran » : défilement par écran façon ALttP, la caméra se cale sur
+    /// l'écran de 20x11 cases où se trouve Brann et glisse d'un écran à l'autre.
+    /// </summary>
+    public string CameraMode { get; private set; } = "suivre";
+
     /// <summary>Nombre d'ennemis de la carte encore vivants.</summary>
     public int AliveEnemies => _aliveEnemies;
 
@@ -70,7 +77,14 @@ public partial class Room : Node2D
     // Avertissements « type inconnu » : une seule fois par session, pas à chaque chargement de salle.
     private static readonly HashSet<string> WarnedKeys = new();
 
+    private const int ScreenTilesX = 20;
+    private const int ScreenTilesY = 11;
+
     private Node2D _entities;
+    private Camera2D _screenCamera;
+    private Player _screenPlayer;
+    private Rect2I _screenArea; // zone de la carte en pixels (mode « ecran »)
+    private Vector2I _screenCell = new(int.MinValue, int.MinValue);
     private int _aliveEnemies;
     private readonly Dictionary<Health, EnemyTrack> _trackedEnemies = new();
     private bool _leaving;
@@ -218,7 +232,42 @@ public partial class Room : Node2D
         camera.LimitRight = (usedRect.Position.X + usedRect.Size.X) * tileSize.X;
         camera.LimitBottom = (usedRect.Position.Y + usedRect.Size.Y) * tileSize.Y;
         camera.PositionSmoothingEnabled = true;
+
+        if (CameraMode == "ecran")
+        {
+            // Défilement par écran : _PhysicsProcess recale les limites sur l'écran de Brann ; LimitSmoothed fait glisser la caméra.
+            _screenCamera = camera;
+            _screenPlayer = player;
+            _screenArea = new Rect2I(
+                usedRect.Position.X * tileSize.X, usedRect.Position.Y * tileSize.Y,
+                usedRect.Size.X * tileSize.X, usedRect.Size.Y * tileSize.Y);
+            camera.LimitSmoothed = true;
+            UpdateScreenLimits();
+        }
         camera.ResetSmoothing(); // Brann vient d'être placé au Spawn : pas de glissement depuis l'ancienne position
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        if (_screenCamera != null && IsInstanceValid(_screenCamera) && IsInstanceValid(_screenPlayer))
+            UpdateScreenLimits();
+    }
+
+    // Limites de la caméra = l'écran (640x352) qui contient Brann, borné à la carte. Aucune allocation.
+    private void UpdateScreenLimits()
+    {
+        int w = ScreenTilesX * 32, h = ScreenTilesY * 32;
+        var pos = _screenPlayer.GlobalPosition;
+        int cx = Mathf.Clamp(Mathf.FloorToInt((pos.X - _screenArea.Position.X) / w), 0, Mathf.Max(0, (_screenArea.Size.X - 1) / w));
+        int cy = Mathf.Clamp(Mathf.FloorToInt((pos.Y - _screenArea.Position.Y) / h), 0, Mathf.Max(0, (_screenArea.Size.Y - 1) / h));
+        if (cx == _screenCell.X && cy == _screenCell.Y) return;
+        _screenCell = new Vector2I(cx, cy);
+        int left = _screenArea.Position.X + cx * w;
+        int top = _screenArea.Position.Y + cy * h;
+        _screenCamera.LimitLeft = left;
+        _screenCamera.LimitTop = top;
+        _screenCamera.LimitRight = Mathf.Min(left + w, _screenArea.End.X);
+        _screenCamera.LimitBottom = Mathf.Min(top + h, _screenArea.End.Y);
     }
 
     // --- Objets du calque « Objets » ------------------------------------------------------------
@@ -661,12 +710,18 @@ public partial class Room : Node2D
     {
         Node source = null;
         foreach (var child in GetChildren())
-            if (child.HasMeta("etage") || child.HasMeta("carte_x") || child.HasMeta("carte_y"))
+            if (child.HasMeta("etage") || child.HasMeta("carte_x") || child.HasMeta("carte_y") || child.HasMeta("camera"))
             {
                 source = child;
                 break;
             }
         if (source == null) return;
+
+        string camera = GetString(source, "camera");
+        if (camera == "ecran" || camera == "suivre")
+            CameraMode = camera;
+        else if (camera != "")
+            WarnOnce("camera:" + camera, $"Carte {Name} : camera inconnue « {camera} » (ecran ou suivre), « suivre » utilisé.");
 
         MapFloor = GetString(source, "etage");
         MapCell = new Vector2I(Mathf.RoundToInt(GetFloat(source, "carte_x")), Mathf.RoundToInt(GetFloat(source, "carte_y")));
@@ -923,7 +978,7 @@ public partial class Room : Node2D
 
         var cibleCarte = (string)sortie.GetMeta("cible_carte");
         var cibleSpawn = sortie.HasMeta("cible_spawn") ? (string)sortie.GetMeta("cible_spawn") : "";
-        if (!ResourceLoader.Exists(cibleCarte))
+        if (!SceneIsAvailable(cibleCarte))
         {
             // Scène pas encore créée (ex. la forêt devant le temple) : repli provisoire ou rien.
             if (string.IsNullOrEmpty(MissingExitFallbackScene))
@@ -941,6 +996,20 @@ public partial class Room : Node2D
             sceneManager.GoToScene(cibleCarte, cibleSpawn, null, "escalier", StairsFadeDuration); // signal TransitionStarted("escalier") : accroche du son
         else
             sceneManager.GoToScene(cibleCarte, cibleSpawn);
+    }
+
+    // Une scène est utilisable si son fichier existe ET que toutes ses dépendances existent (ex. foret_temple_room.tscn
+    // existe avant que le .tmx de la carte ait été peint par le level-designer).
+    private static bool SceneIsAvailable(string path)
+    {
+        if (!ResourceLoader.Exists(path)) return false;
+        foreach (var dep in ResourceLoader.GetDependencies(path))
+        {
+            int cut = dep.LastIndexOf("::", System.StringComparison.Ordinal);
+            string depPath = cut >= 0 ? dep.Substring(cut + 2) : dep;
+            if (depPath.Length > 0 && !ResourceLoader.Exists(depPath)) return false;
+        }
+        return true;
     }
 
     // Une Sortie est ignorée tant qu'une porte fermée occupe la même case (centres à 1 px près).
