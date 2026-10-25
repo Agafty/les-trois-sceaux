@@ -377,22 +377,22 @@ But : un donjon de 14 à 16 salles sur deux étages (décision du 2026-10-24 : 1
 **Briques d'énigmes (réutilisables partout)**
 
 - [x] Portes : verrouillées par petite clé, par grande clé (boss), ou qui s'ouvrent quand tous les ennemis sont morts
-- [ ] Interrupteurs au sol (plaque de pression) et interrupteurs à frapper
-- [ ] Blocs poussables (alignés sur la grille 32×32)
-- [ ] Torches à allumer, murs fissurés (bombes), trous qui font tomber à l'étage inférieur
-- [ ] Un petit système « déclencheur → cible » via signaux, pour câbler une énigme dans l'éditeur sans écrire de code
+- [x] Interrupteurs au sol (plaque de pression) et interrupteurs à frapper
+- [x] Blocs poussables (alignés sur la grille 32×32)
+- [ ] Torches à allumer, murs fissurés (bombes), trous qui font tomber à l'étage inférieur (torches et trous faits ; murs fissurés : avec les bombes, donjon 2)
+- [x] Un petit système « déclencheur → cible » via signaux, pour câbler une énigme dans l'éditeur sans écrire de code
 
 **Structure du donjon**
 
-- [ ] Concevoir sur papier d'abord : plan des salles, emplacement de la carte, de la boussole, de l'objet du donjon, de la grande clé
-- [ ] Règle Zelda : l'objet trouvé au milieu du donjon sert à finir le donjon ET à battre le boss
+- [x] Concevoir sur papier d'abord : plan des salles, emplacement de la carte, de la boussole, de l'objet du donjon, de la grande clé
+- [x] Règle Zelda : l'objet trouvé au milieu du donjon sert à finir le donjon ET à battre le boss
 - [ ] Carte du donjon dans le menu pause (salles visitées + boussole qui montre le boss)
 
 **Boss**
 
-- [ ] Machine à états avec 2 ou 3 phases, attaques télégraphiées (le joueur voit venir le coup)
-- [ ] Point faible lié à l'objet du donjon
-- [ ] Récompense : réceptacle de cœur + cristal/médaillon (compteur de progression du jeu)
+- [x] Machine à états avec 2 ou 3 phases, attaques télégraphiées (le joueur voit venir le coup)
+- [x] Point faible lié à l'objet du donjon
+- [x] Récompense : réceptacle de cœur + cristal/médaillon (compteur de progression du jeu)
 
 **Point de contrôle** : faire jouer le donjon à 2 ou 3 personnes sans les aider. Noter où elles bloquent et où elles s'ennuient. Ne pas passer en production tant que ce donjon n'est pas fun.
 
