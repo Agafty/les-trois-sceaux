@@ -93,3 +93,47 @@ OPT_LANG_EN,English,English
 OPT_ON,Oui,Yes
 OPT_OFF,Non,No
 OPT_HINT,Haut/Bas : choisir - Gauche/Droite : changer,Up/Down: choose - Left/Right: change
+OBJ_FLECHES_10,10 flèches,10 arrows
+OBJ_BOMBES_5,5 bombes,5 bombs
+SHOP_ASK,Acheter {0} pour {1} rubis ?,Buy {0} for {1} rupees?
+SHOP_YES,Oui,Yes
+SHOP_NO,Non,No
+SHOP_NO_RUPEES,Tu n'as pas assez de rubis. Reviens quand ta bourse sera plus pleine !,You don't have enough rupees. Come back when your purse is fuller!
+SHOP_FULL,"Tu en as déjà plein les poches, mon garçon. Je ne vends pas ce que tu ne peux pas porter !","Your pockets are already full, lad. I don't sell what you can't carry!"
+SHOP_NEED_BOW,Des munitions sans arc ? Reviens quand tu en auras un.,Ammo without a bow? Come back when you have one.
+SHOP_BOUGHT,Voilà : {0} ! Un plaisir de faire affaire.,Here you go: {0}! Pleasure doing business.
+PNJ_HULDA,Mère Hulda,Mother Hulda
+PNJ_PIP,Pip,Pip
+PNJ_TOBIAS,Vieux Tobias,Old Tobias
+PNJ_ISOLDE,Dame Isolde,Lady Isolde
+PNJ_GARRICK,Garrick,Garrick
+DLG_HULDA_0_1,Brann ! Te voilà debout si tôt... Cette brume ne me dit rien qui vaille.,Brann! Up so early... I don't like this fog one bit.
+DLG_HULDA_0_2,"J'ai veillé Maître Corvan la nuit de l'éclipse. Je n'ai rien pu faire, le pauvre.","I watched over Master Corvan the night of the eclipse. There was nothing I could do, poor man."
+DLG_HULDA_0_3,Prends garde en forêt. Les bêtes y sont devenues folles.,Be careful in the forest. The beasts have gone mad there.
+DLG_HULDA_1_1,"La brume se lève un peu, tu as fait du bon travail, mon petit.","The fog is lifting a little, you've done good work, my boy."
+DLG_HULDA_1_2,Les habitants osent sortir de chez eux. Ça me fait chaud au cœur.,The villagers dare to leave their homes again. It warms my heart.
+DLG_HULDA_1_3,Quand même... la blessure de Corvan... je me demande.,Still... Corvan's wound... I wonder.
+DLG_PIP_0_1,"Salut Brann ! Moi, je dis qu'il y a un monstre dans la brume !",Hey Brann! I say there's a monster in the fog!
+DLG_PIP_0_2,"Les chemins du nord et de l'est sont fermés. Seule la forêt, à l'ouest, est ouverte.",The north and east roads are closed. Only the forest to the west is open.
+DLG_PIP_0_3,"Appuie sur E pour parler aux gens. Et sur X pour donner des coups d'épée, au cas où !","Press E to talk to people. And X to swing your sword, just in case!"
+DLG_PIP_1_1,Tu as vu ? Il y a moins de brume ! Tu es un héros !,Did you see? There's less fog! You're a hero!
+DLG_PIP_1_2,"Garrick vend des flèches maintenant. Il dit que c'est cher, mais il dit toujours ça.","Garrick sells arrows now. He says they're pricey, but he always says that."
+DLG_PIP_1_3,"Quand je serai grand, je ferai comme toi. Enfin, sans les monstres.","When I grow up I'll do what you do. Well, without the monsters."
+DLG_TOBIAS_0_1,Hmpf. Pas moyen de couper du bois avec cette brume.,Hmpf. No way to chop wood in this fog.
+DLG_TOBIAS_0_2,"Ton maître, Corvan, allait souvent en forêt. Toujours seul, toujours le soir.","Your master Corvan often went into the forest. Always alone, always at dusk."
+DLG_TOBIAS_0_3,"Si tu trouves quelque chose là-bas, dis-le moi.","If you find anything out there, let me know."
+DLG_TOBIAS_1_1,Les bois sont enfin praticables. Je retourne à ma hache.,"The woods are passable again at last. Back to my axe, then."
+DLG_TOBIAS_1_2,"Les ronces du temple ont été taillées, tu le savais ? Pas par un bûcheron, en tout cas.","The temple brambles were cut back, did you know? Not by a woodcutter, at any rate."
+DLG_TOBIAS_1_3,"Un outil de forge, peut-être. Je dis ça, je dis rien.","A forge tool, maybe. Just saying."
+DLG_ISOLDE_0_1,Les archives disent que trois sceaux retiennent Morvath sous le château.,The archives say three seals hold Morvath beneath the castle.
+DLG_ISOLDE_0_2,Chacun est gardé par un gardien. L'éclipse les affaiblit... et les corrompt.,Each is watched by a guardian. The eclipse weakens them... and corrupts them.
+DLG_ISOLDE_0_3,Reviens me voir quand tu auras restauré un sceau.,Come back when you have restored a seal.
+DLG_ISOLDE_1_1,Un premier sceau est rétabli. Le registre des gardiens s'éclaire d'un jour nouveau.,One seal is restored. The guardians' register looks different now.
+DLG_ISOLDE_1_2,"Le prochain gardien dort dans les montagnes, à l'est.",The next guardian sleeps in the mountains to the east.
+DLG_ISOLDE_1_3,Je cherche encore le nom de celui qui a scellé la forêt la dernière fois.,I am still looking for the name of whoever sealed the forest last time.
+DLG_GARRICK_0_1,"Bienvenue chez Garrick ! Les prix sont fixes. Enfin, je les fixe moi-même.","Welcome to Garrick's! Prices are fixed. Well, I fix them myself."
+DLG_GARRICK_0_2,"Avec cette brume, plus aucun client. Je te fais un prix... un petit prix.","With this fog, no customers at all. I'll make you a price... a small one."
+DLG_GARRICK_0_3,"Un quart de cœur ? 150 rubis. Non, je ne négocie pas.","A piece of heart? 150 rupees. No, I don't haggle."
+DLG_GARRICK_1_1,"Ah, un héros ! Et un héros a besoin de flèches. Ça tombe bien, j'en vends.","Ah, a hero! And a hero needs arrows. Lucky me, I sell them."
+DLG_GARRICK_1_2,"10 flèches pour 20 rubis. C'est cadeau, presque. Presque.",10 arrows for 20 rupees. Practically a gift. Practically.
+DLG_GARRICK_1_3,"Les bombes ? Pas encore. Mon fournisseur est dans la mine, et la mine est... fermée.","Bombs? Not yet. My supplier is in the mine, and the mine is... closed."

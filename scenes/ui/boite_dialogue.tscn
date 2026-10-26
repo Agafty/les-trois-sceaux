@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/DialogueBox.cs" id="1_box"]
+
+[node name="BoiteDialogue" type="CanvasLayer"]
+process_mode = 3
+layer = 6
+script = ExtResource("1_box")
+CharsPerSecond = 45.0

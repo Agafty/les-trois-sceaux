@@ -1,0 +1,21 @@
+{
+  "speaker": "PNJ_PIP",
+  "entries": [
+    {
+      "stage": 0,
+      "lines": [
+        "DLG_PIP_0_1",
+        "DLG_PIP_0_2",
+        "DLG_PIP_0_3"
+      ]
+    },
+    {
+      "stage": 1,
+      "lines": [
+        "DLG_PIP_1_1",
+        "DLG_PIP_1_2",
+        "DLG_PIP_1_3"
+      ]
+    }
+  ]
+}

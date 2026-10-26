@@ -246,6 +246,12 @@ public partial class GameState : Node
 
     public int SealCount => _seals.Count;
 
+    /// <summary>
+    /// Étape d'histoire 0..4 (début, après la forêt, après la montagne, après le lac, épilogue), DÉRIVÉE des sceaux et du flag
+    /// <see cref="StoryRules.EpilogueFlag"/> : rien de plus à sauvegarder. Sert à choisir dialogues, boutique et décor du village.
+    /// </summary>
+    public int StoryStage => StoryRules.Compute(_seals.Count, IsCollected(StoryRules.EpilogueFlag));
+
     public bool HasSeal(string id) => !string.IsNullOrEmpty(id) && _seals.Contains(id);
 
     /// <summary>Restaure un sceau. Faux s'il est vide ou déjà possédé. Prévient la sauvegarde automatique.</summary>

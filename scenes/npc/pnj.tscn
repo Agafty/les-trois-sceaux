@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/npc/Npc.cs" id="1_npc"]
+[ext_resource type="Script" path="res://scripts/npc/InteractionZone.cs" id="2_zone"]
+
+[sub_resource type="RectangleShape2D" id="body_shape"]
+size = Vector2(16, 10)
+
+[sub_resource type="CircleShape2D" id="zone_shape"]
+radius = 40.0
+
+[node name="PNJ" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_npc")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 8)
+shape = SubResource("body_shape")
+
+[node name="ZoneInteraction" type="Area2D" parent="."]
+collision_layer = 0
+script = ExtResource("2_zone")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ZoneInteraction"]
+position = Vector2(0, 6)
+shape = SubResource("zone_shape")

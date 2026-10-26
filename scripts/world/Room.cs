@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 /// <summary>
 /// Une salle de jeu : une carte Tiled importée + un conteneur « Entites » (tri en profondeur) où vit Brann.
 /// Au chargement, la salle lit le calque d'objets « Objets » de la carte (Spawn, Sortie, Ennemi, Coffre,
-/// StatueCorbeau, Ramassable, Porte, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable, plus les rectangles nommés « boss_<nom> » et « pilier ») et instancie les vraies scènes aux positions des marqueurs.
+/// StatueCorbeau, Ramassable, PNJ, Article, Porte, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable, plus les rectangles nommés « boss_<nom> » et « pilier ») et instancie les vraies scènes aux positions des marqueurs.
 /// La scène importée n'est jamais modifiée sur le disque : seuls les nœuds de l'arbre en cours sont retirés.
 /// </summary>
 public partial class Room : Node2D
@@ -70,6 +70,8 @@ public partial class Room : Node2D
     private const string PlateScenePath = "res://scenes/puzzles/plaque_pression.tscn";
     private const string TorchScenePath = "res://scenes/puzzles/torche.tscn";
     private const string FallScenePath = "res://scenes/puzzles/chute.tscn";
+    private const string NpcScenePath = "res://scenes/npc/pnj.tscn";
+    private const string ArticleScenePath = "res://scenes/boutique/article.tscn";
     private const float GridCell = 32f;
     private const int DessusZIndex = 2; // au-dessus des entités (0) et de l'icône d'un coffre (1)
     private static readonly Vector2 FootOffset = new(0f, 16f); // coffres et statues : posés au bas de leur case
@@ -312,6 +314,8 @@ public partial class Room : Node2D
                 case "PlaqueDePression": SpawnPlate(node); break;
                 case "Chute": SpawnFallPassage(node); break;
                 case "Torche": SpawnTorch(node); break;
+                case "PNJ": SpawnNpc(node); break;
+                case "Article": SpawnArticle(node); break;
                 case "Porte": portes.Add(node); break; // après les ennemis : elles ont besoin de leur nombre
                 default:
                     WarnOnce("class:" + node.GetMeta("class").AsString(),
@@ -604,6 +608,52 @@ public partial class Room : Node2D
         statue.Id = GetString(marker, "id");
         statue.Position = _entities.ToLocal(MarkerPosition(marker)) + FootOffset;
         _entities.AddChild(statue);
+        RemoveMarker(marker);
+    }
+
+    // PNJ : point au centre de sa case (son origine est le centre de son sprite, comme Brann). id = fichier resources/dialogues/<id>.json,
+    // sprite = art/characters/<sprite>_frames.tres (défaut : l'id), direction = down/up/left/right, errance = rayon en pixels (0 = immobile).
+    private void SpawnNpc(Node marker)
+    {
+        string id = GetString(marker, "id");
+        if (!RoomObjectCatalog.IsSafeName(id))
+        {
+            GD.PushError($"PNJ : id invalide « {id} » ({Name}).");
+            RemoveMarker(marker);
+            return;
+        }
+        var npc = GD.Load<PackedScene>(NpcScenePath).Instantiate<Npc>();
+        npc.Id = id;
+        npc.SpriteName = GetString(marker, "sprite");
+        npc.InitialDirection = GetString(marker, "direction", "down");
+        npc.WanderRadius = Mathf.Max(0f, GetFloat(marker, "errance"));
+        npc.Position = _entities.ToLocal(ObjectCenter(marker));
+        _entities.AddChild(npc);
+        RemoveMarker(marker);
+    }
+
+    // Article de boutique : point au centre de la case du comptoir. contenu = resources/pickups/<contenu>.tres, prix en rubis,
+    // unique (bool, vendu une seule fois, id obligatoire), etape = étape d'histoire minimale, drapeau = flag exigé, vendeur = clé de traduction du nom.
+    private void SpawnArticle(Node marker)
+    {
+        string id = GetString(marker, "id");
+        var effect = LoadPickupEffect(GetString(marker, "contenu"), "Article " + id);
+        if (effect == null)
+        {
+            RemoveMarker(marker);
+            return;
+        }
+        var article = GD.Load<PackedScene>(ArticleScenePath).Instantiate<ShopArticle>();
+        article.Id = id;
+        article.Effect = effect;
+        article.Price = Mathf.Max(0, Mathf.RoundToInt(GetFloat(marker, "prix")));
+        article.Unique = GetBool(marker, "unique");
+        article.MinStage = Mathf.Clamp(Mathf.RoundToInt(GetFloat(marker, "etape")), 0, StoryRules.MaxStage);
+        article.RequiredFlag = GetString(marker, "drapeau");
+        string seller = GetString(marker, "vendeur");
+        if (!string.IsNullOrEmpty(seller)) article.SellerKey = seller;
+        article.Position = _entities.ToLocal(ObjectCenter(marker));
+        _entities.AddChild(article);
         RemoveMarker(marker);
     }
 

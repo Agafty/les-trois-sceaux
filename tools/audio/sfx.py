@@ -320,6 +320,11 @@ def s_sceau(r):
     return mix(a, b)
 
 
+def s_texte(r):
+    # Petit « bip » de voix pour le texte qui défile (très court : il est joué une lettre sur deux).
+    return tone("square", 520, 470, 0.03, 0.35, duty=0.25, lowpass=0.6, attack=0.002, release=0.015)
+
+
 SOUNDS = {
     "epee": s_epee, "coup_ennemi": s_coup_ennemi, "ennemi_mort": s_ennemi_mort,
     "brann_touche": s_brann_touche, "brann_mort": s_brann_mort,
@@ -332,7 +337,7 @@ SOUNDS = {
     "chute": s_chute, "escalier": s_escalier, "sauvegarde": s_sauvegarde,
     "menu_deplace": s_menu_deplace, "menu_valide": s_menu_valide, "menu_retour": s_menu_retour,
     "boss_rugit": s_boss_rugit, "boss_charge": s_boss_charge, "boss_assomme": s_boss_assomme,
-    "boss_vaincu": s_boss_vaincu, "sceau": s_sceau,
+    "boss_vaincu": s_boss_vaincu, "sceau": s_sceau, "texte": s_texte,
 }
 
 

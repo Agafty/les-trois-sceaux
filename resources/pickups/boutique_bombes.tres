@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="GiveItemEffect" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/effects/GiveItemEffect.cs" id="1_effect"]
+[ext_resource type="Resource" path="res://resources/items/bombes.tres" id="2_item"]
+
+[resource]
+script = ExtResource("1_effect")
+Item = ExtResource("2_item")
+Quantity = 5
+OnlyIfOwned = true
+NameKey = "OBJ_BOMBES_5"

@@ -1,0 +1,21 @@
+{
+  "speaker": "PNJ_HULDA",
+  "entries": [
+    {
+      "stage": 0,
+      "lines": [
+        "DLG_HULDA_0_1",
+        "DLG_HULDA_0_2",
+        "DLG_HULDA_0_3"
+      ]
+    },
+    {
+      "stage": 1,
+      "lines": [
+        "DLG_HULDA_1_1",
+        "DLG_HULDA_1_2",
+        "DLG_HULDA_1_3"
+      ]
+    }
+  ]
+}
