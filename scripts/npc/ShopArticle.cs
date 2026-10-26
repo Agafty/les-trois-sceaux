@@ -110,7 +110,8 @@ public partial class ShopArticle : Node2D
 
     private void Open(string seller, string text, string[] choices)
     {
-        _box = DialogueBox.OpenModal(this, seller, new[] { text }, choices);
+        // Choix par défaut « Non » (dernier) : un appui réflexe sur « interact » ne dépense pas les rubis.
+        _box = DialogueBox.OpenModal(this, seller, new[] { text }, choices, choices != null ? choices.Length - 1 : 0);
         _box.Finished += OnFinished;
     }
 

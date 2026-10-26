@@ -115,7 +115,7 @@ DLG_HULDA_1_2,Les habitants osent sortir de chez eux. Ça me fait chaud au cœur
 DLG_HULDA_1_3,Quand même... la blessure de Corvan... je me demande.,Still... Corvan's wound... I wonder.
 DLG_PIP_0_1,"Salut Brann ! Moi, je dis qu'il y a un monstre dans la brume !",Hey Brann! I say there's a monster in the fog!
 DLG_PIP_0_2,"Les chemins du nord et de l'est sont fermés. Seule la forêt, à l'ouest, est ouverte.",The north and east roads are closed. Only the forest to the west is open.
-DLG_PIP_0_3,"Appuie sur E pour parler aux gens. Et sur X pour donner des coups d'épée, au cas où !","Press E to talk to people. And X to swing your sword, just in case!"
+DLG_PIP_0_3,"Approche-toi des gens pour leur parler. Et donne des coups d'épée, au cas où !","Walk up to people to talk to them. And swing your sword, just in case!"
 DLG_PIP_1_1,Tu as vu ? Il y a moins de brume ! Tu es un héros !,Did you see? There's less fog! You're a hero!
 DLG_PIP_1_2,"Garrick vend des flèches maintenant. Il dit que c'est cher, mais il dit toujours ça.","Garrick sells arrows now. He says they're pricey, but he always says that."
 DLG_PIP_1_3,"Quand je serai grand, je ferai comme toi. Enfin, sans les monstres.","When I grow up I'll do what you do. Well, without the monsters."
@@ -137,3 +137,12 @@ DLG_GARRICK_0_3,"Un quart de cœur ? 150 rubis. Non, je ne négocie pas.","A pie
 DLG_GARRICK_1_1,"Ah, un héros ! Et un héros a besoin de flèches. Ça tombe bien, j'en vends.","Ah, a hero! And a hero needs arrows. Lucky me, I sell them."
 DLG_GARRICK_1_2,"10 flèches pour 20 rubis. C'est cadeau, presque. Presque.",10 arrows for 20 rupees. Practically a gift. Practically.
 DLG_GARRICK_1_3,"Les bombes ? Pas encore. Mon fournisseur est dans la mine, et la mine est... fermée.","Bombs? Not yet. My supplier is in the mine, and the mine is... closed."
+PNJ_VILLAGEOIS_APEURE,Villageois,Villager
+PNJ_VILLAGEOIS_MINEUR,Mineur,Miner
+DLG_VILLAGEOIS_APEURE_0_1,La brume... elle est entrée dans le village avant le lever du jour.,The fog... it crept into the village before dawn.
+DLG_VILLAGEOIS_APEURE_0_2,"Je n'ose plus sortir de chez moi. Fais attention, petit.","I don't dare leave my house anymore. Be careful, kid."
+DLG_VILLAGEOIS_APEURE_1_1,"Il y a un peu moins de brume, non ? Ou je rêve ?","There's a little less fog, isn't there? Or am I dreaming?"
+DLG_VILLAGEOIS_APEURE_1_2,"Si tu vas dans la forêt, reviens vite.","If you go into the forest, come back quickly."
+DLG_VILLAGEOIS_MINEUR_3_1,"Nous sommes enfin sortis de la Mine. Quelle nuit, là-dessous...",We finally made it out of the Mine. What a night down there...
+DLG_VILLAGEOIS_MINEUR_3_2,Il y avait quelque chose dans les galeries. Quelque chose qui chantait.,There was something in the tunnels. Something that sang.
+INDICE_REGISTRES,"Les registres de la bibliothèque alignent des noms, année après année. Le nom de Corvan y figure sans cesse.","The library registers list names, year after year. Corvan's name appears again and again."

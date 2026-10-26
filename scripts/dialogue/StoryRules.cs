@@ -19,4 +19,13 @@ public static class StoryRules
         if (epilogue) return MaxStage;
         return Math.Clamp(sealCount, 0, MaxStage - 1);
     }
+
+    /// <summary>Valeur par défaut de <c>etape_max</c> sur un objet Tiled (« jamais retiré »).</summary>
+    public const int NoMaxStage = 99;
+
+    /// <summary>
+    /// Vrai si un objet Tiled doit exister à l'étape donnée (propriétés <c>etape_min</c> / <c>etape_max</c>, bornes incluses).
+    /// Un intervalle à l'envers (min &gt; max) ne contient jamais rien.
+    /// </summary>
+    public static bool IsInStageRange(int minStage, int maxStage, int stage) => stage >= minStage && stage <= maxStage;
 }

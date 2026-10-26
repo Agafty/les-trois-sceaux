@@ -371,6 +371,7 @@ public partial class Player : CharacterBody2D
         // Pour un objet qui s'annule contre un mur, le rayon est prolongé de la longueur de sa pointe.
         var rayEnd = item.CancelIfBlocked ? target + direction * item.BlockCheckExtra : target;
         var query = PhysicsRayQueryParameters2D.Create(from, rayEnd);
+        query.CollisionMask = ~PhysicsLayers.Ravine; // un ravin n'est pas un mur : flèches et bombes passent au-dessus
         var excluded = new Godot.Collections.Array<Rid> { GetRid() };
         query.Exclude = excluded;
         var space = GetWorld2D().DirectSpaceState;

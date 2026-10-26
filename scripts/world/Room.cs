@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 /// <summary>
 /// Une salle de jeu : une carte Tiled importée + un conteneur « Entites » (tri en profondeur) où vit Brann.
 /// Au chargement, la salle lit le calque d'objets « Objets » de la carte (Spawn, Sortie, Ennemi, Coffre,
-/// StatueCorbeau, Ramassable, PNJ, Article, Porte, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable, plus les rectangles nommés « boss_<nom> » et « pilier ») et instancie les vraies scènes aux positions des marqueurs.
+/// StatueCorbeau, Ramassable, PNJ, Article, Porte, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable, Brume, plus les rectangles nommés « boss_<nom> » et « pilier ») et instancie les vraies scènes aux positions des marqueurs.
 /// La scène importée n'est jamais modifiée sur le disque : seuls les nœuds de l'arbre en cours sont retirés.
 /// </summary>
 public partial class Room : Node2D
@@ -99,6 +99,9 @@ public partial class Room : Node2D
     private PackedScene _plateScene;
     private PackedScene _fallScene;
     private HintBox _hintBox;
+    private TileFeatures _tileFeatures;
+    private readonly List<SortieState> _sortieStates = new();
+    private bool _hasTouchedSortie;
     private Hud _hud;
     private readonly List<Node> _bossMarkers = new();
     private readonly List<Rect2> _pillars = new();
@@ -109,6 +112,7 @@ public partial class Room : Node2D
     {
         public Area2D Area;
         public bool Armed;
+        public bool TouchedAtArrival; // effleurée par Brann sans qu'il ait bougé : se déclenche dès qu'il avance
     }
 
     /// <summary>Position de Brann à l'arrivée dans la salle (son Spawn) : il y revient après une chute dans un trou.</summary>
@@ -118,6 +122,12 @@ public partial class Room : Node2D
     public static string ZoneOf(Node node)
     {
         return node?.GetTree()?.CurrentScene is Room room ? room.Zone ?? "" : "";
+    }
+
+    // L'abonnement se fait à l'entrée dans l'arbre (avant le _Ready des enfants) : on ne rate jamais le départ de la salle.
+    public override void _EnterTree()
+    {
+        TreeExiting += OnRoomExiting;
     }
 
     public override void _Ready()
@@ -141,11 +151,11 @@ public partial class Room : Node2D
             AddChild(_entities);
         }
 
-        TreeExiting += OnRoomExiting;
         ReadMapProperties();
         if (HasMapPosition && !string.IsNullOrEmpty(SceneFilePath))
             GetNode<GameState>("/root/GameState").MarkRoomVisited(Zone, System.IO.Path.GetFileNameWithoutExtension(SceneFilePath));
         ConfigureLayers();
+        FilterObjectsByStage(); // avant de chercher le Spawn : un objet (Spawn, Sortie, PNJ...) d'une autre étape n'existe pas
 
         // Brann d'abord sur son Spawn, puis les objets : rien n'apparaît sous ses pieds avant qu'il soit placé.
         var sceneManager = GetNode<SceneManager>("/root/SceneManager");
@@ -153,10 +163,12 @@ public partial class Room : Node2D
         if (player != null && spawn != null)
             player.GlobalPosition = spawn.GlobalPosition;
 
+        PhysicsLayers.BlockedByRavine(player);
         EntryPosition = player?.GlobalPosition ?? Vector2.Zero;
         SetupHoles(player);
 
         SpawnObjects();
+        SetupTileFeatures();
 
         ShareForbiddenCells();
 
@@ -172,6 +184,7 @@ public partial class Room : Node2D
                 if (body is Player) state.Armed = true;
             };
         }
+        _sortieStates.AddRange(sorties);
         if (sorties.Count > 0)
             _ = ArmSortiesAfterArrival(sorties, player);
 
@@ -257,8 +270,37 @@ public partial class Room : Node2D
 
     public override void _PhysicsProcess(double delta)
     {
+        if (_hasTouchedSortie) CheckTouchedSorties();
         if (_screenCamera != null && IsInstanceValid(_screenCamera) && IsInstanceValid(_screenPlayer))
             UpdateScreenLimits();
+    }
+
+    // Sortie effleurée à l'arrivée (Spawn collé à elle) : elle part quand le centre de Brann y entre ; elle est oubliée s'il s'éloigne.
+    private void CheckTouchedSorties()
+    {
+        var player = _screenPlayer ?? FindPlayer(this);
+        bool any = false;
+        foreach (var state in _sortieStates)
+        {
+            if (!state.TouchedAtArrival) continue;
+            if (player == null || !IsInstanceValid(state.Area) || !state.Area.OverlapsBody(player))
+            {
+                state.TouchedAtArrival = false; // il s'est éloigné : elle est armée normalement
+                continue;
+            }
+            if (RectContains(state.Area, player.GlobalPosition)) // le centre de Brann est entré : un vrai passage, pas un effleurement
+            {
+                state.TouchedAtArrival = false;
+                OnSortieEntered(state, player);
+                continue;
+            }
+            any = true;
+        }
+        if (!any)
+        {
+            _hasTouchedSortie = false;
+            if (_screenCamera == null) SetPhysicsProcess(false);
+        }
     }
 
     // Limites de la caméra = l'écran (640x352) qui contient Brann, borné à la carte. Aucune allocation.
@@ -277,6 +319,44 @@ public partial class Room : Node2D
         _screenCamera.LimitTop = top;
         _screenCamera.LimitRight = Mathf.Min(left + w, _screenArea.End.X);
         _screenCamera.LimitBottom = Mathf.Min(top + h, _screenArea.End.Y);
+    }
+
+    // Étape de l'histoire (propriétés etape_min / etape_max de chaque objet du calque « Objets ») : les objets hors intervalle sont retirés
+    // de l'arbre (jamais du fichier). L'étape est lue une fois, au chargement de la salle.
+    private void FilterObjectsByStage()
+    {
+        var objets = FindNodeByName(this, "Objets");
+        if (objets == null) return;
+        int stage = GetNode<GameState>("/root/GameState").StoryStage;
+        foreach (var node in objets.GetChildren())
+        {
+            int min = node.HasMeta("etape_min") ? Mathf.RoundToInt(GetFloat(node, "etape_min")) : 0;
+            int max = node.HasMeta("etape_max") ? Mathf.RoundToInt(GetFloat(node, "etape_max")) : StoryRules.NoMaxStage;
+            if (!StoryRules.IsInStageRange(min, max, stage))
+                RemoveMarker(node);
+        }
+    }
+
+    // Tuiles à comportement (buissons coupables, ravins que les flèches survolent) : voir TileFeatures.
+    private void SetupTileFeatures()
+    {
+        if (FindNodeByName(this, "Murs") is not TileMapLayer walls) return;
+        _tileFeatures = new TileFeatures { Name = "ElementsDeTuiles", Walls = walls, Entities = _entities };
+        AddChild(_tileFeatures);
+        _tileFeatures.Setup();
+        foreach (var door in _doors)
+        {
+            if (!IsInstanceValid(door) || door.Appearance != "pont_levis") continue;
+            if (door.IsOpen) ClearRavineUnder(door);
+            else door.Opened += _ => ClearRavineUnder(door);
+        }
+    }
+
+    // Un pont-levis ouvert est posé sur le ravin : la collision du ravin sous son rectangle disparaît.
+    private void ClearRavineUnder(Door door)
+    {
+        if (_tileFeatures == null || !IsInstanceValid(door)) return;
+        _tileFeatures.ClearRavineUnder(new Rect2(door.GlobalPosition - door.CellSize * 0.5f, door.CellSize));
     }
 
     // --- Objets du calque « Objets » ------------------------------------------------------------
@@ -316,6 +396,7 @@ public partial class Room : Node2D
                 case "Torche": SpawnTorch(node); break;
                 case "PNJ": SpawnNpc(node); break;
                 case "Article": SpawnArticle(node); break;
+                case "Brume": SpawnMist(node); break;
                 case "Porte": portes.Add(node); break; // après les ennemis : elles ont besoin de leur nombre
                 default:
                     WarnOnce("class:" + node.GetMeta("class").AsString(),
@@ -423,6 +504,7 @@ public partial class Room : Node2D
             return;
         }
 
+        PhysicsLayers.BlockedByRavine(boss);
         boss.BossId = bossId;
         boss.Pillars = _pillars.ToArray();
         boss.ArenaDoors = _doors;
@@ -510,6 +592,13 @@ public partial class Room : Node2D
     {
         string type = GetString(marker, "type");
         string variant = GetString(marker, "variante", "normal");
+        if (GetString(marker, "apparition", "chargement") == "scenario")
+        {
+            // Ennemi lancé par une cinématique (étape suivante) : pas instancié au chargement de la salle.
+            WarnOnce("ennemi-scenario", "Ennemi « apparition = scenario » : ignoré pour l'instant (cinématiques pas encore faites).");
+            RemoveMarker(marker);
+            return;
+        }
         if (!RoomObjectCatalog.IsSafeName(type))
         {
             WarnOnce("ennemi-type:" + type, $"Ennemi Tiled avec un type invalide « {type} » ({Name}).");
@@ -523,6 +612,7 @@ public partial class Room : Node2D
         }
 
         var enemy = GD.Load<PackedScene>(path).Instantiate<Node2D>();
+        PhysicsLayers.BlockedByRavine(enemy);
         enemy.Position = _entities.ToLocal(MarkerPosition(marker));
         if (RoomObjectCatalog.IsRedVariant(variant))
             ApplyRedVariant(enemy, type);
@@ -622,7 +712,15 @@ public partial class Room : Node2D
             RemoveMarker(marker);
             return;
         }
-        var npc = GD.Load<PackedScene>(NpcScenePath).Instantiate<Npc>();
+        var npcScene = GD.Load<PackedScene>(NpcScenePath);
+        if (npcScene == null)
+        {
+            GD.PushError($"PNJ « {id} » : scène introuvable ({NpcScenePath}).");
+            RemoveMarker(marker);
+            return;
+        }
+        var npc = npcScene.Instantiate<Npc>();
+        PhysicsLayers.BlockedByRavine(npc);
         npc.Id = id;
         npc.SpriteName = GetString(marker, "sprite");
         npc.InitialDirection = GetString(marker, "direction", "down");
@@ -643,7 +741,14 @@ public partial class Room : Node2D
             RemoveMarker(marker);
             return;
         }
-        var article = GD.Load<PackedScene>(ArticleScenePath).Instantiate<ShopArticle>();
+        var articleScene = GD.Load<PackedScene>(ArticleScenePath);
+        if (articleScene == null)
+        {
+            GD.PushError($"Article « {id} » : scène introuvable ({ArticleScenePath}).");
+            RemoveMarker(marker);
+            return;
+        }
+        var article = articleScene.Instantiate<ShopArticle>();
         article.Id = id;
         article.Effect = effect;
         article.Price = Mathf.Max(0, Mathf.RoundToInt(GetFloat(marker, "prix")));
@@ -679,7 +784,11 @@ public partial class Room : Node2D
     {
         string id = GetString(marker, "id");
         string typeValue = GetString(marker, "type");
-        if (!DoorRules.TryParseKind(typeValue, out var kind))
+        string appearanceValue = GetString(marker, "apparence");
+        if (!DoorRules.TryParseAppearance(appearanceValue, out string appearance))
+            WarnOnce("porte-apparence:" + appearanceValue, $"Porte « {id} » : apparence inconnue « {appearanceValue} » (porte, pont_levis, tronc, rocher ou eboulis) dans {Name}, traitée comme « porte ».");
+        var kind = DoorKind.Interrupteur; // sans « type », un tronc ou un rocher ne s'ouvre que par le code (interrupteur) ou disparaît avec etape_max
+        if (!(string.IsNullOrEmpty(typeValue) && DoorRules.TypeOptional(appearance)) && !DoorRules.TryParseKind(typeValue, out kind))
         {
             GD.PushError($"Porte « {id} » : type inconnu « {typeValue} » (cle, grande_cle, ennemis ou interrupteur) dans {Name}.");
             RemoveMarker(marker);
@@ -702,6 +811,7 @@ public partial class Room : Node2D
         var door = GD.Load<PackedScene>(DoorScenePath).Instantiate<Door>();
         door.Id = id;
         door.Kind = kind;
+        door.Appearance = appearance;
         door.Zone = Zone ?? "";
         door.CellSize = size;
         door.RoomHasEnemies = _aliveEnemies > 0;
@@ -709,6 +819,37 @@ public partial class Room : Node2D
         _entities.AddChild(door);
         _doors.Add(door);
         RemoveMarker(marker);
+    }
+
+    // Brume : rectangle visuel (pas de corps), densité selon l'étape. Dessiné par-dessus le calque « Dessus » ; ne bloque rien.
+    private void SpawnMist(Node marker)
+    {
+        string text = GetString(marker, "densite");
+        if (!BrumeRules.TryParse(text, out var densities))
+        {
+            WarnOnce("brume-densite:" + Name, $"Brume sans propriété « densite » lisible (« {text} ») dans {Name} : ignorée.");
+            RemoveMarker(marker);
+            return;
+        }
+        if (densities.Length != BrumeRules.ValueCount)
+            WarnOnce("brume-nombre:" + Name, $"Brume de {Name} : {densities.Length} valeurs de densité au lieu de {BrumeRules.ValueCount} (une par étape de 0 à {StoryRules.MaxStage}).");
+
+        var center = ObjectCenter(marker);
+        var size = new Vector2(32f, 32f);
+        foreach (var child in marker.GetChildren())
+            if (child is CollisionShape2D { Shape: RectangleShape2D rect })
+            {
+                size = rect.Size;
+                break;
+            }
+
+        float density = BrumeRules.DensityFor(densities, GetNode<GameState>("/root/GameState").StoryStage);
+        RemoveMarker(marker);
+        if (density <= 0f) return; // étape sans brume : rien n'est créé
+
+        var mist = new BrumeZone { Name = "Brume", AreaSize = size, Density = density, ZIndex = DessusZIndex + 1 };
+        AddChild(mist, true); // nom lisible (« Brume », « Brume2 »...)
+        mist.GlobalPosition = center;
     }
 
     // Interrupteur : propriétés id, cible, mode (fleche par défaut, car les premières cartes n'ont pas « mode »).
@@ -857,8 +998,7 @@ public partial class Room : Node2D
         foreach (var door in _doors)
         {
             if (!IsInstanceValid(door)) continue;
-            var p = door.GlobalPosition;
-            PushBlockRules.AddForbiddenAround(forbidden, PushBlockRules.CellIndex(p.X, GridCell), PushBlockRules.CellIndex(p.Y, GridCell));
+            AddRectCells(forbidden, door.GlobalPosition, door.CellSize); // une porte de plusieurs cases (pont-levis) les interdit toutes
         }
         foreach (var block in _blocks)
             block.ForbiddenCells = forbidden;
@@ -876,6 +1016,11 @@ public partial class Room : Node2D
                 size = rect.Size;
                 break;
             }
+        AddRectCells(forbidden, center, size);
+    }
+
+    private static void AddRectCells(HashSet<(int, int)> forbidden, Vector2 center, Vector2 size)
+    {
         if (size == Vector2.Zero)
         {
             PushBlockRules.AddForbiddenAround(forbidden, PushBlockRules.CellIndex(center.X, GridCell), PushBlockRules.CellIndex(center.Y, GridCell));
@@ -1014,7 +1159,9 @@ public partial class Room : Node2D
             foreach (var state in sorties)
             {
                 if (!IsInstanceValid(state.Area)) continue;
-                if (player == null || !IsInstanceValid(player) || !state.Area.OverlapsBody(player))
+                // « Posé sur la Sortie » = le centre de Brann est dans son rectangle. Un simple effleurement (Spawn collé à la porte) ne compte
+                // pas : la marge de la physique le rend instable ; voir TouchedAtArrival.
+                if (player == null || !IsInstanceValid(player) || !RectContains(state.Area, player.GlobalPosition))
                     state.Armed = true;
             }
         }
@@ -1025,12 +1172,32 @@ public partial class Room : Node2D
         }
     }
 
+    // Vrai si le point (monde) est dans le rectangle de la zone ; sans forme rectangulaire, on se rabat sur le chevauchement de la physique.
+    private static bool RectContains(Area2D area, Vector2 point)
+    {
+        foreach (var child in area.GetChildren())
+        {
+            if (child is CollisionShape2D { Shape: RectangleShape2D rect } shape)
+                return new Rect2(shape.GlobalPosition - rect.Size * 0.5f, rect.Size).HasPoint(point);
+        }
+        return true;
+    }
+
     private void OnSortieEntered(SortieState state, Node body)
     {
         if (!state.Armed) return;
         var sortie = state.Area;
         if (body is not Player { IsDead: false }) return;
         if (!sortie.HasMeta("cible_carte")) return;
+        // Brann arrivé sans bouger, pile au bord d'une Sortie (Spawn collé à elle) : la marge de détection de la physique peut la lui faire
+        // toucher sans qu'il ait avancé d'un pixel. Un vrai passage demande au moins un déplacement.
+        if (body is Node2D mover && mover.GlobalPosition.DistanceSquaredTo(EntryPosition) < 0.25f)
+        {
+            state.TouchedAtArrival = true; // _PhysicsProcess la déclenchera dès qu'il avance, s'il la touche toujours
+            _hasTouchedSortie = true;
+            SetPhysicsProcess(true);
+            return;
+        }
         if (IsBlockedByClosedDoor(sortie)) return; // recul ou poussée qui amènerait Brann sur la Sortie d'une porte fermée
 
         var cibleCarte = (string)sortie.GetMeta("cible_carte");

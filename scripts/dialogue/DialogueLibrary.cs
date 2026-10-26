@@ -30,7 +30,10 @@ public static class DialogueLibrary
             try
             {
                 using var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
-                data = DialogueData.Parse(file.GetAsText());
+                if (file == null)
+                    GD.PushError($"Dialogues : impossible d'ouvrir {path} ({FileAccess.GetOpenError()}).");
+                else
+                    data = DialogueData.Parse(file.GetAsText());
             }
             catch (System.FormatException e)
             {

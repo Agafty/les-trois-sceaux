@@ -3,8 +3,9 @@ using Godot;
 
 /// <summary>
 /// Boîte de dialogue en bas de l'écran (cadre sombre, nom du personnage dans un onglet au-dessus).
-/// - Le texte défile lettre par lettre (<see cref="CharsPerSecond"/>) avec un petit bruit de voix ; « interact » ou « attack » affiche
-///   d'un coup la fin de la réplique, puis passe à la suivante. Après la dernière : fermeture, ou choix Oui/Non s'il y en a.
+/// - Le texte défile lettre par lettre (<see cref="CharsPerSecond"/>) avec un petit bruit de voix ; « interact » (seulement : comme
+///   <see cref="InteractionZone"/>, « attack » ne fait rien ici, c'est le coup d'épée de Brann) affiche d'un coup la fin de la réplique,
+///   puis passe à la suivante. Après la dernière : fermeture, ou choix Oui/Non s'il y en a.
 /// - Deux usages :
 ///   * <see cref="OpenModal"/> (PNJ, boutique) : LE JEU EST MIS EN PAUSE (SceneTree.Paused) pendant la conversation. Brann, les ennemis
 ///     et les minuteries s'arrêtent, et le menu pause ne peut pas s'ouvrir par-dessus (il refuse quand le jeu est déjà en pause).
@@ -46,9 +47,10 @@ public partial class DialogueBox : CanvasLayer
     /// Conversation modale (jeu en pause) : textes déjà traduits, choix facultatifs affichés après la dernière réplique.
     /// À attendre avec : var args = await ToSignal(box, DialogueBox.SignalName.Finished); int choice = (int)args[0];
     /// </summary>
-    public static DialogueBox OpenModal(Node owner, string speakerName, IReadOnlyList<string> texts, IReadOnlyList<string> choices = null)
+    public static DialogueBox OpenModal(Node owner, string speakerName, IReadOnlyList<string> texts, IReadOnlyList<string> choices = null, int defaultChoice = 0)
     {
         var box = Create();
+        box.DefaultChoice = defaultChoice;
         owner.AddChild(box);
         box.Begin(speakerName ?? "", texts, choices, true);
         return box;
@@ -76,7 +78,6 @@ public partial class DialogueBox : CanvasLayer
     public bool IsAskingChoice => _asking;
 
     private static readonly StringName ActionInteract = "interact";
-    private static readonly StringName ActionAttack = "attack";
     private static readonly StringName ActionLeft = "move_left";
     private static readonly StringName ActionRight = "move_right";
     private static readonly StringName ActionUp = "move_up";
@@ -85,11 +86,15 @@ public partial class DialogueBox : CanvasLayer
     private static readonly Rect2 BoxRect = new(16f, 272f, 608f, 64f);
     private const float TabHeight = 16f;
     private const float InputDelay = 0.15f; // la touche qui a ouvert la boîte ne doit pas la fermer aussitôt
+    private const float NonModalInputDelay = 1.2f; // réplique de boss : le joueur se bat, on évite qu'un appui réflexe la ferme
 
     private IReadOnlyList<string> _texts;
     private IReadOnlyList<string> _choices;
     private string _speaker = "";
     private bool _modal;
+
+    /// <summary>Choix surligné au départ (index). Hors bornes : le premier. Pour un achat : « Non ».</summary>
+    public int DefaultChoice { get; set; }
     private bool _pausedByBox;
     private bool _finished;
     private bool _asking;
@@ -238,13 +243,13 @@ public partial class DialogueBox : CanvasLayer
             }
         }
 
-        if (_age < InputDelay) return;
+        if (_age < (_modal ? InputDelay : NonModalInputDelay)) return;
         if (_asking)
         {
             if (Input.IsActionJustPressed(ActionLeft) || Input.IsActionJustPressed(ActionUp)) MoveSelection(-1);
             else if (Input.IsActionJustPressed(ActionRight) || Input.IsActionJustPressed(ActionDown)) MoveSelection(1);
         }
-        if (Input.IsActionJustPressed(ActionInteract) || Input.IsActionJustPressed(ActionAttack))
+        if (Input.IsActionJustPressed(ActionInteract))
             Confirm();
     }
 
@@ -265,7 +270,7 @@ public partial class DialogueBox : CanvasLayer
         if (last && _choices != null)
         {
             _asking = true;
-            _selected = 0;
+            _selected = DefaultChoice >= 0 && DefaultChoice < _choices.Count ? DefaultChoice : 0;
             _choicesTab.Visible = true;
             RefreshChoices();
         }

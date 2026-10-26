@@ -33,7 +33,7 @@ public partial class LootDropper : Node
         if (_health != null) _health.Died += OnDied;
     }
 
-    private static void PinTable(LootTable table)
+    public static void PinTable(LootTable table)
     {
         if (table == null) return;
         ResourceKeeper.Pin(table);
