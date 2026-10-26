@@ -415,7 +415,7 @@ But : un style simple et cohérent, que tu peux produire vite. À travailler une
 - [x] Effets sonores : jsfxr / ChipTone pour générer des sons rétro (épée, coup, rubis, coffre, porte)
 - [ ] Musique : un tracker (Furnace, qui peut émuler la puce son SNES) ou un DAW (LMMS gratuit)
 - [ ] Pistes minimum : titre, overworld, village, donjon (×1 ou ×3), boss, victoire, game over
-- [ ] Bus audio séparés Musique / SFX dans Godot + réglage du volume dans les options
+- [x] Bus audio séparés Musique / SFX dans Godot + réglage du volume dans les options
 
 **Livrable** : la vertical slice de la phase 4 entièrement habillée avec tes propres assets.
 
@@ -446,7 +446,8 @@ But : construire le reste du jeu avec les briques déjà validées. Ici on code 
 
 But : un jeu fini, stable, que des inconnus peuvent télécharger et terminer.
 
-- [ ] Menu options : volume musique/SFX, plein écran, échelle de la fenêtre, remappage des touches
+- [x] Menu options : volume musique/SFX, plein écran, échelle de la fenêtre (+ aide jeune joueur, langue)
+- [ ] Remappage des touches dans les options
 - [ ] Écran de game over + reprise au dernier point d'entrée
 - [ ] Passe « juice » : particules (herbe coupée, poussière), animations d'UI, transitions
 - [ ] Équilibrage : dégâts, vie des ennemis, prix de la boutique, nombre de cœurs
