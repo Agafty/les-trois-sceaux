@@ -19,7 +19,8 @@ public partial class DungeonMapPage : Control
     private const int RowPitch = 34;
     private static readonly Vector2 RoomSize = new(36, 22);
     private static readonly Vector2 GridOrigin = new(28, 44);
-    private static readonly Vector2 LegendOrigin = new(236, 84);
+    private static readonly Vector2 LegendOrigin = new(236, 70);
+    private const int LegendPitch = 14;
 
     private static readonly Color VisitedFill = new(0.85f, 0.72f, 0.40f);
     private static readonly Color VisitedBorder = new(0.35f, 0.25f, 0.12f);
@@ -29,6 +30,16 @@ public partial class DungeonMapPage : Control
     private static readonly Color BossColor = new(0.9f, 0.2f, 0.2f);
     private static readonly Color StairsColor = new(1f, 1f, 1f);
     private static readonly Color FallColor = new(0.1f, 0.05f, 0.15f);
+    private static readonly Color CurrentRoomColor = new(0.3f, 0.95f, 1f);
+    private static readonly Color TintGround = new(0.45f, 0.30f, 0.10f, 0.18f);
+    private static readonly Color TintBasement = new(0.05f, 0.10f, 0.40f, 0.40f);
+    private static readonly Color ChestColor = new(0.65f, 0.38f, 0.12f);
+    private static readonly Color BigChestColor = new(0.95f, 0.75f, 0.15f);
+    private static readonly Color DoorBackdrop = new(0.08f, 0.05f, 0.05f);
+    private static readonly Color DoorKeyColor = new(1f, 0.85f, 0.2f);
+    private static readonly Color DoorBossKeyColor = new(1f, 0.5f, 0.1f);
+    private static readonly Color DoorEnemiesColor = new(0.85f, 0.2f, 0.2f);
+    private static readonly Color DoorSwitchColor = new(0.3f, 0.6f, 1f);
 
     private Label _title;
     private Label _floorLabel;
@@ -39,6 +50,9 @@ public partial class DungeonMapPage : Control
     private Label _legendBoss;
     private Label _legendStairs;
     private Label _legendFall;
+    private Label _legendChest;
+    private Label _legendKeyDoor;
+    private Label _roomName;
 
     private Texture2D _texFrame;
     private Texture2D _texVisited;
@@ -47,10 +61,18 @@ public partial class DungeonMapPage : Control
     private Texture2D _texBoss;
     private Texture2D _texStairs;
     private Texture2D _texFall;
+    private Texture2D _texChest;
+    private Texture2D _texBigChest;
+    private Texture2D _texKey;
     private StyleBox _background;
 
     private DungeonLayout _layout;
     private MapRoomState[] _states = System.Array.Empty<MapRoomState>();
+    // Pré-calculés à l'ouverture pour ne rien allouer ni chercher dans _Draw.
+    private int[] _chestKinds = System.Array.Empty<int>(); // 0 aucun, 1 coffre, 2 grand coffre à ouvrir
+    private int[] _linkA = System.Array.Empty<int>();
+    private int[] _linkB = System.Array.Empty<int>();
+    private bool[] _linkOpen = System.Array.Empty<bool>();
     private bool _hasCompass;
     private bool _hasMap;
     private string _currentRoomId = "";
@@ -76,6 +98,9 @@ public partial class DungeonMapPage : Control
         _texBoss = LoadOptional("icone_boss.png");
         _texStairs = LoadOptional("icone_escalier.png");
         _texFall = LoadOptional("icone_chute.png");
+        _texChest = LoadOptional("icone_coffre.png");
+        _texBigChest = LoadOptional("icone_grand_coffre.png");
+        _texKey = LoadOptional("icone_cle.png");
         _background = CreateBackground();
 
         _title = CreateLabel(new Vector2(0, 14), Size.X, 12);
@@ -83,8 +108,10 @@ public partial class DungeonMapPage : Control
         _floorLabel = CreateLabel(new Vector2(LegendOrigin.X, 44), 110, 12);
         _noMapLabel = CreateLabel(new Vector2(16, 110), Size.X - 32, 12);
         _noMapLabel.HorizontalAlignment = HorizontalAlignment.Center;
-        _noItemLabel = CreateLabel(new Vector2(LegendOrigin.X, 168), 112, 40);
+        _noItemLabel = CreateLabel(new Vector2(LegendOrigin.X, 160), 112, 40);
         _noItemLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        _roomName = CreateLabel(new Vector2(16, 208), Size.X - 32, 12);
+        _roomName.HorizontalAlignment = HorizontalAlignment.Center;
         _help = CreateLabel(new Vector2(16, 224), Size.X - 32, 12);
         _help.HorizontalAlignment = HorizontalAlignment.Center;
 
@@ -92,6 +119,8 @@ public partial class DungeonMapPage : Control
         _legendBoss = CreateLegendLabel(1);
         _legendStairs = CreateLegendLabel(2);
         _legendFall = CreateLegendLabel(3);
+        _legendChest = CreateLegendLabel(4);
+        _legendKeyDoor = CreateLegendLabel(5);
     }
 
     public override void _Process(double delta)
@@ -126,6 +155,7 @@ public partial class DungeonMapPage : Control
                 var r = _layout.Rooms[i];
                 _states[i] = DungeonMap.GetState(state.IsRoomVisited(_layout.Zone, r.Id), _hasMap);
             }
+            PrepareDrawData(state);
             var here = _layout.Find(_currentRoomId);
             _floor = here != null ? here.Floor : room.MapFloor == FloorBasement ? FloorBasement : FloorGround;
         }
@@ -136,6 +166,33 @@ public partial class DungeonMapPage : Control
         SetProcess(true);
         RefreshTexts();
         QueueRedraw();
+    }
+
+    /// <summary>Calcule coffres restants et état des portes (appelé à l'ouverture, jamais dans _Draw).</summary>
+    private void PrepareDrawData(GameState state)
+    {
+        var rooms = _layout.Rooms;
+        var links = _layout.Links;
+        if (_chestKinds.Length != rooms.Count) _chestKinds = new int[rooms.Count];
+        if (_linkA.Length != links.Count)
+        {
+            _linkA = new int[links.Count];
+            _linkB = new int[links.Count];
+            _linkOpen = new bool[links.Count];
+        }
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            int left = 0;
+            foreach (var id in rooms[i].ChestIds)
+                if (!state.IsCollected(id)) left++;
+            _chestKinds[i] = left == 0 ? 0 : rooms[i].HasBigChest ? 2 : 1;
+        }
+        for (int j = 0; j < links.Count; j++)
+        {
+            _linkA[j] = IndexOf(links[j].A);
+            _linkB[j] = IndexOf(links[j].B);
+            _linkOpen[j] = links[j].Kind == MapDoorKind.Free || state.IsCollected(links[j].DoorId);
+        }
     }
 
     public void Close()
@@ -170,10 +227,17 @@ public partial class DungeonMapPage : Control
         _legendBoss.Visible = has && _hasCompass;
         _legendStairs.Visible = has;
         _legendFall.Visible = has;
+        _legendChest.Visible = has;
+        _legendKeyDoor.Visible = has;
+        _roomName.Visible = has;
+        var current = has ? _layout.Find(_currentRoomId) : null;
+        _roomName.Text = current != null && !string.IsNullOrEmpty(current.NameKey) ? Tr(current.NameKey) : "";
         _legendBrann.Text = Tr("CARTE_LEG_BRANN");
         _legendBoss.Text = Tr("CARTE_LEG_BOSS");
         _legendStairs.Text = Tr("CARTE_LEG_ESCALIER");
         _legendFall.Text = Tr("CARTE_LEG_TROU");
+        _legendChest.Text = Tr("CARTE_LEG_COFFRE");
+        _legendKeyDoor.Text = Tr("CARTE_LEG_PORTE_CLE");
     }
 
     // ---------------------------------------------------------------- dessin
@@ -183,15 +247,23 @@ public partial class DungeonMapPage : Control
         DrawStyleBox(_background, new Rect2(Vector2.Zero, Size));
         if (_layout == null) return;
 
+        DrawRect(new Rect2(8, 8, Size.X - 16, Size.Y - 16), _floor == FloorBasement ? TintBasement : TintGround, true);
+
         var rooms = _layout.Rooms;
-        // Liens d'abord (sous les salles).
-        foreach (var (a, b) in _layout.Links)
+        var links = _layout.Links;
+        // Passages d'abord (sous les salles).
+        for (int j = 0; j < links.Count; j++)
         {
-            int ia = IndexOf(a), ib = IndexOf(b);
+            int ia = _linkA[j], ib = _linkB[j];
             if (ia < 0 || ib < 0) continue;
             if (rooms[ia].Floor != _floor || rooms[ib].Floor != _floor) continue;
             if (!DungeonMap.ShowLink(_states[ia], _states[ib])) continue;
-            DrawLine(RoomRect(rooms[ia]).GetCenter(), RoomRect(rooms[ib]).GetCenter(), LinkColor, 3f);
+            var kind = links[j].Kind;
+            bool open = _linkOpen[j];
+            var from = RoomRect(rooms[ia]).GetCenter();
+            var to = RoomRect(rooms[ib]).GetCenter();
+            DrawLine(from, to, open ? LinkColor : DoorColor(kind), 3f);
+            if (kind != MapDoorKind.Free) DrawDoorMarker((from + to) / 2f, kind, open);
         }
 
         for (int i = 0; i < rooms.Count; i++)
@@ -208,15 +280,66 @@ public partial class DungeonMapPage : Control
                 if (room.HasStairs) DrawStairsIcon(rect.Position + new Vector2(4, 4));
                 if (room.HasFall) DrawFallIcon(rect.Position + new Vector2(RoomSize.X - 8, 4));
             }
-            if (_blinkOn && room.Id == _currentRoomId)
-                DrawBrannIcon(rect.GetCenter());
+            if (_chestKinds[i] != 0 && DungeonMap.ShowChestIcon(_states[i], _hasCompass))
+            {
+                if (_chestKinds[i] == 2) DrawChestIcon(rect.Position + new Vector2(RoomSize.X - 14, RoomSize.Y - 11), true);
+                else DrawChestIcon(rect.Position + new Vector2(RoomSize.X - 12, RoomSize.Y - 11), false);
+            }
+            if (room.Id == _currentRoomId)
+            {
+                DrawRect(rect.Grow(2f), CurrentRoomColor, false, 2f);
+                if (_blinkOn) DrawBrannIcon(rect.GetCenter());
+            }
         }
 
         // Légende : mêmes symboles que sur la carte.
         DrawBrannIcon(LegendOrigin + new Vector2(6, 6));
-        if (_hasCompass) DrawBossIcon(LegendOrigin + new Vector2(6, 24));
-        DrawStairsIcon(LegendOrigin + new Vector2(1, 38));
-        DrawFallIcon(LegendOrigin + new Vector2(1, 56));
+        if (_hasCompass) DrawBossIcon(LegendOrigin + new Vector2(6, LegendPitch + 6));
+        DrawStairsIcon(LegendOrigin + new Vector2(1, LegendPitch * 2 + 1));
+        DrawFallIcon(LegendOrigin + new Vector2(1, LegendPitch * 3 + 1));
+        DrawChestIcon(LegendOrigin + new Vector2(1, LegendPitch * 4 + 2), false);
+        DrawDoorMarker(LegendOrigin + new Vector2(6, LegendPitch * 5 + 6), MapDoorKind.Key, false);
+    }
+
+    private static Color DoorColor(MapDoorKind kind) => kind switch
+    {
+        MapDoorKind.Key => DoorKeyColor,
+        MapDoorKind.BossKey => DoorBossKeyColor,
+        MapDoorKind.Enemies => DoorEnemiesColor,
+        MapDoorKind.Switch => DoorSwitchColor,
+        _ => LinkColor,
+    };
+
+    /// <summary>Porte au milieu d'un passage : pleine si fermée (avec une clé pour les portes à clé), anneau si ouverte.</summary>
+    private void DrawDoorMarker(Vector2 center, MapDoorKind kind, bool open)
+    {
+        var color = DoorColor(kind);
+        bool isKey = kind == MapDoorKind.Key || kind == MapDoorKind.BossKey;
+        if (open)
+        {
+            DrawRect(new Rect2(center - new Vector2(3, 3), new Vector2(6, 6)), color, false, 1f);
+            return;
+        }
+        if (isKey)
+        {
+            DrawRect(new Rect2(center - new Vector2(5, 6), new Vector2(10, 12)), DoorBackdrop, true);
+            if (_texKey != null) { DrawTexture(_texKey, center - _texKey.GetSize() / 2f, color); return; }
+            DrawCircle(center + new Vector2(0, -2), 2.5f, color);
+            DrawRect(new Rect2(center + new Vector2(-1, 0), new Vector2(2, 5)), color, true);
+            return;
+        }
+        DrawRect(new Rect2(center - new Vector2(4, 4), new Vector2(8, 8)), DoorBackdrop, true);
+        DrawRect(new Rect2(center - new Vector2(3, 3), new Vector2(6, 6)), color, true);
+    }
+
+    private void DrawChestIcon(Vector2 topLeft, bool big)
+    {
+        var tex = big ? _texBigChest : _texChest;
+        if (tex != null) { DrawTexture(tex, topLeft); return; }
+        var size = big ? new Vector2(10, 8) : new Vector2(8, 8);
+        DrawRect(new Rect2(topLeft, size), big ? BigChestColor : ChestColor, true);
+        DrawRect(new Rect2(topLeft, size), Colors.Black, false, 1f);
+        DrawRect(new Rect2(topLeft + new Vector2(size.X / 2f - 1, 3), new Vector2(2, 2)), big ? Colors.Black : BigChestColor, true);
     }
 
     private int IndexOf(string id)
@@ -310,8 +433,8 @@ public partial class DungeonMapPage : Control
 
     private Label CreateLegendLabel(int row)
     {
-        // Les lignes de légende sont espacées de 18 px, texte à droite de l'icône.
-        float y = LegendOrigin.Y + (row == 0 ? 0 : row == 1 ? 18 : row == 2 ? 36 : 54);
+        // Les lignes de légende sont espacées de LegendPitch px, texte à droite de l'icône.
+        float y = LegendOrigin.Y + row * LegendPitch;
         return CreateLabel(new Vector2(LegendOrigin.X + 20, y), 100, 12);
     }
 }

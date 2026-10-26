@@ -57,3 +57,21 @@ CARTE_LEG_ESCALIER,Escalier,Stairs
 CARTE_LEG_TROU,Trou,Hole
 CARTE_AIDE,Haut/Bas : étage - Tab/Select : inventaire,Up/Down: floor - Tab/Select: inventory
 INVENTAIRE_AIDE_CARTE,Tab/Select : carte,Tab/Select: map
+CARTE_LEG_COFFRE,Coffre,Chest
+CARTE_LEG_PORTE_CLE,Porte à clé,Locked door
+SALLE_DONJON1_01,Entrée,Entrance
+SALLE_DONJON1_02,Hall des racines,Root hall
+SALLE_DONJON1_03,Antre du sanglier,Boar's den
+SALLE_DONJON1_04,Broussailles,Thicket
+SALLE_DONJON1_05,Deux dalles,Two slabs
+SALLE_DONJON1_06,Salle de l'arc,Bow room
+SALLE_DONJON1_07,Allée des lutins,Sprite alley
+SALLE_DONJON1_08,La harde,The herd
+SALLE_DONJON1_09,Antichambre,Antechamber
+SALLE_DONJON1_10,Braseros,Braziers
+SALLE_DONJON1_11,Cave d'arrivée,Arrival cave
+SALLE_DONJON1_12,Galerie du retour,Return gallery
+SALLE_DONJON1_13,Trois cibles,Three targets
+SALLE_DONJON1_14,Galerie des torches,Torch gallery
+SALLE_DONJON1_15,Cave secrète,Secret cave
+SALLE_DONJON1_BOSS,Clairière de Sylve,Sylve's glade
