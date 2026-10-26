@@ -152,6 +152,9 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 - `Poule` : point, `id` (`village_poule_01`…) ; `Marqueur` : point, `id`, repère de cinématique ; `Ennemi.apparition` = `chargement` (défaut) ou `scenario`.
 - Propriétés de carte `monde_x`, `monde_y` (facultatives). Intérieurs : cartes 20×11 à fond noir, `camera` = `ecran`.
 - Les `Sortie` de bord font 2 cases (64×32 ou 32×64), un seul `Spawn` par passage, ids `depuis_<zone>`. Les flèches passent au-dessus d'un ravin comme d'un trou.
+- Code : `Room.FilterObjectsByStage()` retire les objets hors étape (Spawn et Sortie compris) avant tout. `Door.Appearance` ; une porte d'apparence ≠ `porte` sans `type` est un obstacle qui ne s'ouvre que par interrupteur ou disparaît avec `etape_max` ; un pont-levis ouvert retire la collision du ravin sous son rectangle (`TileFeatures.ClearRavineUnder`). Image de porte : taille du rectangle, ou double largeur (fermée, ouverte).
+- `TileFeatures` reconnaît par id : buissons coupables (foret 96-99, village 300 : un coup d'épée retire la tuile pour la visite, butin `resources/loot/buisson.tres`, son `buisson`) et ravin (village 80-95) déplacé dans un calque d'affichage, avec une collision en **couche physique 5 « ravin »** : Brann, ennemis, PNJ, boss et blocs la voient, pas les flèches ni les bombes ; le rayon de `TryUseItem` l'ignore.
+- Brume : `BrumeZone` (`ColorRect` animés, z 3), rien si densité 0. Une `Sortie` ne se déclenche que si le **centre** de Brann entre dans son rectangle (un Spawn collé à une Sortie est permis). `MurFissure`, `Poule`, `Marqueur`, `Ennemi.apparition=scenario` : pas encore gérés (un avertissement).
 
 Ces conventions sont un point de départ, à ajuster en phase 1. Toute nouvelle convention est ajoutée ici avant d'être utilisée dans une carte ou dans le code.
 
