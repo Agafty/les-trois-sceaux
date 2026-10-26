@@ -1,11 +1,11 @@
 # Plan du tileset `village` — Brumeval, le village (overworld : place, maisons, lac, ravin, falaise)
 
-> Fichier généré par `tools/sprites/village.py` : modifier le script, pas ce fichier. **État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro).
+> Fichier généré par `tools/sprites/village.py` : modifier le script, pas ce fichier. **État : DESSIN FINAL** (les numéros sont ceux du plan, aucune tuile n'a bougé).
 
 - Image : `art/tilesets/village.png`, 256×1600 px, 8 colonnes × 50 lignes de tuiles 32×32, sans marge ni espacement (400 cases). Tileset Tiled : `maps/tilesets/village.tsx` (collisions et terrains définis). `art/tilesets/village_numeros.png` = la planche ×2 avec les numéros.
 - **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 47 à 50 (ids 368 à 399) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
 - Collisions en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche). Les terrains (Wang par coins) sont dans le panneau Terrains de Tiled.
-- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px (dessin final). Le plan est en aplats : **la couleur indique la famille** (vert herbe, gris-bleu pavés, brun terre, bleu eau, rouge/gris/jaune toits, orange portes et blocages…) ; une zone plus sombre dans une tuile = zone solide.
+- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px (dessin final). Les collisions sont dans le tileset (voir la colonne Collision).
 - **Arbres, buissons, rochers, falaises de forêt, fleurs et chemin de forêt** : on réutilise le tileset `foret` dans la même carte (Tiled accepte plusieurs tilesets par carte).
 - **Variantes jour / brume** : un seul jeu de numéros. Le dessin final fournira `village.png` (jour) et une copie recolorée par teinte `village_brume.png` ; le jeu choisit la texture selon l'avancement. Le calque `Dessus` contient en plus des tuiles **semi-transparentes** de brume (groupe « Brume ») qu'on peut masquer à mesure que la brume se lève.
 

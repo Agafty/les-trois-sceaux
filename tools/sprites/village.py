@@ -1,9 +1,9 @@
 """Tileset de Brumeval, le village — PLAN (aplats + numéros) — Les Trois Sceaux.
 
-Usage : python tools/sprites/village.py
-Produit art/tilesets/village.png (+ _numeros.png, _plan.md) et maps/tilesets/village.tsx.
-Étape actuelle : PLAN. Le dessin final remplacera chaque tuile au même numéro (voir CLAUDE.md).
-Variante « brume » : même planche recolorée par teinte (art/tilesets/village_brume.png, plus tard), mêmes numéros.
+Usage : python tools/sprites/village.py          -> DESSIN FINAL (village.png, village_brume.png, _numeros.png, _plan.md, .tsx)
+        python tools/sprites/village.py --plan   -> PLAN (aplats par famille et numéros)
+Le catalogue (numéros, collisions, terrains) est identique dans les deux cas ; le dessin est dans village_art1/2/3.py.
+Variante « brume » : même planche recolorée (plus froide, désaturée, voilée) : art/tilesets/village_brume.png, mêmes numéros.
 """
 import os
 import sys
@@ -328,4 +328,13 @@ S.notes += ['Pas de tuile de porte « escalier » : les maisons n\'ont pas de ma
             'À régler dans Tiled après livraison du dessin : propriétés, éventuelles animations (fumée, drapeau, eau).']
 
 if __name__ == '__main__':
-    S.save_all('village.py')
+    if '--plan' in sys.argv:
+        S.save_all('village.py')
+    else:
+        import final_lib
+        import art_lib
+        import village_art1
+        import village_art2  # noqa: F401
+        import village_art3  # noqa: F401
+        px = final_lib.render(S, village_art1.REG)
+        final_lib.save_final(S, px, 'village.py', brume=art_lib.haze(px))

@@ -1,11 +1,11 @@
 # Plan du tileset `interieurs` — intérieurs de Brumeval (forge, herboristerie, boutique, cave, archives, maisons)
 
-> Fichier généré par `tools/sprites/interieurs.py` : modifier le script, pas ce fichier. **État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro).
+> Fichier généré par `tools/sprites/interieurs.py` : modifier le script, pas ce fichier. **État : DESSIN FINAL** (les numéros sont ceux du plan, aucune tuile n'a bougé).
 
 - Image : `art/tilesets/interieurs.png`, 256×928 px, 8 colonnes × 29 lignes de tuiles 32×32, sans marge ni espacement (232 cases). Tileset Tiled : `maps/tilesets/interieurs.tsx` (collisions et terrains définis). `art/tilesets/interieurs_numeros.png` = la planche ×2 avec les numéros.
 - **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 26 à 29 (ids 200 à 231) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
 - Collisions en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche). Les terrains (Wang par coins) sont dans le panneau Terrains de Tiled.
-- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px (dessin final). Le plan est en aplats : **la couleur indique la famille** ; une zone plus sombre dans une tuile = zone solide.
+- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px (dessin final). Les collisions sont dans le tileset (voir la colonne Collision).
 - Salle type 20×11 : rangée 0 = plafond, rangée 1 = face du mur du fond (les meubles hauts s'y adossent), colonnes 0 et 19 = bandes latérales, rangée 10 = bandeau du bas avec la porte de sortie (`Sortie` + Spawn d'arrivée juste au-dessus). Un meuble de 2 cases de haut a sa moitié haute au-dessus de sa moitié basse.
 - Le sol des cases couvertes par un meuble reste visible : peindre le sol sur tout `Sol`, puis les meubles sur `Murs` (solides) ou `Decor`.
 

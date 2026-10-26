@@ -1,6 +1,7 @@
-"""Tileset des intérieurs de Brumeval — PLAN (aplats + numéros) — Les Trois Sceaux.
+"""Tileset des intérieurs de Brumeval — Les Trois Sceaux.
 
-Usage : python tools/sprites/interieurs.py
+Usage : python tools/sprites/interieurs.py          -> DESSIN FINAL (interieurs_art1.py et interieurs_art2.py)
+        python tools/sprites/interieurs.py --plan   -> PLAN (aplats + numéros)
 Produit art/tilesets/interieurs.png (+ _numeros.png, _plan.md) et maps/tilesets/interieurs.tsx.
 Intérieurs : forge de Corvan, herboristerie de Hulda, boutique de Garrick (+ sa cave), archives d'Isolde, maisons.
 Une salle = 20×11 cases (un écran). Murs vus de face : plafond + face en haut, bandes latérales, bandeau en bas avec la porte de sortie.
@@ -193,4 +194,11 @@ S.notes += ['Aucun escalier d\'étage : les maisons sont sur un seul niveau ; l\
             'Les coffres, PNJ, statues du corbeau, mur fissuré (objet), Sortie et Spawn sont des **objets Tiled** (calque `Objets`), pas des tuiles : le tileset ne contient que le décor.']
 
 if __name__ == '__main__':
-    S.save_all('interieurs.py')
+    if '--plan' in sys.argv:
+        S.save_all('interieurs.py')
+    else:
+        import final_lib
+        import interieurs_art1
+        import interieurs_art2  # noqa: F401
+        px = final_lib.render(S, interieurs_art1.REG)
+        final_lib.save_final(S, px, 'interieurs.py')
