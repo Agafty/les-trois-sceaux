@@ -212,6 +212,8 @@ public partial class Chest : StaticBody2D
             _sprite.Frame = OpenFrame;
             _zone.SetDeferred(Area2D.PropertyName.Monitoring, false);
             player.BeginLift();
+            AudioManager.PlayAt(Sfx.CoffreOuvre, GlobalPosition);
+            AudioManager.Instance?.PlaySfxDelayed(Sfx.ObjetObtenu, 0.35f); // la fanfare suit le grincement
             ShowReward(player);
             tree.Paused = true; // tout le monde se fige, sauf ce qui est en ProcessMode Always
 

@@ -115,7 +115,11 @@ public partial class PressurePlate : Area2D
         _pressed = pressed;
         ApplyFrame();
         EmitSignal(SignalName.PressedChanged, pressed);
-        if (pressed) TryOpenTarget();
+        if (pressed)
+        {
+            AudioManager.PlayAt(Sfx.Plaque, GlobalPosition);
+            TryOpenTarget();
+        }
     }
 
     // Toutes les plaques de même cible enfoncées ensemble : la porte s'ouvre (et le reste). Se produit rarement.

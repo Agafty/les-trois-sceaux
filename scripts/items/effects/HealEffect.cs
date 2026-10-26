@@ -6,6 +6,8 @@ public partial class HealEffect : PickupEffect
 {
     [Export] public int Amount { get; set; } = 2;
 
+    public override StringName PickupSound => Sfx.Coeur;
+
     public override bool CanApply(Player player, GameState state)
     {
         var health = player.Health;

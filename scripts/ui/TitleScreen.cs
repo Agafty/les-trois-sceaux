@@ -186,12 +186,14 @@ public partial class TitleScreen : Control
     private void MoveSelection(int step)
     {
         _selected = (_selected + step + _rowCount) % _rowCount;
+        AudioManager.Play(Sfx.MenuDeplace);
         ClearMessage();
         Refresh();
     }
 
     private void GoBack()
     {
+        if (_page != Page.Main) AudioManager.Play(Sfx.MenuRetour);
         if (_page == Page.Slots) ShowMain(_newGame ? 0 : 1);
         else if (_page == Page.Confirm) ShowSlots(_pendingSlot - 1);
     }
@@ -208,12 +210,14 @@ public partial class TitleScreen : Control
                 }
                 if (_selected == 1 && !_anySave) return; // rien à continuer
                 _newGame = _selected == 0;
+                AudioManager.Play(Sfx.MenuValide);
                 ShowSlots(0);
                 break;
 
             case Page.Slots:
                 if (_selected == SaveSystem.SlotCount)
                 {
+                    AudioManager.Play(Sfx.MenuRetour);
                     ShowMain(_newGame ? 0 : 1);
                     return;
                 }
@@ -221,6 +225,7 @@ public partial class TitleScreen : Control
                 break;
 
             case Page.Confirm:
+                AudioManager.Play(_selected == 0 ? Sfx.MenuValide : Sfx.MenuRetour);
                 if (_selected == 0) StartNewGame(_pendingSlot);
                 else ShowSlots(_pendingSlot - 1);
                 break;
@@ -232,12 +237,14 @@ public partial class TitleScreen : Control
         var state = _slotStates[slot - 1];
         if (_newGame)
         {
+            AudioManager.Play(Sfx.MenuValide);
             if (state == SlotState.Empty) StartNewGame(slot);
             else ShowConfirm(slot); // occupé ou illisible : on demande avant d'écraser
             return;
         }
 
         if (state == SlotState.Empty) return; // rien à continuer
+        AudioManager.Play(state == SlotState.Unreadable ? Sfx.PorteVerrouillee : Sfx.MenuValide);
         if (state == SlotState.Unreadable)
         {
             ShowError(Tr("TITLE_ERR_UNREADABLE"));

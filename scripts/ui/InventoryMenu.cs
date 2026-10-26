@@ -95,6 +95,7 @@ public partial class InventoryMenu : Control
     {
         if (Input.IsActionJustPressed(ActionMapPage))
         {
+            AudioManager.Play(Sfx.MenuDeplace);
             if (_mapOpen) ShowInventoryPage();
             else ShowMapPage();
             return;
@@ -102,8 +103,10 @@ public partial class InventoryMenu : Control
         if (_mapOpen)
         {
             // Page carte : haut = rez-de-chaussée, bas = sous-sol. L'inventaire ne réagit pas.
+            string floorBefore = _mapPage.Floor;
             if (Input.IsActionJustPressed(ActionUp)) _mapPage.SetFloor(DungeonMapPage.FloorGround);
             else if (Input.IsActionJustPressed(ActionDown)) _mapPage.SetFloor(DungeonMapPage.FloorBasement);
+            if (_mapPage.Floor != floorBefore) AudioManager.Play(Sfx.MenuDeplace);
             return;
         }
         ProcessNavigation((float)delta);
@@ -127,12 +130,14 @@ public partial class InventoryMenu : Control
         _pausedByMenu = true;
         SetProcess(true);
         Refresh();
+        AudioManager.Play(Sfx.MenuValide);
     }
 
     private void Close()
     {
         _open = false;
         _mapOpen = false;
+        AudioManager.Play(Sfx.MenuRetour);
         _mapPage.Close();
         Visible = false;
         SetProcess(false);
@@ -175,6 +180,7 @@ public partial class InventoryMenu : Control
         int index = row * Columns + column;
         if (index == _selected) return;
         _selected = index;
+        AudioManager.Play(Sfx.MenuDeplace);
         UpdateCursor();
     }
 
@@ -195,8 +201,8 @@ public partial class InventoryMenu : Control
     private void ValidateSelection()
     {
         var item = _slotItems[_selected];
-        if (item != null)
-            _gameState.Equip(item.Id); // refuse silencieusement les non-équipables
+        if (item != null && _gameState.Equip(item.Id)) // refuse silencieusement les non-équipables
+            AudioManager.Play(Sfx.MenuValide);
     }
 
     private void OnEquippedChanged(string itemId) => RefreshIfOpen();

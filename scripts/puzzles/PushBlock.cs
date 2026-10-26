@@ -140,6 +140,7 @@ public partial class PushBlock : AnimatableBody2D
         if (!IsCellFree(target)) return false;
 
         _sliding = true;
+        AudioManager.PlayAt(Sfx.BlocPousse, GlobalPosition);
         _slideStart = GlobalPosition;
         _slideTarget = target;
         // Première moitié, puis nouveau test : si la case est devenue occupée, le bloc revient au lieu d'écraser.

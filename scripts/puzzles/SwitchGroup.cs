@@ -42,6 +42,7 @@ public partial class SwitchGroup : Node
         switch (_logic.Hit(index, _state.PuzzleTimeMultiplier))
         {
             case SwitchHitResult.Activated:
+                AudioManager.PlayAt(Sfx.Interrupteur, member.GlobalPosition);
                 member.ShowActive(true);
                 if (_logic.Total(index) > 0f)
                 {
@@ -52,10 +53,12 @@ public partial class SwitchGroup : Node
                 break;
 
             case SwitchHitResult.Solved:
+                AudioManager.PlayAt(Sfx.Interrupteur, member.GlobalPosition);
                 Solve(member);
                 break;
 
             case SwitchHitResult.WrongOrder:
+                AudioManager.PlayAt(Sfx.MauvaisOrdre, member.GlobalPosition);
                 for (int i = 0; i < _members.Count; i++)
                 {
                     _members[i].ShowActive(false);

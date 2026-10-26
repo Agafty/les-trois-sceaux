@@ -35,6 +35,7 @@ public partial class Arrow : ItemUse
     {
         _direction = direction;
         Rotation = direction.Angle(); // le sprite pointe vers la droite : on le tourne
+        AudioManager.Play(Sfx.FlecheTir);
     }
 
     public override void _Ready()
@@ -78,6 +79,7 @@ public partial class Arrow : ItemUse
     {
         if (_burning) return;
         _burning = true;
+        AudioManager.PlayAt(Sfx.FlecheEnflammee, GlobalPosition);
         if (_sprite == null) return;
         if (_burningTexture == null && ResourceLoader.Exists(BurningTexturePath))
             _burningTexture = GD.Load<Texture2D>(BurningTexturePath);
@@ -107,6 +109,7 @@ public partial class Arrow : ItemUse
         // Les CharacterBody2D (Brann, ennemis) ne sont pas des murs : les ennemis sont gérés par leur HurtBox
         // (zone), Brann est ignoré. Tout le reste (TileMapLayer, StaticBody2D) arrête la flèche.
         if (body is CharacterBody2D) return;
+        if (!_done) AudioManager.PlayAt(Sfx.FlecheImpact, GlobalPosition);
         Despawn();
     }
 
@@ -115,11 +118,16 @@ public partial class Arrow : ItemUse
         if (_done) return;
         if (node is IArrowInteractor interactor)
         {
-            if (interactor.OnArrowTouch(this)) Despawn(); // torche allumée : la flèche passe (et s'enflamme)
+            if (interactor.OnArrowTouch(this))
+            {
+                AudioManager.PlayAt(Sfx.FlecheImpact, GlobalPosition);
+                Despawn(); // torche éteinte : la flèche s'arrête (allumée, OnArrowTouch renvoie faux et elle passe)
+            }
             return;
         }
         if (!node.IsInGroup(TargetGroup) || node is not IArrowTarget target) return;
         target.OnArrowHit(GlobalPosition, _direction);
+        AudioManager.PlayAt(Sfx.FlecheImpact, GlobalPosition);
         Despawn();
     }
 

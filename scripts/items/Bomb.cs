@@ -36,7 +36,8 @@ public partial class Bomb : ItemUse
 
     public override void Begin(Player user, Vector2 direction)
     {
-        // Rien à faire : la bombe est posée là où le Player l'a placée.
+        // La bombe est posée là où le Player l'a placée ; seul le grésillement de la mèche démarre ici.
+        AudioManager.PlayAt(Sfx.BombeMeche, GlobalPosition);
     }
 
     public override void _Ready()
@@ -87,6 +88,7 @@ public partial class Bomb : ItemUse
     private void Explode()
     {
         _exploded = true;
+        AudioManager.PlayAt(Sfx.BombeExplosion, GlobalPosition);
         _sprite.Visible = false;
         _explosion.Visible = true;
         _explosion.Frame = 0;

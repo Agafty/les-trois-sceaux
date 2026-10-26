@@ -11,6 +11,8 @@ public partial class SealEffect : PickupEffect
     /// <summary>Identifiant du sceau, ex. « racines ».</summary>
     [Export] public string SealId { get; set; } = "racines";
 
+    public override StringName PickupSound => Sfx.Sceau;
+
     public override bool CanApply(Player player, GameState state) => !string.IsNullOrEmpty(SealId);
 
     public override void Apply(Player player, GameState state) => state.AddSeal(SealId);

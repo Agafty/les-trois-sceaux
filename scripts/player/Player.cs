@@ -137,6 +137,7 @@ public partial class Player : CharacterBody2D
         _swordHitBox.SetDeferred(Area2D.PropertyName.Monitoring, false);
         _sprite.Visible = true;
         _sprite.Play(DeathAnim);
+        AudioManager.Play(Sfx.BrannMort);
         // Filet de sécurité si AnimationFinished n'arrive jamais (animation absente).
         _respawnTimer = RespawnDelay + 2f;
         GD.Print("Brann est mort");
@@ -255,6 +256,7 @@ public partial class Player : CharacterBody2D
         _sprite.Visible = true;
         UpdateAnimation(false);
 
+        AudioManager.Play(Sfx.Chute);
         int damage = applyDamage ? HoleRules.FallDamage(_health.CurrentHealth, FallDamage) : 0;
         if (damage > 0)
             _health.Damage(damage); // HealthChanged -> GameState -> HUD
@@ -465,6 +467,7 @@ public partial class Player : CharacterBody2D
         _swordSprite.Position = slashOffset;
         _swordSprite.Visible = true;
         _swordHitBox.Monitoring = true;
+        AudioManager.Play(Sfx.Epee);
     }
 
     private void ProcessAttack(float delta)

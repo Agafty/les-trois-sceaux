@@ -17,6 +17,12 @@ public partial class HurtBox : Area2D
 
     public bool Invincible { get; set; }
 
+    /// <summary>
+    /// Faux : cette zone ne joue aucun bruitage de coup (le propriétaire gère le sien, ex. le boss).
+    /// Sinon : ennemi touché = coup_ennemi, ennemi vaincu = ennemi_mort, Brann touché = brann_touche.
+    /// </summary>
+    [Export] public bool PlaySounds { get; set; } = true;
+
     private Health _health;
     private CanvasItem _sprite;
 
@@ -34,9 +40,21 @@ public partial class HurtBox : Area2D
             return;
         }
 
+        bool wasAlive = _health == null || _health.CurrentHealth > 0;
         _health?.Damage(damage);
+        if (PlaySounds && wasAlive)
+            PlayHitSound(_health == null || _health.CurrentHealth > 0);
         EmitSignal(SignalName.Hit, damage, fromPosition);
         FlashSprite();
+    }
+
+    // Brann vaincu : son brann_mort joué par Player ; ici seulement le coup reçu.
+    private void PlayHitSound(bool survived)
+    {
+        if (Team == Team.Ennemi)
+            AudioManager.PlayAt(survived ? Sfx.CoupEnnemi : Sfx.EnnemiMort, GlobalPosition);
+        else if (survived)
+            AudioManager.Play(Sfx.BrannTouche);
     }
 
     private void FlashSprite()

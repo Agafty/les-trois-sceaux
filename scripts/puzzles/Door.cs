@@ -195,7 +195,11 @@ public partial class Door : StaticBody2D
         _pushTime = 0f;
         if (Kind == DoorKind.Cle)
         {
-            if (_state.Keys <= 0) return;
+            if (_state.Keys <= 0)
+            {
+                AudioManager.PlayAt(Sfx.PorteVerrouillee, GlobalPosition);
+                return;
+            }
             _state.AddKeys(-1);
             Open();
         }
@@ -203,6 +207,8 @@ public partial class Door : StaticBody2D
         {
             if (_state.HasDungeonItem(Zone, DungeonItems.BigKey))
                 Open(); // la grande clé n'est pas consommée
+            else
+                AudioManager.PlayAt(Sfx.PorteVerrouillee, GlobalPosition);
         }
     }
 
@@ -224,6 +230,7 @@ public partial class Door : StaticBody2D
     // Passe à l'état « ouverte » : plus de collision, plus de détection, apparence ouverte.
     private void ApplyOpen(bool animate)
     {
+        if (animate) AudioManager.PlayAt(Sfx.PorteOuvre, GlobalPosition);
         _open = true;
         _player = null;
         SetPhysicsProcess(false);

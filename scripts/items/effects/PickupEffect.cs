@@ -23,6 +23,9 @@ public abstract partial class PickupEffect : Resource
     /// <summary>Clé de traduction d'une courte phrase d'explication sous le nom (facultatif).</summary>
     [Export] public string DescriptionKey { get; set; } = "";
 
+    /// <summary>Bruitage au ramassage au sol : fanfare pour un objet annoncé, petit « ding » pour un objet courant. Les effets le redéfinissent.</summary>
+    public virtual StringName PickupSound => ShowNameOnPickup ? Sfx.ObjetObtenu : Sfx.Rubis;
+
     public virtual Texture2D GetIcon() => Icon;
 
     public virtual string GetNameKey() => NameKey;

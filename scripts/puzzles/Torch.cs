@@ -111,6 +111,7 @@ public partial class Torch : StaticBody2D, IArrowInteractor
     public void Light()
     {
         if (_lit || _frozen) return;
+        AudioManager.PlayAt(Sfx.TorcheAllume, GlobalPosition);
         SetLit(true, startTimer: true);
         TryOpenTarget();
     }

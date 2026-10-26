@@ -295,6 +295,7 @@ public partial class SylveBoss : Boss
         foreach (var bulb in _bulbs) bulb.Armed = true;
         AddCollisionExceptionWith(_player); // Sylve traverse Brann (le contact le blesse) : il ne s'arrête que sur les murs et les piliers
         EmitSignal(Boss.SignalName.EncounterStarted);
+        AudioManager.Play(Sfx.BossRugit);
         EmitSignal(Boss.SignalName.HintRequested, "BOSS_SYLVE_CONSEIL_1", 7f);
         EmitProgress();
         ShakeCamera(3f, 0.6f);
@@ -386,6 +387,7 @@ public partial class SylveBoss : Boss
     private void BeginWindup()
     {
         SetState(State.Windup, WindupSeconds);
+        AudioManager.PlayAt(Sfx.BossCharge, GlobalPosition);
         UpdateAim();
     }
 
@@ -460,6 +462,7 @@ public partial class SylveBoss : Boss
     private void BeginStun()
     {
         _hitsThisStun = 0;
+        AudioManager.PlayAt(Sfx.BossAssomme, GlobalPosition);
         ShakeCamera(5f, 0.35f);
         SetState(State.Stunned, BossRules.StunDuration(StunSeconds, _gameState.PuzzleTimeMultiplier));
     }
@@ -648,6 +651,7 @@ public partial class SylveBoss : Boss
     private void ShowBounce(Vector2 worldPosition)
     {
         FlashVisual(new Color(0.3f, 0.6f, 3f), 0.3f);
+        AudioManager.PlayAt(Sfx.FlecheImpact, worldPosition);
         _sparkPos = ToLocal(worldPosition);
         _sparkTime = 0.25f;
         QueueRedraw();
@@ -681,6 +685,7 @@ public partial class SylveBoss : Boss
         ClearThorns();
         _blink?.Kill();
         SetState(State.Purify, PurifySeconds);
+        AudioManager.Play(Sfx.BossVaincu);
         ShakeCamera(4f, 0.8f);
         FlashVisual(new Color(3f, 3f, 2.2f), 0.5f);
         // Les ronces noires tombent : elles glissent vers le sol en s'effaçant.
