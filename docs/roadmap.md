@@ -386,7 +386,7 @@ But : un donjon de 14 à 16 salles sur deux étages (décision du 2026-10-24 : 1
 
 - [x] Concevoir sur papier d'abord : plan des salles, emplacement de la carte, de la boussole, de l'objet du donjon, de la grande clé
 - [x] Règle Zelda : l'objet trouvé au milieu du donjon sert à finir le donjon ET à battre le boss
-- [ ] Carte du donjon dans le menu pause (salles visitées + boussole qui montre le boss)
+- [x] Carte du donjon dans le menu pause (salles visitées + boussole qui montre le boss)
 
 **Boss**
 
