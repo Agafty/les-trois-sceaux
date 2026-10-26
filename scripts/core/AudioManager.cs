@@ -9,7 +9,7 @@ using Godot;
 /// - Un son manquant ou inconnu ne plante jamais : un seul avertissement par nom.
 /// - Les sons continuent pendant la pause (ProcessMode Always réglé dans la scène) : menus, coffre qui s'ouvre...
 /// - <see cref="PlayMusic"/> / <see cref="StopMusic"/> sont prêts (aucune musique pour l'instant).
-/// - Volumes par bus en valeur linéaire 0..1 (<see cref="SetSfxVolume"/>, <see cref="SetMusicVolume"/>), pour le futur menu options.
+/// - Volumes par bus en valeur linéaire 0..1 (<see cref="SetSfxVolume"/>, <see cref="SetMusicVolume"/>), réglés par le menu options (GameOptions).
 /// Le reste du code appelle les méthodes statiques <see cref="Play"/> / <see cref="PlayAt"/> : sans AudioManager (scène lancée
 /// hors du jeu, test), elles ne font rien.
 /// </summary>
@@ -67,6 +67,7 @@ public partial class AudioManager : Node
         Instance = this;
         ProcessMode = ProcessModeEnum.Always; // déjà réglé dans la scène ; sécurité
         EnsureBuses();
+        GameOptions.ApplyAudio(); // volumes choisis par le joueur (user://options.json), lus par GameState juste avant
 
         _pool = new AudioStreamPlayer[PoolSize];
         _poolSound = new StringName[PoolSize];

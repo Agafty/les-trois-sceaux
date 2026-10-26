@@ -42,6 +42,7 @@ public partial class TitleScreen : Control
     private SceneManager _sceneManager;
     private Label _heading;
     private Label _message;
+    private OptionsMenu _options;
     private readonly Label[] _rows = new Label[MaxRows];
     private readonly string[] _texts = new string[MaxRows];
     private readonly bool[] _dimmed = new bool[MaxRows];
@@ -65,6 +66,7 @@ public partial class TitleScreen : Control
         _sceneManager = GetNode<SceneManager>("/root/SceneManager");
 
         BuildUi();
+        AddOptionsMenu();
         LoadSlotCache();
         ShowMain(0);
     }
@@ -80,6 +82,7 @@ public partial class TitleScreen : Control
             ShowError(Tr(_newGame ? "TITLE_ERR_START" : "TITLE_ERR_UNREADABLE"));
             return;
         }
+        if (_options.IsOpen) return; // le menu d'options gère ses propres touches
         if (_launched || _sceneManager.IsTransitioning) return; // bloque aussi la double validation
 
         if (Input.IsActionJustPressed(ActionDown) || Input.IsActionJustPressed(ActionUiDown))
@@ -99,13 +102,15 @@ public partial class TitleScreen : Control
     {
         _page = Page.Main;
         _heading.Text = "";
-        _rowCount = 3;
+        _rowCount = 4;
         _texts[0] = Tr("TITLE_NEW");
         _texts[1] = Tr("TITLE_CONTINUE");
-        _texts[2] = Tr("TITLE_QUIT");
+        _texts[2] = Tr("TITLE_OPTIONS");
+        _texts[3] = Tr("TITLE_QUIT");
         _dimmed[0] = false;
         _dimmed[1] = !_anySave; // grisé et non validable s'il n'y a aucune sauvegarde
         _dimmed[2] = false;
+        _dimmed[3] = false;
         _selected = selected;
         ClearMessage();
         Refresh();
@@ -203,9 +208,15 @@ public partial class TitleScreen : Control
         switch (_page)
         {
             case Page.Main:
-                if (_selected == 2)
+                if (_selected == 3)
                 {
                     GetTree().Quit();
+                    return;
+                }
+                if (_selected == 2)
+                {
+                    AudioManager.Play(Sfx.MenuValide);
+                    _options.Open();
                     return;
                 }
                 if (_selected == 1 && !_anySave) return; // rien à continuer
@@ -273,6 +284,28 @@ public partial class TitleScreen : Control
             return;
         }
         _launched = true;
+    }
+
+    // --- Options ----------------------------------------------------------------------------
+
+    // Le menu d'options est une scène à part, ajoutée en dernier pour être dessinée par-dessus le titre.
+    private void AddOptionsMenu()
+    {
+        _options = GD.Load<PackedScene>("res://scenes/ui/options.tscn").Instantiate<OptionsMenu>();
+        AddChild(_options);
+        _options.Closed += OnOptionsClosed;
+    }
+
+    public override void _ExitTree()
+    {
+        if (_options != null) _options.Closed -= OnOptionsClosed;
+    }
+
+    // La langue a pu changer : on reconstruit les textes du menu et les résumés de sauvegardes.
+    private void OnOptionsClosed()
+    {
+        LoadSlotCache();
+        ShowMain(2);
     }
 
     // --- Affichage --------------------------------------------------------------------------

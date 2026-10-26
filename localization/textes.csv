@@ -75,3 +75,21 @@ SALLE_DONJON1_13,Trois cibles,Three targets
 SALLE_DONJON1_14,Galerie des torches,Torch gallery
 SALLE_DONJON1_15,Cave secrète,Secret cave
 SALLE_DONJON1_BOSS,Clairière de Sylve,Sylve's glade
+TITLE_OPTIONS,Options,Options
+INVENTAIRE_AIDE_OPTIONS,O/LB : options,O/LB: options
+OPT_TITLE,Options,Options
+OPT_MUSIC,Musique,Music
+OPT_SFX,Bruitages,Sound effects
+OPT_FULLSCREEN,Plein écran,Fullscreen
+OPT_SCALE,Taille de la fenêtre,Window size
+OPT_SCALE_AUTO,Auto,Auto
+OPT_HELP,Aide : temps limités,Help: time limits
+OPT_HELP_NORMAL,Normal x1,Normal x1
+OPT_HELP_DOUBLE,Doublé x2,Doubled x2
+OPT_HELP_NONE,Sans limite,No limit
+OPT_LANGUAGE,Langue,Language
+OPT_LANG_FR,Français,Français
+OPT_LANG_EN,English,English
+OPT_ON,Oui,Yes
+OPT_OFF,Non,No
+OPT_HINT,Haut/Bas : choisir - Gauche/Droite : changer,Up/Down: choose - Left/Right: change

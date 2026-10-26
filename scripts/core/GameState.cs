@@ -15,7 +15,7 @@ public partial class GameState : Node
     /// <summary>
     /// Option d'aide (accessibilité) : multiplicateur des durées des énigmes chronométrées (cibles, plus tard torches).
     /// 1 = normal, 2 = durées doublées, 0 = illimitées. C'est un réglage du joueur, pas un état de partie :
-    /// il n'est volontairement pas dans les sauvegardes (il ira dans un fichier d'options avec le menu d'options).
+    /// il n'est volontairement pas dans les sauvegardes : il vient de user://options.json (voir GameOptions).
     /// </summary>
     public float PuzzleTimeMultiplier
     {
@@ -84,6 +84,7 @@ public partial class GameState : Node
 
     public override void _Ready()
     {
+        GameOptions.LoadAndApply(); // GameState est le premier autoload : langue, aide et fenêtre sont réglées avant tout écran
         LoadItemRegistry();
     }
 

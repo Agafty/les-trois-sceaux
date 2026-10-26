@@ -23,6 +23,7 @@ public partial class InventoryMenu : Control
     private static readonly StringName ActionLeft = "move_left";
     private static readonly StringName ActionRight = "move_right";
     private static readonly StringName ActionMapPage = "map_page";
+    private static readonly StringName ActionOptions = "options_page";
     private static readonly StringName PanelStyleName = "panel";
 
     private static readonly Vector2 PanelPos = new(140, 50);
@@ -36,6 +37,8 @@ public partial class InventoryMenu : Control
     private Label _name;
     private Label _description;
     private Label _mapHint;
+    private Label _optionsHint;
+    private OptionsMenu _options;
     private DungeonMapPage _mapPage;
     private Control _cursor;
     private readonly TextureRect[] _frames = new TextureRect[SlotCount];
@@ -83,6 +86,7 @@ public partial class InventoryMenu : Control
 
     public override void _UnhandledInput(InputEvent @event)
     {
+        if (_options.IsOpen) return; // « pause » sert alors à fermer les options
         if (!@event.IsActionPressed(ActionPause) || @event.IsEcho()) return;
 
         if (_open) Close();
@@ -93,6 +97,12 @@ public partial class InventoryMenu : Control
     // Actif seulement quand le menu est ouvert (SetProcess).
     public override void _Process(double delta)
     {
+        if (_options.IsOpen) return; // les options gèrent leurs propres touches
+        if (Input.IsActionJustPressed(ActionOptions))
+        {
+            _options.Open();
+            return;
+        }
         if (Input.IsActionJustPressed(ActionMapPage))
         {
             AudioManager.Play(Sfx.MenuDeplace);
@@ -216,6 +226,7 @@ public partial class InventoryMenu : Control
     {
         _title.Text = Tr("MENU_INVENTAIRE");
         _mapHint.Text = Tr("INVENTAIRE_AIDE_CARTE");
+        _optionsHint.Text = Tr("INVENTAIRE_AIDE_OPTIONS");
         var ids = _gameState.InventoryIds;
         for (int i = 0; i < SlotCount; i++)
         {
@@ -288,10 +299,16 @@ public partial class InventoryMenu : Control
         _description.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         _mapHint = CreateLabel(new Vector2(PanelPos.X + 16, PanelPos.Y + PanelSize.Y - 18), PanelSize.X - 32, 12);
         _mapHint.HorizontalAlignment = HorizontalAlignment.Right;
+        _optionsHint = CreateLabel(new Vector2(PanelPos.X + 16, PanelPos.Y + PanelSize.Y - 18), PanelSize.X - 32, 12);
 
         // Page carte : en dernier pour être dessinée par-dessus l'inventaire.
         _mapPage = new DungeonMapPage { Position = PanelPos, Size = PanelSize };
         AddChild(_mapPage);
+
+        // Options : en tout dernier pour être dessinées par-dessus tout.
+        _options = GD.Load<PackedScene>("res://scenes/ui/options.tscn").Instantiate<OptionsMenu>();
+        AddChild(_options);
+        _options.Closed += Refresh; // la langue a pu changer : on réécrit les textes
     }
 
     private Control CreatePanel()
