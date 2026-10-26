@@ -143,6 +143,16 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 
 **Dialogues et étape d'histoire** : `GameState.StoryStage` (0 à 4) est dérivée, jamais stockée : nombre de sceaux (max 3), ou 4 si le flag `morvath_vaincu` est posé. Dialogues JSON `{"speaker":"PNJ_HULDA","entries":[{"stage":0,"flags":[],"not_flags":[],"cycle":false,"lines":["DLG_HULDA_0_1"]}]}` ; premier bloc qui correspond, repli sur l'étape précédente la plus proche (un bloc sans `stage` se met en dernier) ; clés `DLG_<PNJ>_<étape>_<n>` dans `textes.csv`. Une boîte de dialogue modale met le jeu en pause (sans relancer une pause déjà active). Deux PNJ ou articles ne doivent pas être collés (seul le plus proche répond). Penser à inclure `*.json` à l'export.
 
+**Overworld et village (phase 6, plan `maps/overworld/plan.md`)** :
+- `etape_min` (défaut 0) et `etape_max` (défaut 99) sur tout objet du calque `Objets` : la `Room` ne l'instancie que si `GameState.StoryStage` (0 début, 1 après la forêt, 2 après la montagne, 3 après le lac, 4 épilogue) est dans l'intervalle. Plusieurs `PNJ` de même `id` à des étapes disjointes sont permis.
+- La boutique utilise la classe `Article` (pas `Etal`).
+- `Porte` généralisée : propriété `apparence` (`porte` défaut, `pont_levis`, `tronc`, `rocher`, `eboulis`), rectangle de taille libre, et elle peut être posée **sans `Sortie`** pour bloquer un passage d'overworld ; image `art/puzzles/porte_<apparence>.png`.
+- `MurFissure` : `apparence` (`mur` défaut, `eboulis`) ; peut recouvrir une `Sortie` de même rectangle, active une fois détruit.
+- `Brume` : rectangle, `densite` = 5 valeurs séparées par des virgules (une par étape 0 à 4) ; ne bloque pas.
+- `Poule` : point, `id` (`village_poule_01`…) ; `Marqueur` : point, `id`, repère de cinématique ; `Ennemi.apparition` = `chargement` (défaut) ou `scenario`.
+- Propriétés de carte `monde_x`, `monde_y` (facultatives). Intérieurs : cartes 20×11 à fond noir, `camera` = `ecran`.
+- Les `Sortie` de bord font 2 cases (64×32 ou 32×64), un seul `Spawn` par passage, ids `depuis_<zone>`. Les flèches passent au-dessus d'un ravin comme d'un trou.
+
 Ces conventions sont un point de départ, à ajuster en phase 1. Toute nouvelle convention est ajoutée ici avant d'être utilisée dans une carte ou dans le code.
 
 ## Architecture et conventions C#
