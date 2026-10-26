@@ -412,7 +412,7 @@ But : un style simple et cohérent, que tu peux produire vite. À travailler une
 
 **Audio**
 
-- [ ] Effets sonores : jsfxr / ChipTone pour générer des sons rétro (épée, coup, rubis, coffre, porte)
+- [x] Effets sonores : jsfxr / ChipTone pour générer des sons rétro (épée, coup, rubis, coffre, porte)
 - [ ] Musique : un tracker (Furnace, qui peut émuler la puce son SNES) ou un DAW (LMMS gratuit)
 - [ ] Pistes minimum : titre, overworld, village, donjon (×1 ou ×3), boss, victoire, game over
 - [ ] Bus audio séparés Musique / SFX dans Godot + réglage du volume dans les options
