@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="40" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="43">
+ <properties>
+  <property name="camera" value="suivre"/>
+  <property name="monde_x" type="int" value="1"/>
+  <property name="monde_y" type="int" value="2"/>
+ </properties>
+ <tileset firstgid="1" source="../tilesets/village.tsx"/>
+ <tileset firstgid="401" source="../tilesets/foret.tsx"/>
+ <layer id="1" name="Sol" width="40" height="11">
+  <data encoding="csv">
+1,1,5,1,8,5,3,48,48,1,3,7,5,8,8,8,8,8,1,8,1,8,1,6,1,8,1,2,4,1,8,3,48,97,1,1,2,1,8,7,
+1,8,4,3,1,3,4,48,48,5,8,8,1,8,8,6,8,8,8,1,1,8,8,1,6,2,1,8,8,7,2,8,48,48,8,1,1,1,2,4,
+2,7,7,2,1,1,1,98,48,8,7,5,8,3,8,1,8,4,3,8,1,2,1,1,1,1,8,5,3,1,1,1,102,48,3,1,1,1,8,4,
+8,8,2,1,2,5,5,98,98,8,3,2,8,8,1,1,5,8,13,13,13,13,2,7,3,8,3,3,1,2,1,1,48,48,4,8,4,1,2,7,
+97,48,48,48,97,48,48,48,48,48,48,48,15,48,44,36,20,20,13,1,1,13,20,24,48,48,48,15,48,48,48,48,48,97,48,48,48,48,48,48,
+48,48,48,48,48,48,48,48,48,48,48,48,48,48,47,45,30,32,13,1,2,13,32,31,45,46,48,48,98,48,48,98,48,48,48,102,48,98,48,48,
+3,5,1,2,1,7,3,4,6,3,8,7,8,2,1,2,3,32,13,13,13,13,11,1,8,1,1,8,1,1,1,2,1,1,1,1,2,3,8,8,
+2,6,6,2,7,5,1,8,2,4,8,5,2,5,4,6,22,32,32,12,32,32,32,27,3,4,1,2,2,6,2,5,8,3,1,7,4,1,3,2,
+2,5,5,4,8,1,5,8,4,6,5,1,8,1,8,1,24,5,1,32,9,32,32,28,4,1,8,1,1,8,1,8,8,3,8,5,4,6,2,1,
+1,1,48,97,97,98,48,48,48,48,48,15,48,48,48,48,32,32,32,32,32,32,32,32,97,48,48,15,48,48,48,48,48,48,48,48,48,48,2,8,
+7,6,1,7,8,1,7,8,6,4,4,2,1,2,4,3,8,1,8,32,32,1,5,8,2,4,8,8,2,8,7,1,2,5,1,1,1,1,2,2
+</data>
+ </layer>
+ <layer id="2" name="Decor" width="40" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,298,303,304,303,304,303,304,303,304,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,297,0,0,0,0,0,299,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,298,303,304,0,0,0,136,303,304,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,251,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="3" name="Murs" width="40" height="11">
+  <data encoding="csv">
+475,476,475,475,476,475,475,0,0,476,476,475,476,476,475,475,476,476,476,476,475,476,476,475,475,476,475,476,476,475,476,476,0,0,475,476,475,475,475,475,
+476,193,205,205,205,195,476,0,0,475,161,162,162,162,163,0,0,0,0,0,0,0,0,0,0,177,189,178,178,178,179,475,0,0,476,193,194,194,195,475,
+476,199,200,200,200,201,264,0,0,475,167,168,168,168,169,0,0,301,0,301,0,301,0,0,260,183,184,184,184,184,185,475,0,0,475,199,200,200,201,476,
+476,225,228,232,227,229,263,0,0,476,209,212,214,211,213,0,0,0,0,0,0,0,0,260,260,217,219,222,220,219,221,476,0,0,475,225,232,228,229,475,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,249,250,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,257,258,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+476,161,173,162,162,162,163,476,177,189,240,189,178,178,179,0,305,0,0,0,0,0,0,305,0,161,162,162,173,162,163,475,193,205,194,194,195,122,123,475,
+475,167,168,168,168,168,169,476,183,184,184,184,184,184,185,0,0,0,0,0,0,0,0,0,0,167,168,168,168,168,169,475,199,200,200,200,201,125,126,476,
+476,209,211,216,212,211,213,475,217,242,239,241,219,242,221,288,0,254,256,0,0,0,0,0,290,209,211,215,212,211,213,475,225,228,232,227,229,143,129,476,
+476,287,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,289,475,
+475,475,475,475,475,475,475,475,475,475,476,475,476,475,476,475,475,476,475,0,0,475,476,475,475,475,475,476,476,476,475,475,475,475,476,476,476,475,476,476
+</data>
+ </layer>
+ <objectgroup id="4" name="Objets">
+  <object id="1" type="Sortie" x="0" y="128" width="32" height="64">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/foret_sud_room.tscn"/>
+    <property name="cible_spawn" value="depuis_village"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="2" type="Sortie" x="224" y="0" width="64" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/foret_temple_room.tscn"/>
+    <property name="cible_spawn" value="depuis_village_raccourci"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="3" type="Sortie" x="1024" y="0" width="64" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/montagne_room.tscn"/>
+    <property name="cible_spawn" value="depuis_village"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="4" type="Sortie" x="1248" y="128" width="32" height="64">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/route_falaise_room.tscn"/>
+    <property name="cible_spawn" value="depuis_village"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="5" type="Sortie" x="608" y="320" width="64" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/lac_room.tscn"/>
+    <property name="cible_spawn" value="depuis_village"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="6" type="Sortie" x="352" y="256" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/forge_room.tscn"/>
+    <property name="cible_spawn" value="depuis_village"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="7" type="Sortie" x="384" y="96" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/herboristerie_room.tscn"/>
+    <property name="cible_spawn" value="depuis_village"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="8" type="Sortie" x="864" y="96" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/archives_room.tscn"/>
+    <property name="cible_spawn" value="depuis_village"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="9" type="Sortie" x="864" y="256" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/boutique_room.tscn"/>
+    <property name="cible_spawn" value="depuis_village"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="10" type="Sortie" x="1184" y="256" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/cave_garrick_room.tscn"/>
+    <property name="cible_spawn" value="depuis_village"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="11" type="MurFissure" x="1184" y="256" width="32" height="32">
+   <properties>
+    <property name="id" value="village_mur_fissure_cave"/>
+    <property name="apparence" value="mur"/>
+   </properties>
+  </object>
+  <object id="12" type="Porte" x="224" y="32" width="64" height="32">
+   <properties>
+    <property name="id" value="village_tronc_raccourci"/>
+    <property name="type" value="interrupteur"/>
+    <property name="apparence" value="tronc"/>
+    <property name="etape_max" type="int" value="0"/>
+   </properties>
+  </object>
+  <object id="13" type="Spawn" x="80" y="160">
+   <properties>
+    <property name="id" value="depuis_foret_sud"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="14" type="Spawn" x="256" y="80">
+   <properties>
+    <property name="id" value="depuis_foret_raccourci"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="15" type="Spawn" x="1056" y="80">
+   <properties>
+    <property name="id" value="depuis_montagne"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="16" type="Spawn" x="1200" y="160">
+   <properties>
+    <property name="id" value="depuis_route"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="17" type="Spawn" x="640" y="272">
+   <properties>
+    <property name="id" value="depuis_lac"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="18" type="Spawn" x="368" y="304">
+   <properties>
+    <property name="id" value="depuis_forge"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="19" type="Spawn" x="400" y="144">
+   <properties>
+    <property name="id" value="depuis_herboristerie"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="20" type="Spawn" x="880" y="144">
+   <properties>
+    <property name="id" value="depuis_archives"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="21" type="Spawn" x="880" y="304">
+   <properties>
+    <property name="id" value="depuis_boutique"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="22" type="Spawn" x="1200" y="304">
+   <properties>
+    <property name="id" value="depuis_cave_garrick"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="23" type="PNJ" x="112" y="176">
+   <properties>
+    <property name="id" value="pip"/>
+    <property name="direction" value="left"/>
+    <property name="etape_max" type="int" value="0"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="24" type="PNJ" x="720" y="240">
+   <properties>
+    <property name="id" value="pip"/>
+    <property name="direction" value="down"/>
+    <property name="etape_min" type="int" value="1"/>
+    <property name="etape_max" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="25" type="PNJ" x="592" y="240">
+   <properties>
+    <property name="id" value="pip"/>
+    <property name="direction" value="down"/>
+    <property name="etape_min" type="int" value="4"/>
+    <property name="etape_max" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="26" type="PNJ" x="176" y="144">
+   <properties>
+    <property name="id" value="tobias"/>
+    <property name="direction" value="left"/>
+    <property name="etape_max" type="int" value="0"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="27" type="PNJ" x="752" y="144">
+   <properties>
+    <property name="id" value="tobias"/>
+    <property name="direction" value="down"/>
+    <property name="etape_min" type="int" value="4"/>
+    <property name="etape_max" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="28" type="PNJ" x="720" y="208">
+   <properties>
+    <property name="id" value="hulda"/>
+    <property name="direction" value="down"/>
+    <property name="etape_min" type="int" value="4"/>
+    <property name="etape_max" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="29" type="PNJ" x="560" y="240">
+   <properties>
+    <property name="id" value="villageois_apeure"/>
+    <property name="sprite" value="isolde"/>
+    <property name="direction" value="right"/>
+    <property name="etape_max" type="int" value="0"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="30" type="PNJ" x="976" y="176">
+   <properties>
+    <property name="id" value="villageois_mineur"/>
+    <property name="sprite" value="tobias"/>
+    <property name="direction" value="left"/>
+    <property name="etape_min" type="int" value="2"/>
+    <property name="etape_max" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="31" type="Poule" x="208" y="304">
+   <properties>
+    <property name="id" value="village_poule_01"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="32" type="Poule" x="496" y="80">
+   <properties>
+    <property name="id" value="village_poule_02"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="33" type="Poule" x="784" y="240">
+   <properties>
+    <property name="id" value="village_poule_03"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="34" type="Poule" x="1072" y="48">
+   <properties>
+    <property name="id" value="village_poule_04"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="35" type="Poule" x="1136" y="304">
+   <properties>
+    <property name="id" value="village_poule_05"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="36" type="Ramassable" x="784" y="48">
+   <properties>
+    <property name="id" value="village_plume_01"/>
+    <property name="contenu" value="plume_corbeau"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="37" type="Ramassable" x="592" y="80">
+   <properties>
+    <property name="id" value="village_rubis_01"/>
+    <property name="contenu" value="rubis_vert"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="38" type="Ramassable" x="656" y="80">
+   <properties>
+    <property name="id" value="village_rubis_02"/>
+    <property name="contenu" value="rubis_vert"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="39" type="Ennemi" x="720" y="48">
+   <properties>
+    <property name="type" value="ronceau"/>
+    <property name="variante" value="normal"/>
+    <property name="apparition" value="scenario"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="40" type="Ennemi" x="720" y="272">
+   <properties>
+    <property name="type" value="sanglier_noirci"/>
+    <property name="variante" value="normal"/>
+    <property name="apparition" value="scenario"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="41" type="Marqueur" x="656" y="208">
+   <properties>
+    <property name="id" value="pip_cachette"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="42" type="Brume" x="0" y="0" width="1280" height="352">
+   <properties>
+    <property name="densite" value="0.8,0.45,0.3,0.7,0"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer id="5" name="Dessus" width="40" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,306,0,0,0,0,0,0,306,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>

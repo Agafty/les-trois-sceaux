@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="40" height="22" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="9">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="40" height="22" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="15">
  <properties>
   <property name="camera" value="suivre"/>
+  <property name="monde_x" type="int" value="0"/>
+  <property name="monde_y" type="int" value="0"/>
  </properties>
  <tileset firstgid="1" source="../tilesets/foret.tsx"/>
  <layer id="1" name="Sol" width="40" height="22">
@@ -59,8 +61,8 @@
  <layer id="3" name="Murs" width="40" height="22">
   <data encoding="csv">
 76,76,76,75,75,75,76,75,76,76,76,76,75,76,75,75,75,76,76,75,76,75,76,76,75,76,76,76,75,76,75,76,75,75,75,76,76,75,75,76,
-75,76,75,0,76,0,76,0,0,0,75,76,76,0,0,76,75,105,106,107,108,109,75,0,0,0,75,0,76,76,0,75,75,76,0,0,0,76,76,76,
-75,76,74,0,0,0,0,0,0,0,0,0,0,93,94,111,75,113,114,115,116,117,76,0,93,94,0,0,102,0,0,0,0,0,0,0,0,73,76,76,
+75,76,75,0,76,0,76,0,0,0,75,76,76,0,0,76,75,105,106,107,108,109,75,0,0,0,75,0,76,76,0,75,75,76,0,97,0,76,76,76,
+75,76,74,0,0,0,0,0,0,0,0,0,0,93,94,111,75,113,114,115,116,117,76,0,93,94,0,0,102,0,0,0,0,0,0,0,97,73,76,76,
 76,76,0,0,0,0,0,0,91,92,77,0,111,112,112,77,75,121,122,123,124,125,75,112,110,112,0,112,77,0,0,0,0,91,92,0,0,0,76,75,
 76,76,0,0,0,0,0,0,0,0,73,98,110,110,0,0,0,0,0,0,0,0,110,112,112,0,77,0,0,0,0,0,0,0,0,0,0,74,76,75,
 76,75,76,0,0,0,0,77,0,0,0,0,77,0,0,0,0,0,0,0,0,0,112,110,77,77,97,112,95,96,0,0,0,0,0,0,0,74,76,75,
@@ -77,9 +79,9 @@
 76,76,0,89,90,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,78,0,0,0,0,0,0,0,0,75,75,
 76,76,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,98,79,97,0,0,75,75,
 75,75,73,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,91,92,0,0,0,0,0,0,0,0,0,0,0,0,98,0,100,89,90,75,76,
-75,76,76,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,76,75,75,
-75,76,74,76,76,76,0,0,76,76,75,76,74,76,76,76,76,76,75,75,76,75,75,75,89,90,76,76,75,75,89,90,75,73,76,76,75,75,76,75,
-76,75,75,76,75,76,0,0,76,76,75,76,76,76,76,75,76,75,76,75,75,76,75,76,75,75,76,75,75,75,75,75,75,76,75,75,75,74,75,76
+75,76,76,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,97,0,0,76,75,75,
+75,76,74,76,76,76,0,0,76,76,75,76,74,76,76,76,76,76,75,75,76,75,75,75,89,90,76,0,0,75,89,90,75,73,76,76,75,75,76,75,
+76,75,75,76,75,76,0,0,76,76,75,76,76,76,76,75,76,75,76,75,75,76,75,76,75,75,76,0,0,75,75,75,75,76,75,75,75,74,75,76
 </data>
  </layer>
  <objectgroup id="4" name="Objets">
@@ -132,8 +134,49 @@
   </object>
   <object id="8" type="Ramassable" x="1104" y="592">
    <properties>
-    <property name="id" value="foret_rubis_secret_01"/>
-    <property name="contenu" value="rubis_rouge"/>
+    <property name="id" value="foret_quart_coeur_souche"/>
+    <property name="contenu" value="quart_coeur"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="9" type="Sortie" x="192" y="672" width="64" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/foret_sud_room.tscn"/>
+    <property name="cible_spawn" value="depuis_foret_temple"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="10" type="Spawn" x="224" y="624">
+   <properties>
+    <property name="id" value="depuis_foret_sud"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="11" type="Sortie" x="864" y="672" width="64" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/village_room.tscn"/>
+    <property name="cible_spawn" value="depuis_foret_raccourci"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="12" type="Spawn" x="896" y="624">
+   <properties>
+    <property name="id" value="depuis_village_raccourci"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="13" type="Porte" x="864" y="640" width="64" height="32">
+   <properties>
+    <property name="id" value="foret_tronc_raccourci"/>
+    <property name="type" value="interrupteur"/>
+    <property name="apparence" value="tronc"/>
+    <property name="etape_max" type="int" value="0"/>
+   </properties>
+  </object>
+  <object id="14" type="Ramassable" x="1168" y="48">
+   <properties>
+    <property name="id" value="foret_plume_02"/>
+    <property name="contenu" value="plume_corbeau"/>
    </properties>
    <point/>
   </object>
