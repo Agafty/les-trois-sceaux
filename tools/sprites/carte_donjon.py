@@ -9,6 +9,9 @@ Produit dans art/ui/carte/ (PNG RGBA, sans Pillow : mini encodeur zlib + struct)
   icone_boss.png         10x10    tête de cerf (Sylve) : salle du boss
   icone_escalier.png     12x12     escalier entre deux étages
   icone_chute.png        8x8      trou de passage vers l'étage du dessous
+  icone_coffre.png       8x8      petit coffre brun
+  icone_grand_coffre.png 10x8     grand coffre doré
+  icone_cle.png          6x8      petite clé dorée (porte à clé)
 """
 import os
 import struct
@@ -185,11 +188,41 @@ HOLE = ['..0000..',
         '..0000..']
 
 
+CHEST = ['.000000.',
+         '07777770',
+         '07777770',
+         '011KK110',
+         '07777770',
+         '07777770',
+         '01111110',
+         '.000000.']
+
+BIG_CHEST = ['.00000000.',
+             '0LLKKKKKk0',
+             '0KKKKKKKk0',
+             '0kkkLLkkk0',
+             '0KKKKKKKk0',
+             '0KKKKKKKk0',
+             '0kkkkkkkk0',
+             '.00000000.']
+
+KEY = ['.0000.',
+       '0LKKk0',
+       '0K00k0',
+       '0kKKk0',
+       '.0Kk0.',
+       '.0Kk00',
+       '.0KKk0',
+       '.0000.']
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     for name, img in (('cadre', frame()), ('salle_visitee', room_full()), ('salle_inconnue', room_unknown()),
                       ('icone_brann', grid(BRANN)), ('icone_boss', boss()),
-                      ('icone_escalier', grid(STAIRS)), ('icone_chute', grid(HOLE))):
+                      ('icone_escalier', grid(STAIRS)), ('icone_chute', grid(HOLE)),
+                      ('icone_coffre', grid(CHEST)), ('icone_grand_coffre', grid(BIG_CHEST)),
+                      ('icone_cle', grid(KEY))):
         save_png(os.path.join(OUT, name + '.png'), img)
         print(name, len(img[0]), 'x', len(img))
 
