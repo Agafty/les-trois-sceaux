@@ -1,0 +1,31 @@
+{
+  "image": "poule.png",
+  "frame_size": [
+    32,
+    32
+  ],
+  "feet_y": 23,
+  "rows": {
+    "down": 0,
+    "up": 1,
+    "left": 2,
+    "right": 3
+  },
+  "animations": {
+    "idle": {
+      "column": 0,
+      "frames": 1,
+      "fps": 5
+    },
+    "walk": {
+      "column": 1,
+      "frames": 4,
+      "fps": 8
+    },
+    "peck": {
+      "column": 5,
+      "frames": 4,
+      "fps": 6
+    }
+  }
+}
