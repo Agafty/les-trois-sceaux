@@ -19,6 +19,9 @@ public sealed class DialogueEntry
     /// <summary>Faux (défaut) : toutes les répliques s'enchaînent à chaque interaction. Vrai : une seule par interaction, en boucle.</summary>
     public bool Cycle { get; init; }
 
+    /// <summary>Récompense donnée quand la conversation se termine (facultative). Ignorée si son id est déjà mémorisé.</summary>
+    public DialogueReward Reward { get; init; }
+
     public IReadOnlyList<string> Lines { get; init; } = Array.Empty<string>();
 
     public bool FlagsMatch(Func<string, bool> hasFlag)

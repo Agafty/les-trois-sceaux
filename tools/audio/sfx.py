@@ -327,6 +327,21 @@ def s_buisson(r):
     return mix(leaves, cut)
 
 
+def s_eboulement(r):
+    # Un mur ou un éboulis qui s'écroule : grondement grave, puis cailloux qui roulent.
+    rumble = tone("noise", 500, 90, 0.55, 1.0, lowpass=0.9, attack=0.01, release=0.3, rng=r)
+    thump = tone("sine", 90, 45, 0.4, 0.8, release=0.2)
+    gravel = seq(silence(0.15), *[tone("noise", 2500 - 150 * k, 1200, 0.04, 0.5, lowpass=0.6, rng=r) + silence(0.03) for k in range(6)])
+    return mix(rumble, thump, gravel)
+
+
+def s_poule(r):
+    # Un « cot cot » de poule : deux petites notes carrées qui montent puis retombent.
+    return seq(tone("square", 700, 950, 0.06, 0.5, duty=0.3, lowpass=0.5, release=0.02), silence(0.03),
+               tone("square", 800, 1050, 0.06, 0.5, duty=0.3, lowpass=0.5, release=0.02), silence(0.03),
+               tone("square", 900, 600, 0.12, 0.5, duty=0.3, lowpass=0.5, release=0.06, vibrato=0.04, vib_hz=30))
+
+
 def s_texte(r):
     # Petit « bip » de voix pour le texte qui défile (très court : il est joué une lettre sur deux).
     return tone("square", 520, 470, 0.03, 0.35, duty=0.25, lowpass=0.6, attack=0.002, release=0.015)
@@ -345,6 +360,7 @@ SOUNDS = {
     "menu_deplace": s_menu_deplace, "menu_valide": s_menu_valide, "menu_retour": s_menu_retour,
     "boss_rugit": s_boss_rugit, "boss_charge": s_boss_charge, "boss_assomme": s_boss_assomme,
     "boss_vaincu": s_boss_vaincu, "sceau": s_sceau, "texte": s_texte, "buisson": s_buisson,
+    "eboulement": s_eboulement, "poule": s_poule,
 }
 
 

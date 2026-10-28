@@ -38,6 +38,8 @@ public partial class Npc : CharacterBody2D
     private float _wanderTimer;
     private float _walkTime;
     private bool _walking;
+    private DialogueReward _pendingReward;
+    private Player _pendingPlayer;
 
     public override void _Ready()
     {
@@ -77,6 +79,7 @@ public partial class Npc : CharacterBody2D
         var data = DialogueLibrary.Get(Id);
         if (data == null) return System.Array.Empty<string>();
         var entry = DialogueSelector.Pick(data, _state.StoryStage, _state.IsCollected);
+        _pendingReward = entry?.Reward != null && !_state.IsCollected(entry.Reward.Id) ? entry.Reward : null;
         var keys = DialogueSelector.GetLines(entry, _talkCount);
         speaker = string.IsNullOrEmpty(data.Speaker) ? "" : Tr(data.Speaker);
         var lines = new string[keys.Count];
@@ -98,6 +101,7 @@ public partial class Npc : CharacterBody2D
             }
             return;
         }
+        _pendingPlayer = player;
         _talkCount++;
         _walking = false;
         Velocity = Vector2.Zero;
@@ -113,6 +117,24 @@ public partial class Npc : CharacterBody2D
         _box = null;
         _zone.BlockFor(0.3f);
         SetPhysicsProcess(WanderRadius > 0f);
+        GiveReward();
+    }
+
+    // Récompense du bloc de dialogue (champ « reward » du JSON) : donnée une seule fois, à la fin de la conversation.
+    private void GiveReward()
+    {
+        var reward = _pendingReward;
+        var player = _pendingPlayer;
+        _pendingReward = null;
+        _pendingPlayer = null;
+        if (reward == null || _state.IsCollected(reward.Id)) return;
+        if (player == null || !IsInstanceValid(player) || player.IsDead) return;
+        var effect = ResourceKeeper.Load<PickupEffect>(RoomObjectCatalog.PickupEffectPath(reward.Content));
+        if (effect == null || !effect.CanApply(player, _state)) return; // refusée : elle sera proposée à la prochaine conversation
+        _state.MarkCollected(reward.Id);
+        effect.Apply(player, _state);
+        AudioManager.Play(effect.PickupSound);
+        PickupBanner.Announce(player, effect);
     }
 
     // --- Errance (facultative) --------------------------------------------------------------------

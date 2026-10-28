@@ -4,7 +4,8 @@ using System.Text.Json;
 
 /// <summary>
 /// Dialogues d'un personnage, lus depuis resources/dialogues/&lt;id&gt;.json (classe C# pure, testable hors du moteur).
-/// Format : { "speaker": "PNJ_HULDA", "entries": [ { "stage": 0, "flags": [], "not_flags": [], "cycle": false, "lines": ["CLE1", "CLE2"] } ] }
+/// Format : { "speaker": "PNJ_HULDA", "entries": [ { "stage": 0, "flags": [], "not_flags": [], "cycle": false, "lines": ["CLE1", "CLE2"], "reward": { "contenu": "quart_coeur", "id": "village_quart_coeur_poules" } } ] }
+/// (« reward » est facultatif : récompense donnée à la fin de la conversation, une seule fois grâce à son id.)
 /// </summary>
 public sealed class DialogueData
 {
@@ -56,9 +57,21 @@ public sealed class DialogueData
             Stage = stage,
             Flags = ReadStrings(e, "flags", index),
             NotFlags = ReadStrings(e, "not_flags", index),
+            Reward = ReadReward(e, index),
             Cycle = e.TryGetProperty("cycle", out var c) && c.ValueKind == JsonValueKind.True,
             Lines = lines,
         };
+    }
+
+    private static DialogueReward ReadReward(JsonElement e, int index)
+    {
+        if (!e.TryGetProperty("reward", out var r)) return null;
+        if (r.ValueKind != JsonValueKind.Object) throw new FormatException($"entrée {index} : « reward » doit être un objet {{ \"contenu\": ..., \"id\": ... }}");
+        string content = r.TryGetProperty("contenu", out var c) && c.ValueKind == JsonValueKind.String ? c.GetString() ?? "" : "";
+        string id = r.TryGetProperty("id", out var i) && i.ValueKind == JsonValueKind.String ? i.GetString() ?? "" : "";
+        if (!RoomObjectCatalog.IsSafeName(content)) throw new FormatException($"entrée {index} : « reward.contenu » invalide (nom de fichier de resources/pickups/ en minuscules)");
+        if (!RoomObjectCatalog.IsSafeName(id)) throw new FormatException($"entrée {index} : « reward.id » invalide (minuscules, chiffres et _)");
+        return new DialogueReward { Content = content, Id = id };
     }
 
     private static List<string> ReadStrings(JsonElement e, string name, int index)

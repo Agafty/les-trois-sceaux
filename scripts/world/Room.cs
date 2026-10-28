@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 /// <summary>
 /// Une salle de jeu : une carte Tiled importée + un conteneur « Entites » (tri en profondeur) où vit Brann.
 /// Au chargement, la salle lit le calque d'objets « Objets » de la carte (Spawn, Sortie, Ennemi, Coffre,
-/// StatueCorbeau, Ramassable, PNJ, Article, Porte, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable, Brume, plus les rectangles nommés « boss_<nom> » et « pilier ») et instancie les vraies scènes aux positions des marqueurs.
+/// StatueCorbeau, Ramassable, PNJ, Article, Porte, MurFissure, Poule, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable, Brume, plus les rectangles nommés « boss_<nom> » et « pilier ») et instancie les vraies scènes aux positions des marqueurs.
 /// La scène importée n'est jamais modifiée sur le disque : seuls les nœuds de l'arbre en cours sont retirés.
 /// </summary>
 public partial class Room : Node2D
@@ -70,6 +70,8 @@ public partial class Room : Node2D
     private const string PlateScenePath = "res://scenes/puzzles/plaque_pression.tscn";
     private const string TorchScenePath = "res://scenes/puzzles/torche.tscn";
     private const string FallScenePath = "res://scenes/puzzles/chute.tscn";
+    private const string CrackedWallScenePath = "res://scenes/puzzles/mur_fissure.tscn";
+    private const string ChickenScenePath = "res://scenes/npc/poule.tscn";
     private const string NpcScenePath = "res://scenes/npc/pnj.tscn";
     private const string ArticleScenePath = "res://scenes/boutique/article.tscn";
     private const float GridCell = 32f;
@@ -93,6 +95,7 @@ public partial class Room : Node2D
     private readonly Dictionary<Health, EnemyTrack> _trackedEnemies = new();
     private bool _leaving;
     private readonly List<Door> _doors = new();
+    private readonly List<CrackedWall> _crackedWalls = new();
     private HoleWatcher _holes;
     private PackedScene _switchScene;
     private PackedScene _blockScene;
@@ -401,6 +404,8 @@ public partial class Room : Node2D
                 case "PNJ": SpawnNpc(node); break;
                 case "Article": SpawnArticle(node); break;
                 case "Brume": SpawnMist(node); break;
+                case "Poule": SpawnChicken(node); break;
+                case "MurFissure": SpawnCrackedWall(node); break;
                 case "Porte": portes.Add(node); break; // après les ennemis : elles ont besoin de leur nombre
                 default:
                     WarnOnce("class:" + node.GetMeta("class").AsString(),
@@ -784,6 +789,81 @@ public partial class Room : Node2D
         RemoveMarker(marker);
     }
 
+    // Centre et taille du rectangle Tiled d'un objet (YATI en fait un StaticBody2D avec une forme rectangulaire ; un simple point vaut une case).
+    private void ReadRectangle(Node marker, out Vector2 center, out Vector2 size)
+    {
+        center = MarkerPosition(marker) + new Vector2(16f, 16f);
+        size = new Vector2(32f, 32f);
+        var shapeNode = marker.GetNodeOrNull<CollisionShape2D>("Rectangle Shape");
+        if (shapeNode == null)
+            foreach (var child in marker.GetChildren())
+                if (child is CollisionShape2D found) { shapeNode = found; break; }
+        if (shapeNode != null)
+        {
+            center = shapeNode.GlobalPosition;
+            if (shapeNode.Shape is RectangleShape2D rect) size = rect.Size;
+        }
+    }
+
+    // Mur fissuré ou éboulis : rectangle (id, apparence = mur ou eboulis) détruit par une bombe. Voir CrackedWall.
+    private void SpawnCrackedWall(Node marker)
+    {
+        string id = GetString(marker, "id");
+        string appearanceValue = GetString(marker, "apparence");
+        if (!WallRules.TryParseAppearance(appearanceValue, out string appearance))
+            WarnOnce("mur-apparence:" + appearanceValue, $"MurFissure « {id} » : apparence inconnue « {appearanceValue} » (mur ou eboulis) dans {Name}, traitée comme « mur ».");
+        ReadRectangle(marker, out var center, out var size);
+        var scene = GD.Load<PackedScene>(CrackedWallScenePath);
+        if (scene == null)
+        {
+            GD.PushError($"MurFissure « {id} » : scène introuvable ({CrackedWallScenePath}).");
+            RemoveMarker(marker);
+            return;
+        }
+        var wall = scene.Instantiate<CrackedWall>();
+        wall.Id = id;
+        wall.Appearance = appearance;
+        wall.CellSize = size;
+        wall.WallsLayer = FindNodeByName(this, "Murs") as TileMapLayer;
+        wall.FloorLayer = FindNodeByName(this, "Sol") as TileMapLayer;
+        wall.DecorLayer = FindNodeByName(this, "Decor") as TileMapLayer;
+        wall.Position = _entities.ToLocal(center);
+        _entities.AddChild(wall); // les calques et la position sont réglés avant _Ready du mur
+        _crackedWalls.Add(wall);
+        RemoveMarker(marker);
+    }
+
+    // Poule du village : point au centre de la poule (id = village_poule_NN, errance = rayon en px, 48 par défaut). Absente si déjà attrapée.
+    private void SpawnChicken(Node marker)
+    {
+        string id = GetString(marker, "id");
+        if (!RoomObjectCatalog.IsSafeName(id))
+        {
+            GD.PushError($"Poule : id invalide « {id} » ({Name}).");
+            RemoveMarker(marker);
+            return;
+        }
+        if (GetNode<GameState>("/root/GameState").IsCollected(id))
+        {
+            RemoveMarker(marker);
+            return;
+        }
+        var scene = GD.Load<PackedScene>(ChickenScenePath);
+        if (scene == null)
+        {
+            GD.PushError($"Poule « {id} » : scène introuvable ({ChickenScenePath}).");
+            RemoveMarker(marker);
+            return;
+        }
+        var chicken = scene.Instantiate<Chicken>();
+        PhysicsLayers.BlockedByRavine(chicken);
+        chicken.Id = id;
+        if (marker.HasMeta("errance")) chicken.WanderRadius = Mathf.Max(0f, GetFloat(marker, "errance"));
+        chicken.Position = _entities.ToLocal(MarkerPosition(marker));
+        _entities.AddChild(chicken);
+        RemoveMarker(marker);
+    }
+
     private void SpawnDoor(Node marker)
     {
         string id = GetString(marker, "id");
@@ -800,17 +880,7 @@ public partial class Room : Node2D
         }
 
         // YATI a fait un StaticBody2D (solide) de ce rectangle : on lit sa forme pour la case, puis on le retire.
-        var center = MarkerPosition(marker) + new Vector2(16f, 16f);
-        var size = new Vector2(32f, 32f);
-        var shapeNode = marker.GetNodeOrNull<CollisionShape2D>("Rectangle Shape");
-        if (shapeNode == null)
-            foreach (var child in marker.GetChildren())
-                if (child is CollisionShape2D found) { shapeNode = found; break; }
-        if (shapeNode != null)
-        {
-            center = shapeNode.GlobalPosition;
-            if (shapeNode.Shape is RectangleShape2D rect) size = rect.Size;
-        }
+        ReadRectangle(marker, out var center, out var size);
 
         if (string.IsNullOrEmpty(id) && kind == DoorKind.Interrupteur && appearance != "tronc")
             WarnOnce("porte-sans-id:" + Name + MarkerPosition(marker), $"Porte « {appearance} » de type interrupteur sans id dans {Name} : aucun interrupteur ne pourra l'ouvrir.");
@@ -1273,6 +1343,13 @@ public partial class Room : Node2D
             var door = _doors[i];
             if (!IsInstanceValid(door) || door.IsOpen) continue;
             if (door.GlobalPosition.DistanceSquaredTo(center) <= 1f) return true;
+        }
+        // Un mur fissuré ou un éboulis pas encore détruit bouche aussi la Sortie posée sous lui.
+        for (int i = 0; i < _crackedWalls.Count; i++)
+        {
+            var wall = _crackedWalls[i];
+            if (!IsInstanceValid(wall) || wall.IsDestroyed) continue;
+            if (wall.GlobalPosition.DistanceSquaredTo(center) <= 1f) return true;
         }
         return false;
     }

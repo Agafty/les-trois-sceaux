@@ -2,6 +2,23 @@
   "speaker": "PNJ_PIP",
   "entries": [
     {
+      "flags": [
+        "poules_toutes"
+      ],
+      "not_flags": [
+        "village_quart_coeur_poules"
+      ],
+      "reward": {
+        "contenu": "quart_coeur",
+        "id": "village_quart_coeur_poules"
+      },
+      "lines": [
+        "DLG_PIP_POULES_1",
+        "DLG_PIP_POULES_2",
+        "DLG_PIP_POULES_3"
+      ]
+    },
+    {
       "stage": 0,
       "lines": [
         "DLG_PIP_0_1",
@@ -15,6 +32,16 @@
         "DLG_PIP_1_1",
         "DLG_PIP_1_2",
         "DLG_PIP_1_3"
+      ]
+    },
+    {
+      "stage": 2,
+      "not_flags": [
+        "poules_toutes"
+      ],
+      "lines": [
+        "DLG_PIP_2_1",
+        "DLG_PIP_2_2"
       ]
     }
   ]

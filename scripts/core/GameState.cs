@@ -290,6 +290,9 @@ public partial class GameState : Node
     /// <summary>Vrai si l'objet unique (coffre, réceptacle, quart...) a déjà été ramassé.</summary>
     public bool IsCollected(string id) => !string.IsNullOrEmpty(id) && _collected.Contains(id);
 
+    /// <summary>Poules du village attrapées (calculé sur les ids mémorisés : rien de plus à sauvegarder).</summary>
+    public int Chickens => ChickenRules.Count(_collected);
+
     /// <summary>Mémorise un objet unique comme ramassé (base des flags de sauvegarde).</summary>
     public void MarkCollected(string id)
     {

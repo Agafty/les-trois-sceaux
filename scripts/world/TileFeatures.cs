@@ -4,9 +4,9 @@ using Godot;
 /// <summary>
 /// Comportements de certaines tuiles du calque « Murs », reconnues par leur numéro (voir <see cref="TileRules"/>), sans rien
 /// modifier dans les cartes .tmx. Créé et réglé par la <see cref="Room"/>.
-/// - Buissons (foret 96-99, village 300) : une zone <see cref="BushCutter"/> est posée sur chaque case ; un coup d'épée retire la tuile
+/// - Buissons (foret 96-99, village 300, montagne 203-204) : une zone <see cref="BushCutter"/> est posée sur chaque case ; un coup d'épée retire la tuile
 ///   (pour cette visite de la salle seulement : la salle est rechargée depuis la carte), avec un bruit, des feuilles et parfois un butin.
-/// - Ravins (village 80-95) : les flèches doivent passer au-dessus d'un ravin, comme au-dessus d'un trou, alors que Brann et les
+/// - Ravins (village et montagne 80-95) : les flèches doivent passer au-dessus d'un ravin, comme au-dessus d'un trou, alors que Brann et les
 ///   ennemis ne le traversent pas. Or la collision d'une tuile est celle du tileset (couche 1, celle que les flèches voient). On sépare donc
 ///   les deux : les tuiles de ravin passent dans un calque « Ravin » qui ne fait que l'affichage, et leur collision (lue sur les polygones
 ///   du tileset) est refaite dans un corps statique de la couche 5 (<see cref="PhysicsLayers.Ravine"/>), que Brann et les ennemis ont dans leur masque.
@@ -54,7 +54,7 @@ public partial class TileFeatures : Node2D
             string name = TileRules.TilesetNameFromTexturePath(atlas.Texture.ResourcePath);
             if (name == "")
                 GD.PushWarning($"Carte {GetParent()?.Name} : tileset « {atlas.Texture.ResourcePath} » non reconnu (pas un PNG nommé) : ses buissons et ravins éventuels sont ignorés.");
-            if (name == TileRules.ForestTileset || name == TileRules.VillageTileset)
+            if (name == TileRules.ForestTileset || name == TileRules.VillageTileset || name == TileRules.MountainTileset)
                 sources[id] = (name, atlas.GetAtlasGridSize().X);
         }
         if (sources.Count == 0) return;
