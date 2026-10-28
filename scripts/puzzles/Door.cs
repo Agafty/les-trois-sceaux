@@ -153,6 +153,7 @@ public partial class Door : StaticBody2D
     /// </summary>
     public static bool OpenById(SceneTree tree, GameState state, string id)
     {
+        if (string.IsNullOrEmpty(id)) return false; // un id vide ne désigne aucune porte
         // Appelé une fois par résolution d'énigme : l'allocation de la liste de nœuds est sans importance.
         foreach (var node in tree.GetNodesInGroup(GroupName))
         {

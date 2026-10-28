@@ -100,7 +100,7 @@ public partial class SaveSystem : Node
         if (!IsValidSlot(slot)) return false;
         _state.ResetState();
         PlayTimeSeconds = 0;
-        _sceneManager.ResetSpawnId(); // pas de point d'entrée hérité de la partie précédente
+        // Le point d'entrée (LastSpawnId) n'est PAS remis à zéro ici : l'appelant vient de le régler par GoToScene(scène, spawn, ...) avant ce rappel.
         _lastZone = null;
         _skipNextZoneSave = true;
         _newGameSavePending = true; // écrit l'emplacement dès l'arrivée dans la salle de départ

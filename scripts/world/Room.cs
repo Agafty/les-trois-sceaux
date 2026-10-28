@@ -79,6 +79,7 @@ public partial class Room : Node2D
     // Avertissements « type inconnu » : une seule fois par session, pas à chaque chargement de salle.
     private static readonly HashSet<string> WarnedKeys = new();
 
+    private const int ViewMarginBottom = 8; // 360 (vue) - 352 (11 cases)
     private const int ScreenTilesX = 20;
     private const int ScreenTilesY = 11;
 
@@ -159,7 +160,10 @@ public partial class Room : Node2D
 
         // Brann d'abord sur son Spawn, puis les objets : rien n'apparaît sous ses pieds avant qu'il soit placé.
         var sceneManager = GetNode<SceneManager>("/root/SceneManager");
-        var spawn = FindSpawnById(this, sceneManager.ConsumeSpawnId());
+        string wantedSpawn = sceneManager.ConsumeSpawnId();
+        var spawn = FindSpawnById(this, wantedSpawn);
+        if (!string.IsNullOrEmpty(wantedSpawn) && !(spawn != null && spawn.HasMeta("id") && spawn.GetMeta("id").AsString() == wantedSpawn))
+            WarnOnce("spawn:" + Name + ":" + wantedSpawn, $"Spawn « {wantedSpawn} » introuvable dans {Name} (absent de la carte, ou retiré par etape_min/etape_max) : premier Spawn utilisé.");
         if (player != null && spawn != null)
             player.GlobalPosition = spawn.GlobalPosition;
 
@@ -249,7 +253,7 @@ public partial class Room : Node2D
         camera.LimitLeft = usedRect.Position.X * tileSize.X;
         camera.LimitTop = usedRect.Position.Y * tileSize.Y;
         camera.LimitRight = (usedRect.Position.X + usedRect.Size.X) * tileSize.X;
-        camera.LimitBottom = (usedRect.Position.Y + usedRect.Size.Y) * tileSize.Y;
+        camera.LimitBottom = (usedRect.Position.Y + usedRect.Size.Y) * tileSize.Y + ViewMarginBottom; // vue de 360 pour 352 de carte : la marge de 8 px est en bas seulement
         camera.PositionSmoothingEnabled = true;
 
         if (CameraMode == "ecran")
@@ -318,7 +322,7 @@ public partial class Room : Node2D
         _screenCamera.LimitLeft = left;
         _screenCamera.LimitTop = top;
         _screenCamera.LimitRight = Mathf.Min(left + w, _screenArea.End.X);
-        _screenCamera.LimitBottom = Mathf.Min(top + h, _screenArea.End.Y);
+        _screenCamera.LimitBottom = Mathf.Min(top + h, _screenArea.End.Y) + ViewMarginBottom;
     }
 
     // Étape de l'histoire (propriétés etape_min / etape_max de chaque objet du calque « Objets ») : les objets hors intervalle sont retirés
@@ -348,7 +352,7 @@ public partial class Room : Node2D
         {
             if (!IsInstanceValid(door) || door.Appearance != "pont_levis") continue;
             if (door.IsOpen) ClearRavineUnder(door);
-            else door.Opened += _ => ClearRavineUnder(door);
+            else door.Opened += _ => GetTree().CreateTimer(0.3).Timeout += () => { if (IsInstanceValid(this) && IsInsideTree()) ClearRavineUnder(door); }; // à la fin de l'animation d'ouverture
         }
     }
 
@@ -808,6 +812,8 @@ public partial class Room : Node2D
             if (shapeNode.Shape is RectangleShape2D rect) size = rect.Size;
         }
 
+        if (string.IsNullOrEmpty(id) && kind == DoorKind.Interrupteur && appearance != "tronc")
+            WarnOnce("porte-sans-id:" + Name + MarkerPosition(marker), $"Porte « {appearance} » de type interrupteur sans id dans {Name} : aucun interrupteur ne pourra l'ouvrir.");
         var door = GD.Load<PackedScene>(DoorScenePath).Instantiate<Door>();
         door.Id = id;
         door.Kind = kind;
@@ -1162,7 +1168,16 @@ public partial class Room : Node2D
                 // « Posé sur la Sortie » = le centre de Brann est dans son rectangle. Un simple effleurement (Spawn collé à la porte) ne compte
                 // pas : la marge de la physique le rend instable ; voir TouchedAtArrival.
                 if (player == null || !IsInstanceValid(player) || !RectContains(state.Area, player.GlobalPosition))
+                {
                     state.Armed = true;
+                    if (player != null && IsInstanceValid(player) && state.Area.OverlapsBody(player))
+                    {
+                        // Effleurée sans l'événement d'entrée (déjà passé) : elle part dès que le centre de Brann y entre.
+                        state.TouchedAtArrival = true;
+                        _hasTouchedSortie = true;
+                        SetPhysicsProcess(true);
+                    }
+                }
             }
         }
         catch (System.Exception e)

@@ -2,10 +2,10 @@
   "speaker": "PNJ_VILLAGEOIS_MINEUR",
   "entries": [
     {
-      "stage": 3,
+      "stage": 2,
       "lines": [
-        "DLG_VILLAGEOIS_MINEUR_3_1",
-        "DLG_VILLAGEOIS_MINEUR_3_2"
+        "DLG_VILLAGEOIS_MINEUR_2_1",
+        "DLG_VILLAGEOIS_MINEUR_2_2"
       ]
     }
   ]

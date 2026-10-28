@@ -52,6 +52,8 @@ public partial class TileFeatures : Node2D
             int id = tileSet.GetSourceId(i);
             if (tileSet.GetSource(id) is not TileSetAtlasSource atlas || atlas.Texture == null) continue;
             string name = TileRules.TilesetNameFromTexturePath(atlas.Texture.ResourcePath);
+            if (name == "")
+                GD.PushWarning($"Carte {GetParent()?.Name} : tileset « {atlas.Texture.ResourcePath} » non reconnu (pas un PNG nommé) : ses buissons et ravins éventuels sont ignorés.");
             if (name == TileRules.ForestTileset || name == TileRules.VillageTileset)
                 sources[id] = (name, atlas.GetAtlasGridSize().X);
         }

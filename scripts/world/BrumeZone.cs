@@ -41,6 +41,7 @@ public partial class BrumeZone : Node2D
             float low = i == 0 ? 0.7f : 0.35f;
             float first = i == 0 ? low : 1f;
             float second = i == 0 ? 1f : low;
+            veil.Modulate = new Color(1f, 1f, 1f, first); // pas de saut brusque à la première image
             var breath = veil.CreateTween().SetLoops();
             breath.TweenProperty(veil, "modulate:a", first, BreathSeconds * 0.5f).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
             breath.TweenProperty(veil, "modulate:a", second, BreathSeconds * 0.5f).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
