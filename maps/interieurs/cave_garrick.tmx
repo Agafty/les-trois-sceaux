@@ -85,7 +85,8 @@
   </object>
  <object id="5" type="PNJ" x="304" y="112">
    <properties>
-    <property name="id" value="garrick"/>
+    <property name="id" value="garrick_cave"/>
+    <property name="sprite" value="garrick"/>
     <property name="direction" value="down"/>
     <property name="etape_min" type="int" value="2"/>
    </properties>
