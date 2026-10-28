@@ -1,0 +1,144 @@
+{
+  "scenarios": [
+    {
+      "salle": "forge_room",
+      "cinematique": "ouverture_01_matin",
+      "si": [
+        "ouverture_debut"
+      ]
+    },
+    {
+      "salle": "forge_room",
+      "cinematique": "ouverture_01b_charbon",
+      "si": [
+        "ouverture_debut",
+        "ouv_01"
+      ],
+      "sauf": [
+        "ouv_02"
+      ]
+    },
+    {
+      "salle": "forge_room",
+      "cinematique": "ouverture_02_charbon",
+      "si": [
+        "ouverture_debut",
+        "village_charbon_01",
+        "village_charbon_02"
+      ]
+    },
+    {
+      "salle": "forge_room",
+      "cinematique": "ouverture_05_corvan",
+      "si": [
+        "ouverture_debut",
+        "ouv_04"
+      ]
+    },
+    {
+      "salle": "forge_room",
+      "cinematique": "ouverture_08_forge",
+      "si": [
+        "ouverture_debut",
+        "ouv_07"
+      ]
+    },
+    {
+      "salle": "boutique_room",
+      "cinematique": "ouverture_livraison_garrick",
+      "si": [
+        "ouverture_debut",
+        "ouv_02"
+      ]
+    },
+    {
+      "salle": "herboristerie_room",
+      "cinematique": "ouverture_livraison_hulda",
+      "si": [
+        "ouverture_debut",
+        "ouv_02"
+      ]
+    },
+    {
+      "salle": "village_room",
+      "cinematique": "ouverture_03_epee_bois",
+      "si": [
+        "ouverture_debut",
+        "ouv_garrick",
+        "ouv_hulda"
+      ]
+    },
+    {
+      "salle": "village_room",
+      "cinematique": "ouverture_03b_ronceau",
+      "si": [
+        "ouverture_debut",
+        "epee_bois"
+      ],
+      "sauf": [
+        "ouv_ronceau"
+      ]
+    },
+    {
+      "salle": "village_room",
+      "cinematique": "ouverture_04_eclipse",
+      "si": [
+        "ouverture_debut",
+        "ouv_ronceau"
+      ]
+    },
+    {
+      "salle": "village_room",
+      "cinematique": "ouverture_06_place",
+      "si": [
+        "ouverture_debut",
+        "ouv_05"
+      ]
+    },
+    {
+      "salle": "village_room",
+      "cinematique": "ouverture_06b_place_retour",
+      "si": [
+        "ouverture_debut",
+        "ouv_06"
+      ],
+      "sauf": [
+        "ouv_place"
+      ]
+    },
+    {
+      "salle": "village_room",
+      "cinematique": "ouverture_07_retour",
+      "si": [
+        "ouverture_debut",
+        "ouv_place"
+      ]
+    }
+  ],
+  "reperes": [
+    {
+      "salle": "forge_room",
+      "id": "charbon_01",
+      "x": 176,
+      "y": 208
+    },
+    {
+      "salle": "forge_room",
+      "id": "charbon_02",
+      "x": 208,
+      "y": 208
+    },
+    {
+      "salle": "village_room",
+      "id": "potager",
+      "x": 656,
+      "y": 96
+    },
+    {
+      "salle": "village_room",
+      "id": "chateau",
+      "x": 1200,
+      "y": 48
+    }
+  ]
+}

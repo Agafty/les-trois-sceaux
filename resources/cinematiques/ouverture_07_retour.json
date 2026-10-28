@@ -1,0 +1,48 @@
+{
+  "id": "ouverture_07_retour",
+  "drapeau_fin": "ouv_07",
+  "etapes": [
+    {
+      "action": "animer",
+      "acteur": "pip",
+      "nom": "idle_down"
+    },
+    {
+      "action": "apparaitre",
+      "cible": "pnj",
+      "id": "hulda",
+      "a": "pip_cachette",
+      "decalage": [
+        -90,
+        50
+      ],
+      "direction": "right"
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_PIP",
+      "lignes": [
+        "DLG_OUV_RETOUR_1"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_HULDA",
+      "lignes": [
+        "DLG_OUV_RETOUR_2"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_BRANN",
+      "lignes": [
+        "DLG_OUV_RETOUR_3"
+      ]
+    },
+    {
+      "action": "aller_a",
+      "carte": "res://scenes/rooms/forge_room.tscn",
+      "spawn": "depuis_village"
+    }
+  ]
+}

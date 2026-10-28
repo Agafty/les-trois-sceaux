@@ -158,3 +158,62 @@ DLG_GARRICK_CAVE_1,Comment as-tu trouvé ça ?!,How did you find this place?!
 DLG_GARRICK_CAVE_2,"Ici, c'est ma réserve privée. Les bons articles ne sont pas pour tout le monde.","This is my private stock. The good stuff isn't for everybody."
 DLG_GARRICK_CAVE_3,"100 rubis pièce, et pas un mot à personne. Surtout pas à Pip.","100 rupees each, and not a word to anyone. Especially not Pip."
 REWARD_REFUSED,"Tu ne peux pas le porter pour l'instant. Reviens me voir plus tard.","You can't carry it right now. Come back and see me later."
+DLG_OUV_MATIN_1,"Debout, Brann ! Le soleil est déjà haut.","Up, Brann! The sun is already high."
+DLG_OUV_MATIN_2,"Ce soir, il y aura une éclipse. Je veux finir mon travail avant.",Tonight there will be an eclipse. I want to finish my work before then.
+DLG_OUV_MATIN_3,"Il me faut du charbon. Il y a deux morceaux près du mur, à gauche.","I need coal. There are two pieces by the wall, on the left."
+DLG_OUV_MATIN_4,"Marche jusqu'à eux pour les ramasser, puis reviens me voir.","Walk up to them to pick them up, then come back to me."
+DLG_OUV_CHARBON_1,"Du bon charbon ! Merci, Brann.","Good coal! Thank you, Brann."
+DLG_OUV_CHARBON_2,"Regarde, je vais forger la lame du jour.","Watch, I'm going to forge today's blade."
+DLG_OUV_CHARBON_3,Aïe ! Raté... Ma main tremble un peu.,Ouch! Missed... My hand is shaking a bit.
+DLG_OUV_CHARBON_4,"Maître, ça va ?","Master, are you all right?"
+DLG_OUV_CHARBON_5,"Ce n'est rien. Un peu de fatigue, c'est tout.",It's nothing. Just a little tired.
+DLG_OUV_CHARBON_6,"Tiens, ce pain est pour Garrick, et ce miel pour Hulda. Ce sont de vieux amis.","Here, this bread is for Garrick, and this honey for Hulda. They are old friends."
+DLG_OUV_CHARBON_7,"Va les voir. Ensuite, Pip t'attend dans le village.",Go and see them. Then Pip is waiting for you in the village.
+DLG_OUV_GARRICK_1,Bonjour Garrick ! Du pain de la part de Corvan.,Hello Garrick! Some bread from Corvan.
+DLG_OUV_GARRICK_2,"Hmm, ça sent bon ! Dis-lui merci.","Mmm, it smells good! Tell him thanks."
+DLG_OUV_GARRICK_3,"Dis donc, il avait l'air pâle, ces temps-ci. Et ses yeux brillaient drôlement.","Say, he has looked pale lately. And his eyes were shining oddly."
+DLG_OUV_GARRICK_4,"Il est juste fatigué, je crois.","He's just tired, I think."
+DLG_OUV_HULDA_1,Bonjour Mère Hulda ! Du miel de la part de Corvan.,Hello Mother Hulda! Some honey from Corvan.
+DLG_OUV_HULDA_2,Du miel de Corvan ! Quel gentil garçon. Merci.,Honey from Corvan! Such a kind man. Thank you.
+DLG_OUV_HULDA_3,"Dis-moi, Brann, tu peux m'aider ? Des ronces poussent dans mon potager, sur la place.","Tell me, Brann, can you help me? Brambles are growing in my garden, on the square."
+DLG_OUV_HULDA_4,Pip a une épée en bois. Va le voir !,Pip has a wooden sword. Go and see him!
+DLG_OUV_EPEE_1,Brann ! Mère Hulda m'a dit que tu viens pour les ronces.,Brann! Mother Hulda told me you're coming for the brambles.
+DLG_OUV_EPEE_2,"Tiens, prends mon épée en bois ! C'est pour de faux, mais elle coupe les buissons.","Here, take my wooden sword! It's pretend, but it cuts bushes."
+DLG_OUV_EPEE_3,"Le potager est sur la place, au nord du puits. Appuie sur la touche d'attaque pour donner un coup !","The garden is on the square, north of the well. Press the attack button to swing!"
+DLG_OUV_ECLIPSE_1,"Bravo, Brann ! Tu as chassé les ronces !","Well done, Brann! You chased the brambles away!"
+DLG_OUV_ECLIPSE_2,Le ciel devient tout violet ! Et ce bruit... Ça vient du château !,The sky is turning all purple! And that noise... It comes from the castle!
+DLG_OUV_ECLIPSE_3,L'éclipse ! Corvan est seul à la forge !,The eclipse! Corvan is alone at the forge!
+DLG_OUV_CORVAN_1,Corvan ! Qu'est-il arrivé ?,Corvan! What happened?
+DLG_OUV_CORVAN_2,Cette blessure... elle est toute noire !,That wound... it is all black!
+DLG_OUV_CORVAN_3,Ce n'est rien... Une ombre est venue. Elle a tout cassé.,It's nothing... A shadow came. It broke everything.
+DLG_OUV_CORVAN_4,"Écoute, Brann. Prends mon épée, sur l'établi. Elle est à toi.","Listen, Brann. Take my sword, on the workbench. It's yours."
+DLG_OUV_CORVAN_5,"Protège le village. Vite, ils arrivent !","Protect the village. Quick, they're coming!"
+DLG_OUV_CORVAN_6,"Je reviens, maître. Tiens bon !","I'll be back, master. Hold on!"
+DLG_OUV_PLACE_1,Brann ! Un sanglier noir et des ronces ! Je me cache derrière le puits !,Brann! A black boar and brambles! I'm hiding behind the well!
+DLG_OUV_PLACE_2,"Reste caché, Pip. Je m'en occupe !","Stay hidden, Pip. I'll handle this!"
+DLG_OUV_RETOUR_1,"Tu as gagné ! Tu es trop fort, Brann !","You won! You're so strong, Brann!"
+DLG_OUV_RETOUR_2,Brann ! La terre a tremblé ! Où est Corvan ?,Brann! The ground shook! Where is Corvan?
+DLG_OUV_RETOUR_3,"Il est blessé, à la forge ! Venez vite !","He's hurt, at the forge! Come quickly!"
+DLG_OUV_FORGE_1,"Corvan ? Il était là, par terre !","Corvan? He was right here, on the floor!"
+DLG_OUV_FORGE_2,"Il n'est plus là... Regarde, des traces de pas !","He's gone... Look, footprints!"
+DLG_OUV_FORGE_3,"Elles sortent de la forge, vers la forêt. Il a marché tout seul ?","They lead out of the forge, toward the forest. He walked off alone?"
+DLG_OUV_FORGE_4,Avec cette blessure noire ? C'est étrange...,With that black wound? That's strange...
+DLG_OUV_FORGE_5,Je sens une grande ombre. L'éclipse a affaibli les trois sceaux qui retiennent Morvath.,I sense a great shadow. The eclipse has weakened the three seals that hold Morvath.
+DLG_OUV_FORGE_6,Voyez ce corbeau de pierre sur l'enclume. Touchez-le : il se souviendra de votre route.,See this stone raven on the anvil. Touch it: it will remember your journey.
+DLG_OUV_FORGE_7,"Pour aider Corvan, il faut restaurer les sceaux. Le premier est dans le temple, au fond de la forêt.","To help Corvan, the seals must be restored. The first is in the temple, deep in the forest."
+DLG_OUV_FORGE_8,"Je veille sur Dame Isolde. Va, Brann !","I'll look after Lady Isolde. Go, Brann!"
+DLG_OUV_FORGE_9,"Brann ! Moi, je connais la forêt ! C'est tout droit, à l'ouest du village.","Brann! I know the forest! It's straight ahead, west of the village."
+DLG_OUV_FORGE_10,Sors de la forge et prends la rue vers la gauche. Bonne chance !,Leave the forge and take the street to the left. Good luck!
+PNJ_BRANN,Brann,Brann
+PNJ_CORVAN,Corvan,Corvan
+CINE_SKIP,Maintenir Pause pour passer,Hold Pause to skip
+OBJ_CHARBON,un morceau de charbon,a piece of coal
+OBJ_EPEE_BOIS,l'épée en bois de Pip,Pip's wooden sword
+OBJ_EPEE_BOIS_DESC,Elle coupe les buissons. Appuie sur la touche d'attaque.,It cuts bushes. Press the attack button.
+OBJ_EPEE_CORVAN,l'épée de Corvan,Corvan's sword
+OBJ_EPEE_CORVAN_DESC,"Une vraie lame, solide et bien équilibrée.","A real blade, sturdy and well balanced."
+PROLOGUE_1,"Il y a très longtemps, trois sceaux magiques ont enfermé le sorcier Morvath sous son château.","A very long time ago, three magic seals locked the sorcerer Morvath beneath his castle."
+PROLOGUE_2,"Mais les sceaux s'affaiblissent. Quand la lune cachera le soleil, ce soir, ils pourraient céder.","But the seals are growing weak. When the moon hides the sun tonight, they may break."
+PROLOGUE_3,"Au village de Brumeval, un jeune forgeron se réveille comme chaque matin. Il s'appelle Brann.","In the village of Brumeval, a young smith wakes up like every morning. His name is Brann."
+PROLOGUE_NEXT,Appuie sur une touche,Press any key
+PROLOGUE_SKIP,Pause : passer,Pause: skip

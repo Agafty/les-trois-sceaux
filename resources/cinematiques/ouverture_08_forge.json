@@ -1,0 +1,176 @@
+{
+  "id": "ouverture_08_forge",
+  "drapeau_fin": "ouverture_fin",
+  "etapes": [
+    {
+      "action": "teinte",
+      "couleur": "eclipse",
+      "duree": 0
+    },
+    {
+      "action": "apparaitre",
+      "cible": "pnj",
+      "id": "hulda",
+      "a": "depuis_village",
+      "decalage": [
+        -40,
+        -8
+      ],
+      "direction": "up"
+    },
+    {
+      "action": "deplacer",
+      "acteur": "brann",
+      "vers": "corvan_forge",
+      "decalage": [
+        0,
+        36
+      ],
+      "vitesse": 90
+    },
+    {
+      "action": "regarder",
+      "acteur": "brann",
+      "direction": "up"
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_BRANN",
+      "lignes": [
+        "DLG_OUV_FORGE_1"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_HULDA",
+      "lignes": [
+        "DLG_OUV_FORGE_2"
+      ]
+    },
+    {
+      "action": "apparaitre",
+      "cible": "decor",
+      "id": "traces",
+      "image": "traces_pas",
+      "a": "corvan_forge",
+      "decalage": [
+        0,
+        28
+      ]
+    },
+    {
+      "action": "camera",
+      "vers": "corvan_forge",
+      "decalage": [
+        0,
+        60
+      ],
+      "duree": 1.0
+    },
+    {
+      "action": "attendre",
+      "secondes": 0.8
+    },
+    {
+      "action": "camera",
+      "vers": "brann",
+      "duree": 1.0
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_HULDA",
+      "lignes": [
+        "DLG_OUV_FORGE_3"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_BRANN",
+      "lignes": [
+        "DLG_OUV_FORGE_4"
+      ]
+    },
+    {
+      "action": "apparaitre",
+      "cible": "pnj",
+      "id": "isolde",
+      "a": "isolde_forge",
+      "direction": "down"
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_ISOLDE",
+      "lignes": [
+        "DLG_OUV_FORGE_5",
+        "DLG_OUV_FORGE_6"
+      ]
+    },
+    {
+      "action": "camera",
+      "vers": "corvan_forge",
+      "decalage": [
+        -32,
+        0
+      ],
+      "duree": 1.0
+    },
+    {
+      "action": "attendre",
+      "secondes": 0.8
+    },
+    {
+      "action": "camera",
+      "vers": "brann",
+      "duree": 1.0
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_ISOLDE",
+      "lignes": [
+        "DLG_OUV_FORGE_7"
+      ]
+    },
+    {
+      "action": "teinte",
+      "couleur": "normal",
+      "duree": 3.0
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_HULDA",
+      "lignes": [
+        "DLG_OUV_FORGE_8"
+      ]
+    },
+    {
+      "action": "apparaitre",
+      "cible": "pnj",
+      "id": "pip",
+      "a": "depuis_village",
+      "decalage": [
+        40,
+        -8
+      ],
+      "direction": "left"
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_PIP",
+      "lignes": [
+        "DLG_OUV_FORGE_9",
+        "DLG_OUV_FORGE_10"
+      ]
+    },
+    {
+      "action": "disparaitre",
+      "acteur": "pip"
+    },
+    {
+      "action": "disparaitre",
+      "acteur": "hulda"
+    },
+    {
+      "action": "sauvegarder"
+    }
+  ]
+}

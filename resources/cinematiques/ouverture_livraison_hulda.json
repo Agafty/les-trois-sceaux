@@ -1,0 +1,22 @@
+{
+  "id": "ouverture_livraison_hulda",
+  "drapeau_fin": "ouv_hulda",
+  "etapes": [
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_BRANN",
+      "lignes": [
+        "DLG_OUV_HULDA_1"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_HULDA",
+      "lignes": [
+        "DLG_OUV_HULDA_2",
+        "DLG_OUV_HULDA_3",
+        "DLG_OUV_HULDA_4"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "ouverture_01b_charbon",
+  "etapes": [
+    {
+      "action": "apparaitre",
+      "cible": "ramassable",
+      "id": "village_charbon_01",
+      "contenu": "charbon",
+      "a": "charbon_01"
+    },
+    {
+      "action": "apparaitre",
+      "cible": "ramassable",
+      "id": "village_charbon_02",
+      "contenu": "charbon",
+      "a": "charbon_02"
+    }
+  ]
+}

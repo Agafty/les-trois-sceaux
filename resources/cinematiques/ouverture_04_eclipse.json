@@ -1,0 +1,97 @@
+{
+  "id": "ouverture_04_eclipse",
+  "drapeau_fin": "ouv_04",
+  "etapes": [
+    {
+      "action": "fondu",
+      "vers": "noir",
+      "duree": 0.3
+    },
+    {
+      "action": "placer",
+      "acteur": "pip",
+      "vers": "@brann",
+      "decalage": [
+        -44,
+        0
+      ]
+    },
+    {
+      "action": "regarder",
+      "acteur": "pip",
+      "direction": "right"
+    },
+    {
+      "action": "fondu",
+      "vers": "clair",
+      "duree": 0.3
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_PIP",
+      "lignes": [
+        "DLG_OUV_ECLIPSE_1"
+      ]
+    },
+    {
+      "action": "musique",
+      "piste": "stop",
+      "duree": 1.0
+    },
+    {
+      "action": "attendre",
+      "secondes": 1.2
+    },
+    {
+      "action": "drapeau",
+      "nom": "ouv_eclipse"
+    },
+    {
+      "action": "son",
+      "nom": "eboulement"
+    },
+    {
+      "action": "secousse",
+      "force": 3,
+      "duree": 2.0
+    },
+    {
+      "action": "teinte",
+      "couleur": "eclipse",
+      "duree": 2.0
+    },
+    {
+      "action": "camera",
+      "vers": "chateau",
+      "duree": 1.4
+    },
+    {
+      "action": "attendre",
+      "secondes": 0.8
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_PIP",
+      "lignes": [
+        "DLG_OUV_ECLIPSE_2"
+      ]
+    },
+    {
+      "action": "camera",
+      "vers": "brann",
+      "duree": 1.0
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_BRANN",
+      "lignes": [
+        "DLG_OUV_ECLIPSE_3"
+      ]
+    },
+    {
+      "action": "aller_a",
+      "carte": "res://scenes/rooms/forge_room.tscn",
+      "spawn": "depuis_village"
+    }
+  ]
+}

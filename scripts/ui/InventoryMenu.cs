@@ -127,6 +127,7 @@ public partial class InventoryMenu : Control
     private void TryOpen()
     {
         if (GetTree().Paused) return; // un autre système a déjà mis le jeu en pause
+        if (CinematicPlayer.Active) return; // « pause » sert à passer la cinématique (maintenir), pas à ouvrir le menu
         if (_sceneManager.IsTransitioning) return;
         if (GetTree().GetFirstNodeInGroup("player") is Player { IsDead: true }) return;
 

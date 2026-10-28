@@ -1,0 +1,28 @@
+{
+  "id": "ouverture_01_matin",
+  "drapeau_fin": "ouv_01",
+  "etapes": [
+    {
+      "action": "apparaitre",
+      "cible": "pnj",
+      "id": "corvan",
+      "sprite": "corvan",
+      "a": "corvan_forge",
+      "direction": "down"
+    },
+    {
+      "action": "attendre",
+      "secondes": 0.6
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_CORVAN",
+      "lignes": [
+        "DLG_OUV_MATIN_1",
+        "DLG_OUV_MATIN_2",
+        "DLG_OUV_MATIN_3",
+        "DLG_OUV_MATIN_4"
+      ]
+    }
+  ]
+}

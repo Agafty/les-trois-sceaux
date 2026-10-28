@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 /// <summary>
 /// Une salle de jeu : une carte Tiled importée + un conteneur « Entites » (tri en profondeur) où vit Brann.
 /// Au chargement, la salle lit le calque d'objets « Objets » de la carte (Spawn, Sortie, Ennemi, Coffre,
-/// StatueCorbeau, Ramassable, PNJ, Article, Porte, MurFissure, Poule, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable, Brume, plus les rectangles nommés « boss_<nom> » et « pilier ») et instancie les vraies scènes aux positions des marqueurs.
+/// StatueCorbeau, Ramassable, PNJ, Article, Porte, MurFissure, Poule, Interrupteur, PlaqueDePression, Chute, Torche, BlocPoussable, Brume, Marqueur, Scenario, plus les rectangles nommés « boss_<nom> » et « pilier ») et instancie les vraies scènes aux positions des marqueurs.
 /// La scène importée n'est jamais modifiée sur le disque : seuls les nœuds de l'arbre en cours sont retirés.
 /// </summary>
 public partial class Room : Node2D
@@ -110,6 +110,11 @@ public partial class Room : Node2D
     private readonly List<Node> _bossMarkers = new();
     private readonly List<Rect2> _pillars = new();
     private readonly List<PushBlock> _blocks = new();
+    private readonly Dictionary<string, Vector2> _points = new(); // Marqueur : id -> position monde (repères de cinématique)
+    private readonly List<ScenarioDef> _scenarios = new();
+    private readonly List<ScenarioEnemyInfo> _scenarioEnemies = new();
+    private readonly Dictionary<string, Node2D> _pickupById = new();
+    private CanvasModulate _tint;
 
     // Une Sortie « armée » se déclenche quand Brann y entre. Elle ne l'est pas tant que Brann, arrivé dessus, ne l'a pas quittée.
     private sealed class SortieState
@@ -121,6 +126,76 @@ public partial class Room : Node2D
 
     /// <summary>Position de Brann à l'arrivée dans la salle (son Spawn) : il y revient après une chute dans un trou.</summary>
     public Vector2 EntryPosition { get; private set; }
+
+    /// <summary>Lecteur de cinématiques de la salle (null si la salle n'a pas de Brann).</summary>
+    public CinematicPlayer Cinematics { get; private set; }
+
+    /// <summary>Conteneur d'entités (Brann, PNJ, ennemis) : là où une cinématique fait apparaître ses personnages.</summary>
+    public Node2D EntitiesNode => _entities;
+
+    /// <summary>Nom de la scène sans extension (« forge_room »), clé des repères de repli et des scénarios de scenarios.json.</summary>
+    public string RoomStem => string.IsNullOrEmpty(SceneFilePath) ? Name.ToString() : System.IO.Path.GetFileNameWithoutExtension(SceneFilePath);
+
+    /// <summary>Ennemis de la carte marqués « apparition = scenario » : créés seulement par une cinématique.</summary>
+    public IReadOnlyList<ScenarioEnemyInfo> ScenarioEnemies => _scenarioEnemies;
+
+    /// <summary>Teinte actuelle de la salle (multiplicateur de couleur ; blanc = aucune).</summary>
+    public Color Tint => _tint != null ? _tint.Color : Colors.White;
+
+    /// <summary>Change la teinte de la salle (ciel d'éclipse...). Le HUD et les boîtes de texte ne sont pas teintés.</summary>
+    public void SetTint(Color color)
+    {
+        if (_tint == null)
+        {
+            if (color == Colors.White) return;
+            _tint = new CanvasModulate { Name = "Teinte" };
+            AddChild(_tint);
+        }
+        _tint.Color = color;
+    }
+
+    /// <summary>
+    /// Position monde d'un repère nommé : Marqueur de la carte, sinon Spawn de même id, sinon repère de repli de scenarios.json
+    /// (avec un avertissement : il faut alors poser le Marqueur dans Tiled). Faux si introuvable.
+    /// </summary>
+    public bool TryGetPoint(string id, out Vector2 position)
+    {
+        if (_points.TryGetValue(id, out position)) return true;
+        foreach (var node in FindAllByClass(this, "Spawn"))
+            if (node is Node2D spawn && GetString(node, "id") == id)
+            {
+                position = spawn.GlobalPosition;
+                return true;
+            }
+        if (CinematicLibrary.TryGetFallbackPoint(RoomStem, id, out position))
+        {
+            WarnOnce("repere:" + RoomStem + ":" + id, $"Repère « {id} » absent de la carte {RoomStem} : position de repli de scenarios.json (à poser dans Tiled).");
+            return true;
+        }
+        WarnOnce("repere-manque:" + RoomStem + ":" + id, $"Repère « {id} » introuvable dans {RoomStem} (ni Marqueur, ni Spawn, ni repli).");
+        position = Vector2.Zero;
+        return false;
+    }
+
+    /// <summary>Crée un ennemi de la scène (type = scenes/enemies/&lt;type&gt;.tscn). Utilisé par les cinématiques. Null si impossible.</summary>
+    public Node2D SpawnScenarioEnemy(string type, string variant, Vector2 worldPosition) => CreateEnemy(type, variant, worldPosition);
+
+    /// <summary>Vrai si un ramassable de cet id existe déjà dans la salle.</summary>
+    public bool HasPickup(string id) => _pickupById.TryGetValue(id, out var node) && IsInstanceValid(node) && !node.IsQueuedForDeletion();
+
+    /// <summary>
+    /// Pose un ramassable unique (contenu = resources/pickups/&lt;contenu&gt;.tres) ; ne fait rien s'il existe déjà dans la salle ou
+    /// s'il a déjà été ramassé. Renvoie vrai s'il a été créé.
+    /// </summary>
+    public bool TrySpawnPickup(string id, string content, Vector2 worldPosition)
+    {
+        if (string.IsNullOrEmpty(id) || HasPickup(id)) return false;
+        if (GetNode<GameState>("/root/GameState").IsCollected(id)) return false;
+        var effect = LoadPickupEffect(content, "Ramassable " + id);
+        if (effect == null) return false;
+        CreatePickup(id, effect, worldPosition);
+        return true;
+    }
 
     /// <summary>Zone de la salle courante (chaîne vide hors d'une salle).</summary>
     public static string ZoneOf(Node node)
@@ -197,6 +272,35 @@ public partial class Room : Node2D
 
         if (player != null)
             ConfigureCamera(player);
+        SetupCinematics(player);
+    }
+
+    // Cinématiques : teinte du ciel d'éclipse pendant l'ouverture, lecteur de cinématiques et surveillance des déclencheurs.
+    private void SetupCinematics(Player player)
+    {
+        var state = GetNode<GameState>("/root/GameState");
+        if (CinematicColors.TryParse(OpeningRules.AmbientTint(state.IsCollected), out float r, out float g, out float b))
+            SetTint(new Color(r, g, b));
+        if (player == null) return;
+
+        Cinematics = new CinematicPlayer { Name = "Cinematiques" };
+        AddChild(Cinematics);
+        Cinematics.Setup(this, player);
+
+        // Déclencheurs de repli (scenarios.json) : seulement pour les cinématiques que la carte ne déclenche pas elle-même.
+        foreach (var fallback in CinematicLibrary.GetFallbackScenarios(RoomStem))
+        {
+            bool inMap = false;
+            foreach (var own in _scenarios)
+                if (own.Cinematic == fallback.Cinematic) { inMap = true; break; }
+            if (!inMap) _scenarios.Add(fallback);
+        }
+        if (_scenarios.Count > 0)
+        {
+            var watcher = new ScenarioWatcher { Name = "Scenarios" };
+            AddChild(watcher);
+            watcher.Setup(Cinematics, player, _scenarios);
+        }
     }
 
     // Rôle : cesser de suivre les ennemis quand la salle quitte l'arbre. Attention : Godot émet tree_exiting des enfants
@@ -404,6 +508,8 @@ public partial class Room : Node2D
                 case "PNJ": SpawnNpc(node); break;
                 case "Article": SpawnArticle(node); break;
                 case "Brume": SpawnMist(node); break;
+                case "Marqueur": RegisterPoint(node); break;
+                case "Scenario": RegisterScenario(node); break;
                 case "Poule": SpawnChicken(node); break;
                 case "MurFissure": SpawnCrackedWall(node); break;
                 case "Porte": portes.Add(node); break; // après les ennemis : elles ont besoin de leur nombre
@@ -603,26 +709,33 @@ public partial class Room : Node2D
         string variant = GetString(marker, "variante", "normal");
         if (GetString(marker, "apparition", "chargement") == "scenario")
         {
-            // Ennemi lancé par une cinématique (étape suivante) : pas instancié au chargement de la salle.
-            WarnOnce("ennemi-scenario", "Ennemi « apparition = scenario » : ignoré pour l'instant (cinématiques pas encore faites).");
+            // Ennemi lancé par une cinématique (« apparaitre » ennemis) : pas instancié au chargement, on retient où et quoi.
+            _scenarioEnemies.Add(new ScenarioEnemyInfo(type, variant, GetString(marker, "groupe"), MarkerPosition(marker)));
             RemoveMarker(marker);
             return;
         }
+        if (CreateEnemy(type, variant, MarkerPosition(marker)) != null)
+            RemoveMarker(marker);
+    }
+
+    // Instancie un ennemi à une position monde, le suit (portes « ennemis », trous) et renvoie le nœud (null si type invalide).
+    private Node2D CreateEnemy(string type, string variant, Vector2 worldPosition)
+    {
         if (!RoomObjectCatalog.IsSafeName(type))
         {
             WarnOnce("ennemi-type:" + type, $"Ennemi Tiled avec un type invalide « {type} » ({Name}).");
-            return;
+            return null;
         }
         string path = RoomObjectCatalog.EnemyScenePath(type);
         if (!ResourceLoader.Exists(path))
         {
             WarnOnce("ennemi-scene:" + type, $"Ennemi « {type} » : scène introuvable ({path}).");
-            return;
+            return null;
         }
 
         var enemy = GD.Load<PackedScene>(path).Instantiate<Node2D>();
         PhysicsLayers.BlockedByRavine(enemy);
-        enemy.Position = _entities.ToLocal(MarkerPosition(marker));
+        enemy.Position = _entities.ToLocal(worldPosition);
         if (RoomObjectCatalog.IsRedVariant(variant))
             ApplyRedVariant(enemy, type);
         else if (variant != "normal")
@@ -636,7 +749,7 @@ public partial class Room : Node2D
             _trackedEnemies[health] = new EnemyTrack(health, () => OnEnemyGone(health), () => OnEnemyLeftTree(health));
             _aliveEnemies++;
         }
-        RemoveMarker(marker);
+        return enemy;
     }
 
     // Variante rouge : palette rouge (art/enemies/<type>_red_frames.tres), plus de vie, plus de dégâts au contact.
@@ -781,11 +894,55 @@ public partial class Room : Node2D
             return;
         }
 
+        CreatePickup(id, effect, MarkerPosition(marker));
+        RemoveMarker(marker);
+    }
+
+    private void CreatePickup(string id, PickupEffect effect, Vector2 worldPosition)
+    {
         var pickup = GD.Load<PackedScene>(PickupScenePath).Instantiate<ItemPickup>();
         pickup.UniqueId = id; // non vide : objet permanent, absent s'il a déjà été ramassé
         pickup.Effect = effect;
-        pickup.Position = _entities.ToLocal(MarkerPosition(marker));
+        pickup.Position = _entities.ToLocal(worldPosition);
         _entities.AddChild(pickup);
+        if (!string.IsNullOrEmpty(id)) _pickupById[id] = pickup;
+    }
+
+    // Marqueur : repère invisible nommé (« corvan_forge »...), utilisé par les cinématiques. Le point Tiled est le centre de la case.
+    private void RegisterPoint(Node marker)
+    {
+        string id = GetString(marker, "id");
+        if (!RoomObjectCatalog.IsSafeName(id))
+            WarnOnce("marqueur-id:" + Name + ":" + id, $"Marqueur sans id valide ({Name}) : ignoré.");
+        else
+            _points[id] = ObjectCenter(marker);
+        RemoveMarker(marker);
+    }
+
+    // Scenario : déclencheur de cinématique. Point = dès que les conditions sont vraies ; rectangle (godot_node_type=area) = quand le centre de Brann y entre.
+    // Propriétés : cinematique (id du fichier de resources/cinematiques/), si / sauf (drapeaux séparés par des virgules).
+    private void RegisterScenario(Node marker)
+    {
+        string cine = GetString(marker, "cinematique");
+        if (!RoomObjectCatalog.IsSafeName(cine))
+        {
+            WarnOnce("scenario-id:" + Name + ":" + cine, $"Scenario sans « cinematique » valide ({Name}) : ignoré.");
+            RemoveMarker(marker);
+            return;
+        }
+        bool zone = false;
+        foreach (var child in marker.GetChildren())
+            if (child is CollisionShape2D) { zone = true; break; }
+        Vector2 center = Vector2.Zero, size = Vector2.Zero;
+        if (zone) ReadRectangle(marker, out center, out size);
+        _scenarios.Add(new ScenarioDef
+        {
+            Room = RoomStem,
+            Cinematic = cine,
+            RequiredFlags = ScenarioRules.SplitFlags(GetString(marker, "si")),
+            ForbiddenFlags = ScenarioRules.SplitFlags(GetString(marker, "sauf")),
+            X = center.X - size.X * 0.5f, Y = center.Y - size.Y * 0.5f, Width = size.X, Height = size.Y,
+        });
         RemoveMarker(marker);
     }
 

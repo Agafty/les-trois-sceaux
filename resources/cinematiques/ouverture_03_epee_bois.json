@@ -1,0 +1,69 @@
+{
+  "id": "ouverture_03_epee_bois",
+  "drapeau_fin": "ouv_03",
+  "etapes": [
+    {
+      "action": "fondu",
+      "vers": "noir",
+      "duree": 0.4
+    },
+    {
+      "action": "placer",
+      "acteur": "brann",
+      "vers": "@pip",
+      "decalage": [
+        40,
+        0
+      ]
+    },
+    {
+      "action": "regarder",
+      "acteur": "brann",
+      "direction": "left"
+    },
+    {
+      "action": "regarder",
+      "acteur": "pip",
+      "direction": "right"
+    },
+    {
+      "action": "fondu",
+      "vers": "clair",
+      "duree": 0.4
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_PIP",
+      "lignes": [
+        "DLG_OUV_EPEE_1",
+        "DLG_OUV_EPEE_2"
+      ]
+    },
+    {
+      "action": "donner",
+      "contenu": "epee_bois",
+      "id": "ouv_don_epee_bois"
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_PIP",
+      "lignes": [
+        "DLG_OUV_EPEE_3"
+      ]
+    },
+    {
+      "action": "camera",
+      "vers": "potager",
+      "duree": 1.0
+    },
+    {
+      "action": "attendre",
+      "secondes": 0.8
+    },
+    {
+      "action": "camera",
+      "vers": "brann",
+      "duree": 1.0
+    }
+  ]
+}

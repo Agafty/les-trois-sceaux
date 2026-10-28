@@ -149,6 +149,49 @@ public partial class Npc : CharacterBody2D
         PickupBanner.Announce(player, effect);
     }
 
+    // --- Pilotage par une cinématique -----------------------------------------------------------
+
+    /// <summary>Vrai tant qu'une cinématique pilote ce PNJ : ni errance, ni conversation.</summary>
+    public bool IsScripted { get; private set; }
+
+    /// <summary>Une cinématique prend le contrôle (position, regard, animation). Le PNJ s'arrête et ne répond plus à « interact ».</summary>
+    public void BeginScripted()
+    {
+        IsScripted = true;
+        _walking = false;
+        Velocity = Vector2.Zero;
+        SetPhysicsProcess(false);
+        if (_zone != null) _zone.Enabled = false;
+    }
+
+    /// <summary>Fin de la cinématique : le PNJ reprend sa place (sa case actuelle devient sa maison d'errance) et redevient interlocuteur.</summary>
+    public void EndScripted()
+    {
+        IsScripted = false;
+        _home = GlobalPosition;
+        PlayIdle();
+        SetPhysicsProcess(WanderRadius > 0f);
+        if (_zone != null) _zone.Enabled = true;
+    }
+
+    /// <summary>Cinématique : regarde dans une direction et marche (animation de marche) ou reste immobile.</summary>
+    public void ScriptedPose(Vector2 direction, bool walking)
+    {
+        FaceTowards(direction);
+        if (walking && _sprite?.SpriteFrames != null && _sprite.SpriteFrames.HasAnimation(WalkAnims[_facing]))
+            _sprite.Play(WalkAnims[_facing]);
+        else
+            PlayIdle();
+    }
+
+    /// <summary>Cinématique : joue une animation précise (« wounded », « hammer »...). Faux si le sprite ne la connaît pas.</summary>
+    public bool ScriptedPlay(StringName animation)
+    {
+        if (_sprite?.SpriteFrames == null || !_sprite.SpriteFrames.HasAnimation(animation)) return false;
+        _sprite.Play(animation);
+        return true;
+    }
+
     // --- Errance (facultative) --------------------------------------------------------------------
 
     public override void _PhysicsProcess(double delta)

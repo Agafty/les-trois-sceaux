@@ -1,0 +1,11 @@
+{
+  "id": "ouverture_03b_ronceau",
+  "etapes": [
+    {
+      "action": "apparaitre",
+      "cible": "ennemis",
+      "type": "ronceau",
+      "drapeau_mort": "ouv_ronceau"
+    }
+  ]
+}

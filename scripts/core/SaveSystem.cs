@@ -99,6 +99,7 @@ public partial class SaveSystem : Node
     {
         if (!IsValidSlot(slot)) return false;
         _state.ResetState();
+        _state.MarkCollected(OpeningRules.StartedFlag); // l'ouverture du jeu (cinématiques, Brann sans épée) commence
         PlayTimeSeconds = 0;
         // Le point d'entrée (LastSpawnId) n'est PAS remis à zéro ici : l'appelant vient de le régler par GoToScene(scène, spawn, ...) avant ce rappel.
         _lastZone = null;
@@ -275,12 +276,12 @@ public partial class SaveSystem : Node
     // Rien après un Load, une nouvelle partie ou une réapparition (la zone ne change pas).
     private void OnTransitionFinished(string scenePath, string spawnId)
     {
+        if (GetTree().CurrentScene is not Room room) return; // prologue, écran titre : la sauvegarde de départ attend la première vraie salle
         if (_newGameSavePending)
         {
             _newGameSavePending = false;
             RequestAutoSave();
         }
-        if (GetTree().CurrentScene is not Room room) return;
         string zone = room.Zone ?? "";
         if (zone.Length == 0)
         {
@@ -304,7 +305,8 @@ public partial class SaveSystem : Node
             RequestAutoSave();
     }
 
-    private void RequestAutoSave()
+    /// <summary>Demande une sauvegarde automatique (fin de l'ouverture...). Sans effet sans emplacement choisi.</summary>
+    public void RequestAutoSave()
     {
         if (_autoSavePending) return;
         _autoSavePending = true;

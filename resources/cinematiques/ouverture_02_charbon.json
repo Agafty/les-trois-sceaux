@@ -1,0 +1,87 @@
+{
+  "id": "ouverture_02_charbon",
+  "drapeau_fin": "ouv_02",
+  "etapes": [
+    {
+      "action": "apparaitre",
+      "cible": "pnj",
+      "id": "corvan",
+      "sprite": "corvan",
+      "a": "corvan_forge",
+      "direction": "down"
+    },
+    {
+      "action": "deplacer",
+      "acteur": "brann",
+      "vers": "@corvan",
+      "decalage": [
+        0,
+        36
+      ],
+      "vitesse": 110
+    },
+    {
+      "action": "regarder",
+      "acteur": "brann",
+      "direction": "up"
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_CORVAN",
+      "lignes": [
+        "DLG_OUV_CHARBON_1",
+        "DLG_OUV_CHARBON_2"
+      ]
+    },
+    {
+      "action": "animer",
+      "acteur": "corvan",
+      "nom": "hammer"
+    },
+    {
+      "action": "attendre",
+      "secondes": 1.2
+    },
+    {
+      "action": "son",
+      "nom": "coup_ennemi"
+    },
+    {
+      "action": "secousse",
+      "force": 2,
+      "duree": 0.2
+    },
+    {
+      "action": "animer",
+      "acteur": "corvan",
+      "nom": "idle_down"
+    },
+    {
+      "action": "attendre",
+      "secondes": 0.6
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_CORVAN",
+      "lignes": [
+        "DLG_OUV_CHARBON_3"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_BRANN",
+      "lignes": [
+        "DLG_OUV_CHARBON_4"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_CORVAN",
+      "lignes": [
+        "DLG_OUV_CHARBON_5",
+        "DLG_OUV_CHARBON_6",
+        "DLG_OUV_CHARBON_7"
+      ]
+    }
+  ]
+}

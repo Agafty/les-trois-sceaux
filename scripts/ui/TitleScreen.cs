@@ -9,9 +9,13 @@ using Godot;
 /// </summary>
 public partial class TitleScreen : Control
 {
-    /// <summary>Salle où commence une nouvelle partie.</summary>
+    /// <summary>Salle où commence une nouvelle partie : la forge de Corvan (début de l'ouverture du jeu).</summary>
     [Export(PropertyHint.File, "*.tscn")]
-    public string NewGameScenePath { get; set; } = "res://scenes/rooms/foret_temple_room.tscn";
+    public string NewGameScenePath { get; set; } = "res://scenes/rooms/forge_room.tscn";
+
+    /// <summary>Écran de prologue (3 écrans de texte) montré avant la première salle. Vide : on va directement à la salle de départ.</summary>
+    [Export(PropertyHint.File, "*.tscn")]
+    public string PrologueScenePath { get; set; } = "res://scenes/ui/prologue.tscn";
 
     /// <summary>Spawn d'arrivée d'une nouvelle partie (vide = premier Spawn de la carte).</summary>
     [Export]
@@ -278,7 +282,13 @@ public partial class TitleScreen : Control
         }
         // La remise à zéro de l'état n'a lieu qu'une fois l'écran noir (beforeChange), comme pour Load :
         // si la transition échoue, rien n'a été modifié.
-        if (!_sceneManager.GoToScene(NewGameScenePath, NewGameSpawnId, () => _saveSystem.StartNewGame(slot)))
+        // Avec prologue : titre -> prologue (la remise à zéro se fait ici) -> salle de départ (le prologue lance ce second changement).
+        bool withPrologue = !string.IsNullOrEmpty(PrologueScenePath) && ResourceLoader.Exists(PrologueScenePath);
+        PrologueScreen.NextScene = NewGameScenePath;
+        PrologueScreen.NextSpawn = NewGameSpawnId;
+        string target = withPrologue ? PrologueScenePath : NewGameScenePath;
+        string targetSpawn = withPrologue ? "" : NewGameSpawnId;
+        if (!_sceneManager.GoToScene(target, targetSpawn, () => _saveSystem.StartNewGame(slot)))
         {
             ShowError(Tr("TITLE_ERR_START"));
             return;

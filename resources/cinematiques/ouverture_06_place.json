@@ -1,0 +1,77 @@
+{
+  "id": "ouverture_06_place",
+  "drapeau_fin": "ouv_06",
+  "etapes": [
+    {
+      "action": "fondu",
+      "vers": "noir",
+      "duree": 0.3
+    },
+    {
+      "action": "placer",
+      "acteur": "pip",
+      "vers": "pip_cachette"
+    },
+    {
+      "action": "animer",
+      "acteur": "pip",
+      "nom": "crouch"
+    },
+    {
+      "action": "fondu",
+      "vers": "clair",
+      "duree": 0.3
+    },
+    {
+      "action": "son",
+      "nom": "boss_rugit"
+    },
+    {
+      "action": "secousse",
+      "force": 2.5,
+      "duree": 0.6
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_PIP",
+      "lignes": [
+        "DLG_OUV_PLACE_1"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_BRANN",
+      "lignes": [
+        "DLG_OUV_PLACE_2"
+      ]
+    },
+    {
+      "action": "apparaitre",
+      "cible": "ennemis",
+      "type": "sanglier_noirci",
+      "drapeau_mort": "ouv_place"
+    },
+    {
+      "action": "apparaitre",
+      "cible": "ennemi",
+      "type": "ronceau",
+      "a": "pip_cachette",
+      "decalage": [
+        -96,
+        -30
+      ],
+      "drapeau_mort": "ouv_place"
+    },
+    {
+      "action": "apparaitre",
+      "cible": "ennemi",
+      "type": "ronceau",
+      "a": "pip_cachette",
+      "decalage": [
+        96,
+        -30
+      ],
+      "drapeau_mort": "ouv_place"
+    }
+  ]
+}

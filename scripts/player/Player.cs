@@ -3,7 +3,7 @@ using Godot;
 public partial class Player : CharacterBody2D
 {
     private enum Direction { Bas, Haut, Gauche, Droite }
-    private enum State { Deplacement, Attaque, Touche, Mort, Chute }
+    private enum State { Deplacement, Attaque, Touche, Mort, Chute, Cinematique }
 
     private static readonly StringName DeathAnim = "death";
     private static readonly StringName LiftAnim = "lift";
@@ -64,6 +64,8 @@ public partial class Player : CharacterBody2D
     private const float FallLeaveTimeout = 3f;
     private SceneManager _sceneManager;
     private GameState _gameState;
+    private System.Func<string, bool> _isFlagSet; // GameState.IsCollected, gardé une fois (pas de délégué créé à chaque appui)
+    private static readonly Color WoodSwordColor = new(0.72f, 0.5f, 0.3f);
 
     /// <summary>Décalage (px) entre l'origine de Brann et le centre de ses pieds (centre de sa capsule de collision).</summary>
     public static readonly Vector2 FeetOffset = new(0f, 6f);
@@ -90,6 +92,7 @@ public partial class Player : CharacterBody2D
         _camera = GetNodeOrNull<Camera2D>("Camera2D");
         _hurtBox = GetNode<HurtBox>("HurtBox");
         _gameState = GetNode<GameState>("/root/GameState");
+        _isFlagSet = _gameState.IsCollected;
         // Les _Ready des enfants passent avant celui du parent : Health a déjà fait son init par défaut.
         _health.SetValues(_gameState.PlayerHealth, _gameState.PlayerMaxHealth);
         _health.HealthChanged += OnHealthChanged;
@@ -189,6 +192,9 @@ public partial class Player : CharacterBody2D
             return;
         }
 
+        if (_state == State.Cinematique)
+            return; // piloté par le lecteur de cinématiques (CinematicPlayer)
+
         UpdateInvincibility((float)delta);
 
         if (_state == State.Attaque)
@@ -216,7 +222,10 @@ public partial class Player : CharacterBody2D
         UpdateAnimation(input != Vector2.Zero);
 
         if (Input.IsActionJustPressed("attack"))
-            StartAttack();
+        {
+            // Au début de l'ouverture Brann n'a pas encore d'épée : le bouton ne fait rien.
+            if (OpeningRules.HasSword(_isFlagSet)) StartAttack();
+        }
         else if (Input.IsActionJustPressed("use_item"))
             TryUseItem();
     }
@@ -312,6 +321,44 @@ public partial class Player : CharacterBody2D
         _blinkTimer = BlinkInterval;
         _hurtBox.Invincible = true; // levée par UpdateInvincibility à la fin du délai
         UpdateAnimation(false);
+    }
+
+    // --- Cinématiques ---------------------------------------------------------------------------
+
+    /// <summary>Vrai pendant une cinématique : Brann n'obéit plus au joueur et ne peut pas être blessé.</summary>
+    public bool IsInCinematic => _state == State.Cinematique;
+
+    /// <summary>Entre en mode cinématique (sans effet s'il est mort ou en train de tomber). Renvoie vrai si c'est fait.</summary>
+    public bool BeginCinematic()
+    {
+        if (_state == State.Mort || _state == State.Chute) return false;
+        _state = State.Cinematique;
+        Velocity = Vector2.Zero;
+        _knockbackVelocity = Vector2.Zero;
+        _invincibleTimer = 0f;
+        _hurtBox.Invincible = true;
+        _sprite.Visible = true;
+        _sprite.Scale = Vector2.One;
+        _swordSprite.Visible = false;
+        _swordHitBox.Monitoring = false;
+        UpdateAnimation(false);
+        return true;
+    }
+
+    /// <summary>Rend la main au joueur.</summary>
+    public void EndCinematic()
+    {
+        if (_state != State.Cinematique) return;
+        _state = State.Deplacement;
+        _hurtBox.Invincible = false;
+        UpdateAnimation(false);
+    }
+
+    /// <summary>Cinématique : tourne Brann vers une direction et le montre marchant ou immobile.</summary>
+    public void CinematicPose(Vector2 direction, bool walking)
+    {
+        UpdateFacing(direction);
+        UpdateAnimation(walking);
     }
 
     /// <summary>Vrai quand Brann peut agir (ni attaque, ni touché, ni mort) : utilisé pour interagir avec un coffre.</summary>
@@ -463,6 +510,7 @@ public partial class Player : CharacterBody2D
             _ => ("attack_down", "slash_down", new Vector2(0, 16)),
         };
 
+        _swordSprite.Modulate = OpeningRules.HasRealSword(_isFlagSet) ? Colors.White : WoodSwordColor; // épée en bois : lame brune
         _sprite.Play(animBody);
         _swordSprite.Play(animSlash);
         _swordSprite.Position = slashOffset;

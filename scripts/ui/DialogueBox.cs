@@ -298,6 +298,9 @@ public partial class DialogueBox : CanvasLayer
             Finish(-1);
     }
 
+    /// <summary>Ferme la boîte tout de suite, sans choix (cinématique passée par le joueur).</summary>
+    public void Close() => Finish(-1);
+
     /// <summary>Déplace le choix surligné (-1 / +1, sans boucler).</summary>
     public void MoveSelection(int step)
     {
