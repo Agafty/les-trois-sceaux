@@ -103,7 +103,8 @@ public partial class ShopArticle : Node2D
             case ShopResult.CannotUse:
                 AudioManager.Play(Sfx.PorteVerrouillee);
                 bool needsBow = Effect is GiveItemEffect { OnlyIfOwned: true, Item: not null } give && !_state.HasItem(give.Item.Id);
-                Open(seller, Tr(needsBow ? "SHOP_NEED_BOW" : "SHOP_FULL"), null);
+                bool needsItem = Effect is CapacityEffect capacity && capacity.IsMissingItem(_state);
+                Open(seller, Tr(needsBow ? "SHOP_NEED_BOW" : needsItem ? "SHOP_NEED_ITEM" : "SHOP_FULL"), null);
                 break;
         }
     }

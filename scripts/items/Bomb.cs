@@ -19,8 +19,8 @@ public partial class Bomb : ItemUse
     [Export] public float ExplosionActiveTime { get; set; } = 0.1f;
     /// <summary>Durée totale de l'effet visuel avant disparition.</summary>
     [Export] public float ExplosionVisualTime { get; set; } = 0.3f;
-    /// <summary>Marge ajoutée au rayon pour les destructibles (leur position est leur centre, une tuile fait 32 px).</summary>
-    [Export] public float DestructibleMargin { get; set; } = 16f;
+    /// <summary>Marge ajoutée au rayon pour les destructibles (portée mesurée jusqu'au bord de leur rectangle).</summary>
+    [Export] public float DestructibleMargin { get; set; }
     /// <summary>Clignotements par seconde au début / à la fin de la mèche.</summary>
     [Export] public float BlinkRateStart { get; set; } = 4f;
     [Export] public float BlinkRateEnd { get; set; } = 14f;
@@ -101,8 +101,13 @@ public partial class Bomb : ItemUse
         float reachSq = reach * reach;
         foreach (var node in GetTree().GetNodesInGroup(DestructibleGroup))
         {
-            if (node is IBombDestructible target && node is Node2D n2d
-                && n2d.GlobalPosition.DistanceSquaredTo(GlobalPosition) <= reachSq)
+            if (node is not IBombDestructible target || node is not Node2D n2d) continue;
+            // Distance de la bombe au rectangle du destructible (0 si elle est dedans).
+            var half = target.BombHalfExtents;
+            var offset = (GlobalPosition - n2d.GlobalPosition).Abs() - half;
+            float dx = Mathf.Max(offset.X, 0f);
+            float dy = Mathf.Max(offset.Y, 0f);
+            if (dx * dx + dy * dy <= reachSq)
                 target.OnBombExplosion(GlobalPosition);
         }
     }

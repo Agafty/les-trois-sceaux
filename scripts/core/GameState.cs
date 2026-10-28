@@ -119,14 +119,55 @@ public partial class GameState : Node
     public int GetQuantity(string id) => _inventory.GetQuantity(id);
 
     /// <summary>Faux si l'objet est déjà au maximum (le ramassable reste alors au sol).</summary>
-    public bool CanAddItem(ItemData item) => item != null && _inventory.CanAdd(item.Id, item.MaxQuantity);
+    public bool CanAddItem(ItemData item) => item != null && _inventory.CanAdd(item.Id, GetMaxQuantity(item));
+
+    private readonly Dictionary<string, int> _capacityBonus = new();
+
+    /// <summary>Bonus de capacité acquis par objet (grand carquois, grand sac de bombes), pour la sauvegarde.</summary>
+    public IReadOnlyDictionary<string, int> CapacityBonuses => _capacityBonus;
+
+    public int GetCapacityBonus(string id) => id != null && _capacityBonus.TryGetValue(id, out int b) ? b : 0;
+
+    /// <summary>Quantité maximale réelle d'un objet : son maximum de base (ItemData) plus le bonus de capacité. 0 si l'objet n'a pas de quantité.</summary>
+    public int GetMaxQuantity(ItemData item) =>
+        item == null || !item.HasQuantity ? 0 : item.MaxQuantity + GetCapacityBonus(item.Id);
+
+    /// <summary>Quantité maximale réelle d'un objet par son id (0 si inconnu ou sans quantité).</summary>
+    public int GetMaxQuantityById(string id) => GetMaxQuantity(GetItemData(id));
+
+    /// <summary>
+    /// Fixe le bonus de capacité d'un objet (jamais en baisse) et, si l'objet est possédé, remplit son stock au nouveau maximum.
+    /// Faux si le bonus n'augmente pas.
+    /// </summary>
+    public bool UpgradeCapacity(string id, int bonus)
+    {
+        if (string.IsNullOrEmpty(id) || bonus <= GetCapacityBonus(id)) return false;
+        _capacityBonus[id] = bonus;
+        var data = GetItemData(id);
+        if (data != null && data.HasQuantity && _inventory.Has(id))
+        {
+            _inventory.SetQuantity(id, GetMaxQuantity(data));
+            EmitSignal(SignalName.InventoryChanged);
+        }
+        return true;
+    }
+
+    /// <summary>Restaure les bonus de capacité depuis une sauvegarde (à appeler avant LoadInventory).</summary>
+    public void LoadCapacityBonuses(IEnumerable<SaveCapacityEntry> entries)
+    {
+        _capacityBonus.Clear();
+        if (entries == null) return;
+        foreach (var e in entries)
+            if (e != null && !string.IsNullOrEmpty(e.Id) && e.Bonus > 0)
+                _capacityBonus[e.Id] = System.Math.Min(e.Bonus, 99);
+    }
 
     /// <summary>Ajoute un objet. Le premier équipable obtenu s'équipe seul si rien n'est équipé.</summary>
     public bool AddItem(ItemData item, int quantity = 1)
     {
         if (item == null || string.IsNullOrEmpty(item.Id)) return false;
         _itemData[item.Id] = item; // garantit que le registre connaît l'objet
-        if (!_inventory.Add(item.Id, quantity, item.MaxQuantity)) return false;
+        if (!_inventory.Add(item.Id, quantity, GetMaxQuantity(item))) return false;
 
         EmitSignal(SignalName.InventoryChanged);
         if (item.Type == ItemType.Equipable && EquippedItemId == "")
@@ -172,7 +213,7 @@ public partial class GameState : Node
                 continue;
             }
             if (data.HasQuantity)
-                _inventory.Clamp(id, data.MaxQuantity);
+                _inventory.Clamp(id, GetMaxQuantity(data));
             else
                 _inventory.SetQuantity(id, 1); // objet sans quantité : toujours 1
         }
@@ -333,6 +374,9 @@ public partial class GameState : Node
         data.VisitedRooms.Sort(string.CompareOrdinal);
         foreach (var id in _inventory.Ids)
             data.Inventory.Add(new SaveInventoryEntry { Id = id, Quantity = _inventory.GetQuantity(id) });
+        foreach (var pair in _capacityBonus)
+            data.CapacityBonuses.Add(new SaveCapacityEntry { Id = pair.Key, Bonus = pair.Value });
+        data.CapacityBonuses.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
         data.CollectedIds.AddRange(_collected);
         data.CollectedIds.Sort(string.CompareOrdinal); // ordre stable : fichiers comparables
         return data;
@@ -377,6 +421,7 @@ public partial class GameState : Node
         PlayerHealth = health;
         EmitSignal(SignalName.PlayerHealthChanged, PlayerHealth, PlayerMaxHealth);
 
+        LoadCapacityBonuses(data.CapacityBonuses); // avant l'inventaire : il borne les quantités sur le maximum réel
         LoadInventory(ids, quantities, data.EquippedItemId);
         LoadCollected(data.CollectedIds, data.HeartPieces);
         LoadProgress(data.DungeonItems, data.RavenFeathers);

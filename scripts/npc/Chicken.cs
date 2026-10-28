@@ -4,7 +4,7 @@ using Godot;
 /// Poule du village (classe Tiled « Poule », mini-jeu de Pip). Elle flâne autour de son point de départ ; Brann l'attrape en marchant
 /// dessus ou d'un coup d'épée (sans lui faire de mal). Elle caquette puis disparaît, et son id est mémorisé dans GameState :
 /// elle ne revient pas. Quand les cinq sont attrapées, le flag <see cref="ChickenRules.AllCaughtFlag"/> est posé (Pip donne alors son quart de cœur).
-/// Sprite : art/characters/poule_frames.tres (animations idle_/walk_ down, up, left, right comme les PNJ) ; sans ce fichier, une image
+/// Sprite : art/characters/poule_frames.tres (animations idle_/walk_/peck_ down, up, left, right ; peck = elle picore à l'arrêt) ; sans ce fichier, une image
 /// provisoire est dessinée par le code.
 /// </summary>
 public partial class Chicken : CharacterBody2D
@@ -26,6 +26,7 @@ public partial class Chicken : CharacterBody2D
     private static readonly StringName PlayerGroup = "player";
     private static readonly StringName[] IdleAnims = { "idle_down", "idle_up", "idle_left", "idle_right" };
     private static readonly StringName[] WalkAnims = { "walk_down", "walk_up", "walk_left", "walk_right" };
+    private static readonly StringName[] PeckAnims = { "peck_down", "peck_up", "peck_left", "peck_right" };
     private const string FramesPath = "res://art/characters/poule_frames.tres";
     private static ImageTexture _placeholder;
 
@@ -146,7 +147,7 @@ public partial class Chicken : CharacterBody2D
         _walking = false;
         Velocity = Vector2.Zero;
         _wanderTimer = 1f + GD.Randf() * 2.5f;
-        PlayAnim(IdleAnims);
+        PlayAnim(GD.Randf() < 0.5f ? PeckAnims : IdleAnims); // une fois sur deux, elle picore pendant la pause
     }
 
     private void Face(Vector2 direction)

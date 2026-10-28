@@ -79,7 +79,6 @@ public partial class Npc : CharacterBody2D
         var data = DialogueLibrary.Get(Id);
         if (data == null) return System.Array.Empty<string>();
         var entry = DialogueSelector.Pick(data, _state.StoryStage, _state.IsCollected);
-        _pendingReward = entry?.Reward != null && !_state.IsCollected(entry.Reward.Id) ? entry.Reward : null;
         var keys = DialogueSelector.GetLines(entry, _talkCount);
         speaker = string.IsNullOrEmpty(data.Speaker) ? "" : Tr(data.Speaker);
         var lines = new string[keys.Count];
@@ -102,6 +101,8 @@ public partial class Npc : CharacterBody2D
             return;
         }
         _pendingPlayer = player;
+        var picked = DialogueSelector.Pick(DialogueLibrary.Get(Id), _state.StoryStage, _state.IsCollected);
+        _pendingReward = picked?.Reward != null && !_state.IsCollected(picked.Reward.Id) ? picked.Reward : null;
         _talkCount++;
         _walking = false;
         Velocity = Vector2.Zero;
@@ -129,8 +130,19 @@ public partial class Npc : CharacterBody2D
         _pendingPlayer = null;
         if (reward == null || _state.IsCollected(reward.Id)) return;
         if (player == null || !IsInstanceValid(player) || player.IsDead) return;
-        var effect = ResourceKeeper.Load<PickupEffect>(RoomObjectCatalog.PickupEffectPath(reward.Content));
-        if (effect == null || !effect.CanApply(player, _state)) return; // refusée : elle sera proposée à la prochaine conversation
+        string path = RoomObjectCatalog.PickupEffectPath(reward.Content);
+        var effect = ResourceKeeper.Load<PickupEffect>(path);
+        if (effect == null)
+        {
+            GD.PushWarning($"PNJ « {Id} » : récompense « {reward.Content} » introuvable ({path}).");
+            return;
+        }
+        if (!effect.CanApply(player, _state))
+        {
+            // Refusée (ex. cœur à vie pleine) : elle sera proposée à la prochaine conversation.
+            PickupBanner.AnnounceMessage(player, Tr("REWARD_REFUSED"));
+            return;
+        }
         _state.MarkCollected(reward.Id);
         effect.Apply(player, _state);
         AudioManager.Play(effect.PickupSound);

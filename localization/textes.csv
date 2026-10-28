@@ -149,3 +149,12 @@ DLG_VILLAGEOIS_APEURE_0_2,"Je n'ose plus sortir de chez moi. Fais attention, pet
 DLG_VILLAGEOIS_MINEUR_2_1,"Nous sommes enfin sortis de la Mine. Quelle nuit, là-dessous...",We finally made it out of the Mine. What a night down there...
 DLG_VILLAGEOIS_MINEUR_2_2,Il y avait quelque chose dans les galeries. Quelque chose qui chantait.,There was something in the tunnels. Something that sang.
 INDICE_REGISTRES,"Les registres de la bibliothèque alignent des noms, année après année. Le nom de Corvan y figure sans cesse.","The library registers list names, year after year. Corvan's name appears again and again."
+OBJ_GRAND_CARQUOIS,le grand carquois,the big quiver
+OBJ_GRAND_CARQUOIS_DESC,Tu peux maintenant porter 50 flèches.,You can now carry 50 arrows.
+OBJ_GRAND_SAC_BOMBES,le grand sac de bombes,the big bomb bag
+OBJ_GRAND_SAC_BOMBES_DESC,Tu peux maintenant porter 20 bombes.,You can now carry 20 bombs.
+SHOP_NEED_ITEM,"Cette amélioration est pour un objet que tu n'as pas encore. Reviens quand tu l'auras.",This upgrade is for an item you don't have yet. Come back once you do.
+DLG_GARRICK_CAVE_1,Comment as-tu trouvé ça ?!,How did you find this place?!
+DLG_GARRICK_CAVE_2,"Ici, c'est ma réserve privée. Les bons articles ne sont pas pour tout le monde.","This is my private stock. The good stuff isn't for everybody."
+DLG_GARRICK_CAVE_3,"100 rubis pièce, et pas un mot à personne. Surtout pas à Pip.","100 rupees each, and not a word to anyone. Especially not Pip."
+REWARD_REFUSED,"Tu ne peux pas le porter pour l'instant. Reviens me voir plus tard.","You can't carry it right now. Come back and see me later."

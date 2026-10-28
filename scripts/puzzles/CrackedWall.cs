@@ -34,6 +34,9 @@ public partial class CrackedWall : StaticBody2D, IBombDestructible
 
     public bool IsDestroyed => _destroyed;
 
+    /// <summary>Demi-taille du rectangle : la bombe mesure sa portée jusqu'au bord (voir <see cref="IBombDestructible"/>).</summary>
+    public Vector2 BombHalfExtents => CellSize * 0.5f;
+
     private sealed class ClosedCell
     {
         public Vector2I Cell;
@@ -110,9 +113,16 @@ public partial class CrackedWall : StaticBody2D, IBombDestructible
                         continue;
                     }
                 }
+                // Tuile ouverte déjà posée dans « Decor » (mur ouvert) ou « Sol » (éboulis dégagé) : on dessine la fermée par-dessus.
                 if (DecorLayer != null && TryReadTile(DecorLayer, cell, out tileset, out tileId)
                     && TileRules.TryGetClosedTile(tileset, tileId, out int closedFromDecor))
+                {
                     AddOverlay(cell, tileset, closedFromDecor);
+                    continue;
+                }
+                if (FloorLayer != null && TryReadTile(FloorLayer, cell, out tileset, out tileId)
+                    && TileRules.TryGetClosedTile(tileset, tileId, out int closedFromFloor))
+                    AddOverlay(cell, tileset, closedFromFloor);
             }
         }
     }

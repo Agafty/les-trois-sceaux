@@ -48,6 +48,8 @@ public static class SaveSerializer
         d.DungeonItems.RemoveAll(string.IsNullOrEmpty);
         d.VisitedRooms ??= new();
         d.VisitedRooms.RemoveAll(string.IsNullOrEmpty);
+        d.CapacityBonuses ??= new();
+        d.CapacityBonuses.RemoveAll(e => e == null || string.IsNullOrEmpty(e.Id) || e.Bonus <= 0);
         d.Seals ??= new();
         d.Seals.RemoveAll(string.IsNullOrEmpty);
         if (d.RavenFeathers < 0) d.RavenFeathers = 0;
@@ -60,7 +62,7 @@ public static class SaveSerializer
     /// <summary>
     /// Met à niveau les données jusqu'à <see cref="SaveData.CurrentVersion"/>.
     /// Chaque ancienne version a son case qui adapte les champs, monte Version d'un cran puis fait « goto » vers le suivant.
-    /// Pour un futur format 5 : « case 4: ...adapter...; data.Version = 5; goto case 5; » puis « case 5: return true; ».
+    /// Pour un futur format 6 : « case 5: ...adapter...; data.Version = 6; goto case 6; » puis « case 6: return true; ».
     /// </summary>
     public static bool Migrate(SaveData data, out string error)
     {
@@ -89,6 +91,11 @@ public static class SaveSerializer
                 data.Version = 4;
                 goto case 4;
             case 4:
+                // Version 4 -> 5 : ajout des améliorations de capacité (absentes = aucune).
+                data.CapacityBonuses = new();
+                data.Version = 5;
+                goto case 5;
+            case 5:
                 return true; // rien à migrer
             case 0:
                 error = "numéro de version absent";

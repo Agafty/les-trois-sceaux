@@ -28,21 +28,30 @@ public partial class PickupBanner : CanvasLayer
     {
         string nameKey = effect.GetNameKey();
         if (string.IsNullOrEmpty(nameKey)) return;
+        var banner = GetOrCreate(owner);
+        string text = string.Format(banner.Tr("CHEST_OBTAIN"), banner.Tr(nameKey));
+        bool hasDescription = !string.IsNullOrEmpty(effect.DescriptionKey);
+        if (hasDescription) text += "\n" + banner.Tr(effect.DescriptionKey);
+        banner.ShowText(text, hasDescription);
+    }
+
+    /// <summary>Montre un court message libre (déjà traduit) dans le même bandeau, sans pause (ex. récompense refusée).</summary>
+    public static void AnnounceMessage(Node owner, string text) => GetOrCreate(owner).ShowText(text, false);
+
+    private static PickupBanner GetOrCreate(Node owner)
+    {
         var banner = owner.GetNodeOrNull<PickupBanner>(NodeName);
         if (banner == null)
         {
             banner = new PickupBanner { Name = NodeName, Layer = 6, Visible = false };
             owner.AddChild(banner);
         }
-        banner.ShowText(effect, nameKey);
+        return banner;
     }
 
-    private void ShowText(PickupEffect effect, string nameKey)
+    private void ShowText(string text, bool hasDescription)
     {
         if (_label == null) Build();
-        string text = string.Format(Tr("CHEST_OBTAIN"), Tr(nameKey));
-        bool hasDescription = !string.IsNullOrEmpty(effect.DescriptionKey);
-        if (hasDescription) text += "\n" + Tr(effect.DescriptionKey);
         _label.Text = text;
         float height = hasDescription ? 64f : 28f;
         _back.Position = new Vector2(16f, BottomY - height); // juste au-dessus de la boîte d'indice (16,272,608,64) : pas de chevauchement
