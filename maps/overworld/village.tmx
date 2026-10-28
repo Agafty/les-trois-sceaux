@@ -252,7 +252,7 @@
   <object id="29" type="PNJ" x="560" y="240">
    <properties>
     <property name="id" value="villageois_apeure"/>
-    <property name="sprite" value="isolde"/>
+    <property name="sprite" value="villageois_apeure"/>
     <property name="direction" value="right"/>
     <property name="etape_max" type="int" value="0"/>
    </properties>
@@ -261,7 +261,7 @@
   <object id="30" type="PNJ" x="976" y="176">
    <properties>
     <property name="id" value="villageois_mineur"/>
-    <property name="sprite" value="tobias"/>
+    <property name="sprite" value="villageois_mineur"/>
     <property name="direction" value="left"/>
     <property name="etape_min" type="int" value="2"/>
     <property name="etape_max" type="int" value="2"/>
