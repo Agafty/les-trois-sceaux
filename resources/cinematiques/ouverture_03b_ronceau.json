@@ -4,7 +4,7 @@
     {
       "action": "apparaitre",
       "cible": "ennemis",
-      "type": "ronceau",
+      "groupe": "potager",
       "drapeau_mort": "ouv_ronceau"
     }
   ]

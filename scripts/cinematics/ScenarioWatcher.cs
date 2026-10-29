@@ -16,6 +16,7 @@ public partial class ScenarioWatcher : Node
     private CinematicPlayer _player;
     private Player _brann;
     private GameState _state;
+    private System.Func<string, bool> _isSet; // GameState.IsCollected, mémorisé (pas de délégué créé à chaque vérification)
     private SceneManager _sceneManager;
     private List<ScenarioDef> _defs;
     private readonly HashSet<string> _fired = new();
@@ -27,6 +28,7 @@ public partial class ScenarioWatcher : Node
         _brann = brann;
         _defs = defs;
         _state = GetNode<GameState>("/root/GameState");
+        _isSet = _state.IsCollected;
         _sceneManager = GetNode<SceneManager>("/root/SceneManager");
     }
 
@@ -49,7 +51,7 @@ public partial class ScenarioWatcher : Node
                 _fired.Add(def.Cinematic); // déjà signalé : on n'insiste pas
                 continue;
             }
-            if (!ScenarioRules.Matches(def, data.EndFlag, _state.IsCollected)) continue;
+            if (!ScenarioRules.Matches(def, data.EndFlag, _isSet)) continue;
             if (def.HasZone && !def.ZoneContains(_brann.GlobalPosition.X, _brann.GlobalPosition.Y)) continue;
 
             _fired.Add(def.Cinematic);

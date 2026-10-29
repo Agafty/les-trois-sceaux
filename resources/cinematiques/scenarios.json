@@ -115,30 +115,5 @@
       ]
     }
   ],
-  "reperes": [
-    {
-      "salle": "forge_room",
-      "id": "charbon_01",
-      "x": 176,
-      "y": 208
-    },
-    {
-      "salle": "forge_room",
-      "id": "charbon_02",
-      "x": 208,
-      "y": 208
-    },
-    {
-      "salle": "village_room",
-      "id": "potager",
-      "x": 656,
-      "y": 96
-    },
-    {
-      "salle": "village_room",
-      "id": "chateau",
-      "x": 1200,
-      "y": 48
-    }
-  ]
+  "reperes": []
 }

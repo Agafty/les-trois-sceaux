@@ -48,30 +48,8 @@
     {
       "action": "apparaitre",
       "cible": "ennemis",
-      "type": "sanglier_noirci",
-      "drapeau_mort": "ouv_place"
-    },
-    {
-      "action": "apparaitre",
-      "cible": "ennemi",
-      "type": "ronceau",
-      "a": "pip_cachette",
-      "decalage": [
-        -96,
-        -30
-      ],
-      "drapeau_mort": "ouv_place"
-    },
-    {
-      "action": "apparaitre",
-      "cible": "ennemi",
-      "type": "ronceau",
-      "a": "pip_cachette",
-      "decalage": [
-        96,
-        -30
-      ],
-      "drapeau_mort": "ouv_place"
+      "drapeau_mort": "ouv_place",
+      "groupe": "place"
     }
   ]
 }

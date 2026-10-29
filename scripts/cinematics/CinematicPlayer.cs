@@ -131,10 +131,10 @@ public partial class CinematicPlayer : Node
         _spawnBatch.Clear();
         WasSkipped = false;
         _current = data;
-        ShowHint(data.Skippable);
         SetProcess(true);
         try
         {
+            ShowHint(data.Skippable);
             foreach (var step in data.Steps)
             {
                 if (_skip) ApplyFinal(step, false);
@@ -420,6 +420,7 @@ public partial class CinematicPlayer : Node
             case "ennemi": AppearEnemy(step); break;
             case "decor": AppearDecor(step); break;
             case "ramassable":
+                if (_room.HasPickup(step.Id) || _state.IsCollected(step.Id)) break; // déjà dans la carte, ou déjà ramassé : rien à poser
                 if (ResolveTarget(step, out var pos)) _room.TrySpawnPickup(step.Id, step.Content, pos);
                 break;
         }
@@ -594,6 +595,12 @@ public partial class CinematicPlayer : Node
             }
             GD.PushError($"Cinématique : impossible d'aller à {step.Scene}.");
             _leaving = false;
+            if (!IsPlaying && IsInstanceValid(this) && IsInsideTree())
+            {
+                // Finish() avait laissé Brann figé en attendant le départ : la salle ne part pas, on lui rend la main.
+                Active = false;
+                if (IsInstanceValid(_player)) _player.EndCinematic();
+            }
         }
         catch (OperationCanceledException)
         {

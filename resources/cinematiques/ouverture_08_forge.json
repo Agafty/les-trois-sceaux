@@ -52,19 +52,11 @@
       "cible": "decor",
       "id": "traces",
       "image": "traces_pas",
-      "a": "corvan_forge",
-      "decalage": [
-        0,
-        28
-      ]
+      "a": "traces_forge"
     },
     {
       "action": "camera",
-      "vers": "corvan_forge",
-      "decalage": [
-        0,
-        60
-      ],
+      "vers": "traces_forge",
       "duree": 1.0
     },
     {
