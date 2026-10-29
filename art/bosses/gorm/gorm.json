@@ -1,0 +1,105 @@
+{
+ "cellule": [
+  96,
+  96
+ ],
+ "origine": [
+  48,
+  94
+ ],
+ "gorm.png": {
+  "colonnes": 17,
+  "lignes": [
+   "plein",
+   "brise",
+   "nu"
+  ],
+  "animations": {
+   "idle": {
+    "debut": 0,
+    "nombre": 2,
+    "fps": 3.0
+   },
+   "marche": {
+    "debut": 2,
+    "nombre": 4,
+    "fps": 6.0
+   },
+   "frappe": {
+    "debut": 6,
+    "nombre": 4,
+    "fps": 5.0
+   },
+   "touche": {
+    "debut": 10,
+    "nombre": 1,
+    "fps": 1.0
+   },
+   "etourdi": {
+    "debut": 11,
+    "nombre": 2,
+    "fps": 3.0
+   },
+   "mort": {
+    "debut": 13,
+    "nombre": 4,
+    "fps": 4.0
+   }
+  },
+  "note": "ligne = etat d'armure (0 plein, 1 brise, 2 nu) ; 'mort' seulement sur la ligne 2 (nu)"
+ },
+ "gorm_corruption.png": "memes cases que gorm.png : a superposer, a faire clignoter",
+ "gorm_ombre.png": "ombre au sol, 1 case 96x96, centree sur l'origine",
+ "rocher.png": {
+  "cellule": [
+   32,
+   32
+  ],
+  "ordre": [
+   "rocher_a",
+   "rocher_b",
+   "impact0",
+   "impact1",
+   "impact2"
+  ],
+  "origine_rocher": [
+   16,
+   26
+  ]
+ },
+ "rocher_ombre.png": {
+  "cellule": [
+   32,
+   32
+  ],
+  "ordre": [
+   "ombre0",
+   "ombre1",
+   "ombre2",
+   "ombre3_clignote"
+  ],
+  "centre": [
+   16,
+   16
+  ]
+ },
+ "plaques": {
+  "plein": [
+   "poitrine_gauche",
+   "poitrine_droite",
+   "epaule_gauche",
+   "epaule_droite",
+   "ventre"
+  ],
+  "brise": [
+   "poitrine_droite",
+   "epaule_droite"
+  ],
+  "nu": [],
+  "cristal_centre_px": "x=48, y=48 (+ decalage vertical du corps selon la case)"
+ },
+ "zone_cristal_demi_taille": [
+  7,
+  13
+ ]
+}
