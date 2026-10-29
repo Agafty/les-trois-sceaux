@@ -115,7 +115,7 @@ Overworld de 5×4 écrans (3200×1760 px, 100×44 tuiles) :
 | --- | --- |
 | Overworld (village 2, forêt 5, montagne 4, lac et rives 5, route/falaise/château 4) | 20 écrans |
 | Temple des Racines (donjon tutoriel) | 16 salles sur 2 étages |
-| Mine Effondrée | 10 salles |
+| Mine Effondrée | 16 salles sur 2 étages |
 | Sanctuaire Englouti | 12 salles |
 | Château final (couloir, 1-2 énigmes avec les 3 objets, combat contre Corvan) | 4 à 5 salles |
 | Intérieurs (forge, Hulda, boutique, archives, 1-2 grottes secrètes), plus petits qu'un écran | 5 à 6 pièces |
