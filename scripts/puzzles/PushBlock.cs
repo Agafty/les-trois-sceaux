@@ -52,6 +52,7 @@ public partial class PushBlock : AnimatableBody2D
     private const float MinPushDot = 0.6f;
 
     private static Texture2D _placeholder;
+    private static readonly HashSet<string> _warnedAppearances = new();
 
     private Area2D _contact;
     private Player _player;
@@ -209,13 +210,16 @@ public partial class PushBlock : AnimatableBody2D
     private void SetupSprite()
     {
         var sprite = GetNode<Sprite2D>("Sprite2D");
-        string path = string.IsNullOrEmpty(Appearance) ? DefaultTexturePath : $"res://art/puzzles/bloc_{Appearance}.png";
-        if (!ResourceLoader.Exists(path) && path != DefaultTexturePath)
+        string path = DefaultTexturePath;
+        if (!string.IsNullOrEmpty(Appearance))
         {
-            GD.PushWarning($"Bloc poussable : image {path} introuvable, image par défaut utilisée.");
-            path = DefaultTexturePath;
+            string custom = $"res://art/puzzles/bloc_{Appearance}.png";
+            if (RoomObjectCatalog.IsSafeName(Appearance) && ResourceLoader.Exists(custom))
+                path = custom;
+            else if (_warnedAppearances.Add(Appearance))
+                GD.PushWarning($"Bloc poussable : apparence « {Appearance} » invalide ou image {custom} introuvable, image par défaut utilisée.");
         }
-        if (ResourceLoader.Exists(path))
+        if (path == DefaultTexturePath && ResourceLoader.Exists(path) || path != DefaultTexturePath)
         {
             sprite.Texture = GD.Load<Texture2D>(path);
             return;
