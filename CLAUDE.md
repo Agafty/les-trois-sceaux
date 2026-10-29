@@ -14,7 +14,7 @@ La conception complète (scénario, personnages, carte, bestiaire, économie, ph
 
 ## Phase en cours
 
-**Phase 6 — Production du contenu** (point de contrôle de la phase 4 : test du temple par 2-3 personnes mené en parallèle, corrections à faire avant le donjon 2). (Mettre à jour cette ligne à chaque changement de phase.)
+**Phase 6 — Production du contenu** : donjon 2, la Mine Effondrée (point de contrôle de la phase 4 validé le 2026-10-29). (Mettre à jour cette ligne à chaque changement de phase.)
 
 ## Comment travailler avec moi
 

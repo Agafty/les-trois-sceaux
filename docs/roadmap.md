@@ -394,7 +394,7 @@ But : un donjon de 14 à 16 salles sur deux étages (décision du 2026-10-24 : 1
 - [x] Point faible lié à l'objet du donjon
 - [x] Récompense : réceptacle de cœur + cristal/médaillon (compteur de progression du jeu)
 
-**Point de contrôle** : faire jouer le donjon à 2 ou 3 personnes sans les aider. Noter où elles bloquent et où elles s'ennuient. Ne pas passer en production tant que ce donjon n'est pas fun.
+**Point de contrôle** (validé le 2026-10-29 : retours des joueurs OK) : faire jouer le donjon à 2 ou 3 personnes sans les aider. Noter où elles bloquent et où elles s'ennuient. Ne pas passer en production tant que ce donjon n'est pas fun.
 
 ## Phase 5 — Direction artistique et audio originaux (en parallèle, à partir de la phase 2)
 
