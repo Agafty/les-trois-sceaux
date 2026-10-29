@@ -1,12 +1,12 @@
 # Plan du tileset `mine` — La Mine Effondrée (donjon 2 : galeries, rails, éboulis, cristaux, arène de Gorm)
 
-> Fichier généré par `tools/sprites/mine.py` : modifier le script, pas ce fichier. **État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro).
+> Fichier généré par `tools/sprites/mine.py` : modifier le script, pas ce fichier. **État : DESSIN FINAL** (les numéros sont ceux du plan, aucune tuile n'a bougé).
 
-- Image : `art/tilesets/mine.png`, 256×768 px, 8 colonnes × 24 lignes de tuiles 32×32, sans marge ni espacement (192 cases). Tileset Tiled : `maps/tilesets/mine.tsx` (collisions et terrains définis). `art/tilesets/mine_numeros.png` = la planche ×2 avec les numéros.
-- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 21 à 24 (ids 160 à 191) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
+- Image : `art/tilesets/mine.png`, 256×832 px, 8 colonnes × 26 lignes de tuiles 32×32, sans marge ni espacement (208 cases). Tileset Tiled : `maps/tilesets/mine.tsx` (collisions et terrains définis). `art/tilesets/mine_numeros.png` = la planche ×2 avec les numéros.
+- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 23 à 26 (ids 176 à 207) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
 - Collisions en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche). Les terrains (Wang par coins) sont dans le panneau Terrains de Tiled.
 - Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px. Palette : roche brun-gris chaude, bois d'étais, rails gris, cristaux cyan, cristal rouge de Gorm. En PLAN, **la couleur indique la famille** (sol (brun-gris) / poussière (sombre) / arène (violet-gris) / mur (brun) / rail et métal (gris clair) / bois (brun) / trou (noir) / passage (turquoise) / eau (bleu) / cristal (cyan) / cristal rouge / minerai (jaune) / éboulis et blocage (magenta) / fissuré à la bombe (violet) / porte (orange) / escalier (beige)) ; une zone plus sombre dans une tuile = zone solide.
-- Un SEUL tileset pour les deux étages (rez-de-chaussée et sous-sol) : pour assombrir le sous-sol, utiliser la teinte de salle (`Room.SetTint`) plutôt qu'une seconde planche.
+- DEUX planches de même numérotation : `mine.png` (rez-de-chaussée) et `mine_sous_sol.png` (recoloration plus sombre et bleutée, tileset `mine_sous_sol.tsx` identique).
 
 ## POUR LE DÉVELOPPEUR : ids à reconnaître par le code
 
@@ -19,7 +19,11 @@ Tileset `mine` (8 colonnes, id local Tiled = ligne × 8 + colonne). Une tuile re
 | **Escaliers** | 56 (montant), 57 (descendant) | `Sol` | Posent une `Sortie` `transition=escalier` (comme le temple). |
 | **MURS FISSURÉS** fermé -> ouvert | 144 -> 148 (haut), 145 -> 149 (bas), 146 -> 150 (gauche), 147 -> 151 (droite) ; 152 -> 153 (rocher fissuré) | fermés `Murs`, ouverts `Decor` | Comme `TileRules` pour `montagne` 156 -> 157 et 172 -> 173 : la bombe retire la tuile fermée de `Murs` et le code pose la version ouverte sur `Decor` (ou elle est déjà posée dessous). Les versions ouvertes sont opaques. |
 | **ÉBOULIS bloquants** fermé -> dégagé | 72 -> 76, 73 -> 77, 74 -> 76 (moitié gauche), 75 -> 77 (moitié droite) | fermés `Murs`, dégagés `Sol` | Comme `montagne` 176/178 -> 180 et 177/179 -> 181. |
+| ÉBOULIS dans une ouverture | 164 -> 76, 165 -> 77 | fermés `Murs`, dégagés `Sol` | Même règle que les éboulis ; à poser à la place d'une tuile de porte. |
 | Indice visuel | 154 `mur_craquele` | `Murs` | Rien : simple décor solide (aucun id à reconnaître). |
+
+Tilesets : `mine` ET `mine_sous_sol` (mêmes ids, mêmes collisions) : `HoleWatcher` doit accepter les deux fichiers.
+Les éboulis ont d'autres numéros que `montagne` (72 à 77, pas 176 à 181) : à déclarer dans `TileRules` pour `mine`.
 
 Tout le reste est géré par les collisions du `.tsx` (murs 16 à 30, 40 à 43 portes, 72 à 75, 104 à 110, 113, 121, 122, 131, 143, 144 à 147, 152, 154) : aucun code.
 Les ids 0 à 5, 16 à 57, 58 à 71 et 80 à 92 ont **les mêmes numéros que `temple_racines`** pour le sol, les murs, les portes, la poussière (= la terre du temple), les escaliers et l'eau.
@@ -273,6 +277,23 @@ Fermés : sur `Murs` (solides, objet `MurFissure` par-dessus). Ouverts : sur `De
 | 152 | `rocher_fissure` | ROCHER FISSURÉ : bloc craquelé posé au sol (solide ; objet MurFissure dessus) | Murs | pleine |
 | 153 | `rocher_fissure_ouvert` | Rocher fissuré OUVERT : cavité noire entre des blocs (Sortie dessus) | Decor | aucune |
 | 154 | `mur_craquele` | Mur du haut craquelé (indice discret, sans fonction ; solide) | Murs | pleine |
+
+## 14. Ajouts : poutres, veines, rails en T, mobilier
+
+Demandés par `maps/donjon2/plan.md` §7. `poutre_sciee` = décor de la salle 08. `mur_veine_etoile` = mur lumineux bleu-blanc de la salle 13. `eboulis_ouverture_h/v` : éboulis dans l encadrement d une porte (fermé -> 76/77).
+
+| N° | Nom | Rôle | Calque | Collision |
+| --- | --- | --- | --- | --- |
+| 160 | `rail_t_haut` | Rail en T : rail horizontal + branche vers le HAUT | Decor | aucune |
+| 161 | `rail_t_bas` | Rail en T : rail horizontal + branche vers le BAS | Decor | aucune |
+| 162 | `rail_t_gauche` | Rail en T : rail vertical + branche vers la GAUCHE | Decor | aucune |
+| 163 | `rail_t_droite` | Rail en T : rail vertical + branche vers la DROITE | Decor | aucune |
+| 164 | `eboulis_ouverture_h` | Éboulis dans une ouverture horizontale (porte haut/bas) (solide ; se dégage comme 72 -> 76) | Murs | pleine |
+| 165 | `eboulis_ouverture_v` | Éboulis dans une ouverture verticale (porte gauche/droite) (solide ; se dégage comme 73 -> 77) | Murs | pleine |
+| 166 | `pelle_sol` | Pelle plantée dans un tas de gravats | Decor | aucune |
+| 167 | `etabli` | Établi de mineur : outils posés (solide) | Murs | partielle : 4,8 24×22 |
+| 168 | `panneau_bois` | Panneau de bois (support d un indice ; solide, étroit) | Murs | partielle : 11,14 10×18 |
+| 169 | `flaque` | Flaque d eau sur le sol (sans effet) | Decor | aucune |
 
 ## Terrains (Wang, par coins)
 

@@ -51,7 +51,11 @@ Tileset `mine` (8 colonnes, id local Tiled = ligne × 8 + colonne). Une tuile re
 | **Escaliers** | 56 (montant), 57 (descendant) | `Sol` | Posent une `Sortie` `transition=escalier` (comme le temple). |
 | **MURS FISSURÉS** fermé -> ouvert | 144 -> 148 (haut), 145 -> 149 (bas), 146 -> 150 (gauche), 147 -> 151 (droite) ; 152 -> 153 (rocher fissuré) | fermés `Murs`, ouverts `Decor` | Comme `TileRules` pour `montagne` 156 -> 157 et 172 -> 173 : la bombe retire la tuile fermée de `Murs` et le code pose la version ouverte sur `Decor` (ou elle est déjà posée dessous). Les versions ouvertes sont opaques. |
 | **ÉBOULIS bloquants** fermé -> dégagé | 72 -> 76, 73 -> 77, 74 -> 76 (moitié gauche), 75 -> 77 (moitié droite) | fermés `Murs`, dégagés `Sol` | Comme `montagne` 176/178 -> 180 et 177/179 -> 181. |
+| ÉBOULIS dans une ouverture | 164 -> 76, 165 -> 77 | fermés `Murs`, dégagés `Sol` | Même règle que les éboulis ; à poser à la place d'une tuile de porte. |
 | Indice visuel | 154 `mur_craquele` | `Murs` | Rien : simple décor solide (aucun id à reconnaître). |
+
+Tilesets : `mine` ET `mine_sous_sol` (mêmes ids, mêmes collisions) : `HoleWatcher` doit accepter les deux fichiers.
+Les éboulis ont d'autres numéros que `montagne` (72 à 77, pas 176 à 181) : à déclarer dans `TileRules` pour `mine`.
 
 Tout le reste est géré par les collisions du `.tsx` (murs 16 à 30, 40 à 43 portes, 72 à 75, 104 à 110, 113, 121, 122, 131, 143, 144 à 147, 152, 154) : aucun code.
 Les ids 0 à 5, 16 à 57, 58 à 71 et 80 à 92 ont **les mêmes numéros que `temple_racines`** pour le sol, les murs, les portes, la poussière (= la terre du temple), les escaliers et l'eau.
@@ -76,8 +80,8 @@ S = MineSheet('mine', 8, 'La Mine Effondrée (donjon 2 : galeries, rails, éboul
               ['- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d\'1 px. Palette : roche brun-gris chaude, bois d\'étais, rails gris, '
                'cristaux cyan, cristal rouge de Gorm. En PLAN, **la couleur indique la famille** (' + FAMILLES + ') ; une zone plus sombre '
                'dans une tuile = zone solide.',
-               '- Un SEUL tileset pour les deux étages (rez-de-chaussée et sous-sol) : pour assombrir le sous-sol, utiliser la teinte de salle '
-               '(`Room.SetTint`) plutôt qu\'une seconde planche.'],
+               '- DEUX planches de même numérotation : `mine.png` (rez-de-chaussée) et `mine_sous_sol.png` (recoloration plus sombre et bleutée, '
+               'tileset `mine_sous_sol.tsx` identique).'],
               ['`Sol` : sol, poussière, eau peu profonde, trous (mortels et de passage), escaliers, arène, éboulis dégagé',
                '`Decor` : rails, gravats, cristaux au sol, ossements, ouvertures de mur fissuré (version ouverte)',
                '`Murs` : tout ce qui bloque (murs, éboulis, wagonnets, tas de minerai, tonneaux, murs fissurés fermés). Collisions dans le tileset',
@@ -371,10 +375,31 @@ mu(152, 'rocher_fissure', 'ROCHER FISSURÉ : bloc craquelé posé au sol (solide
 de(153, 'rocher_fissure_ouvert', 'Rocher fissuré OUVERT : cavité noire entre des blocs (Sortie dessus)', 'secret')
 mu(154, 'mur_craquele', 'Mur du haut craquelé (indice discret, sans fonction ; solide)', FULL, 'mur')
 
+
+# ------------------------------------------------------------------ 14. ajouts demandés par le plan du donjon 2
+grp(155, 'Ajouts : poutres, veines, rails en T, mobilier', 'Demandés par `maps/donjon2/plan.md` §7. `poutre_sciee` = décor de la salle 08. '
+    '`mur_veine_etoile` = mur lumineux bleu-blanc de la salle 13. `eboulis_ouverture_h/v` : éboulis dans l encadrement d une porte (fermé -> 76/77).')
+du(155, 'poutre_sciee', 'POUTRE SCIÉE : poutre en travers dont une extrémité est coupée net (décor, Dessus)')
+du(156, 'poutre_brisee', 'Poutre brisée : éclats de bois pendants (décor, Dessus)')
+mu(157, 'mur_veine_minerai', 'Mur plein avec veine de minerai doré (solide)', FULL, 'minerai')
+mu(158, 'mur_veine_etoile', 'Mur plein avec VEINE D ÉTOILE lumineuse bleu-blanc (solide)', FULL, 'cristal')
+mu(159, 'mur_cristaux_rouges', 'Mur plein incrusté de cristaux rouges (sous-sol, solide)', FULL, 'cristal_r')
+de(160, 'rail_t_haut', 'Rail en T : rail horizontal + branche vers le HAUT', 'rail')
+de(161, 'rail_t_bas', 'Rail en T : rail horizontal + branche vers le BAS', 'rail')
+de(162, 'rail_t_gauche', 'Rail en T : rail vertical + branche vers la GAUCHE', 'rail')
+de(163, 'rail_t_droite', 'Rail en T : rail vertical + branche vers la DROITE', 'rail')
+mu(164, 'eboulis_ouverture_h', 'Éboulis dans une ouverture horizontale (porte haut/bas) (solide ; se dégage comme 72 -> 76)', FULL, 'bloc')
+mu(165, 'eboulis_ouverture_v', 'Éboulis dans une ouverture verticale (porte gauche/droite) (solide ; se dégage comme 73 -> 77)', FULL, 'bloc')
+de(166, 'pelle_sol', 'Pelle plantée dans un tas de gravats', 'metal')
+mu(167, 'etabli', 'Établi de mineur : outils posés (solide)', OBJ, 'bois')
+mu(168, 'panneau_bois', 'Panneau de bois (support d un indice ; solide, étroit)', POSTC, 'bois')
+de(169, 'flaque', 'Flaque d eau sur le sol (sans effet)', 'eau')
+
 PAIRES = [('mur_fissure_haut', 'mur_fissure_haut_ouvert'), ('mur_fissure_bas', 'mur_fissure_bas_ouvert'),
           ('mur_fissure_gauche', 'mur_fissure_gauche_ouvert'), ('mur_fissure_droite', 'mur_fissure_droite_ouvert'),
           ('rocher_fissure', 'rocher_fissure_ouvert'), ('eboulis_a', 'eboulis_degage_a'), ('eboulis_g', 'eboulis_degage_a'),
-          ('eboulis_b', 'eboulis_degage_b'), ('eboulis_d', 'eboulis_degage_b')]
+          ('eboulis_b', 'eboulis_degage_b'), ('eboulis_d', 'eboulis_degage_b'),
+          ('eboulis_ouverture_h', 'eboulis_degage_a'), ('eboulis_ouverture_v', 'eboulis_degage_b')]
 
 S.notes += [
     'IDS À RECONNAÎTRE PAR LE CODE : voir la section « Pour le développeur » en tête de ce fichier.',
@@ -393,5 +418,9 @@ if __name__ == '__main__':
     else:
         import final_lib
         import mine_art
+        import mine_art2  # noqa: F401
+        import mine_art3  # noqa: F401
         px = final_lib.render(S, mine_art.REG)
         final_lib.save_final(S, px, 'mine.py')
+        import mine_art3
+        mine_art3.save_sous_sol(S, px)
