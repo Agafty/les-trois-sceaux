@@ -206,7 +206,7 @@ DLG_OUV_FORGE_9,"Brann ! Moi, je connais la forêt ! C'est tout droit, à l'oues
 DLG_OUV_FORGE_10,Sors de la forge et prends la rue vers la gauche. Bonne chance !,Leave the forge and take the street to the left. Good luck!
 PNJ_BRANN,Brann,Brann
 PNJ_CORVAN,Corvan,Corvan
-CINE_SKIP,Maintenir Pause pour passer,Hold Pause to skip
+CINE_SKIP,Maintenir Échap (Start) pour passer,Hold Esc (Start) to skip
 OBJ_CHARBON,un morceau de charbon,a piece of coal
 OBJ_EPEE_BOIS,l'épée en bois de Pip,Pip's wooden sword
 OBJ_EPEE_BOIS_DESC,Elle coupe les buissons. Appuie sur la touche d'attaque.,It cuts bushes. Press the attack button.
@@ -216,4 +216,4 @@ PROLOGUE_1,"Il y a très longtemps, trois sceaux magiques ont enfermé le sorcie
 PROLOGUE_2,"Mais les sceaux s'affaiblissent. Quand la lune cachera le soleil, ce soir, ils pourraient céder.","But the seals are growing weak. When the moon hides the sun tonight, they may break."
 PROLOGUE_3,"Au village de Brumeval, un jeune forgeron se réveille comme chaque matin. Il s'appelle Brann.","In the village of Brumeval, a young smith wakes up like every morning. His name is Brann."
 PROLOGUE_NEXT,Appuie sur une touche,Press any key
-PROLOGUE_SKIP,Pause : passer,Pause: skip
+PROLOGUE_SKIP,Échap (Start) : passer,Esc (Start): skip
