@@ -47,6 +47,7 @@ public partial class CinematicPlayer : Node
     private float _hold;
     private bool _leaving; // une étape « aller_a » a lancé le changement de salle : Brann reste figé jusqu'à son départ
     private int _moves;
+    private readonly HashSet<string> _spawnBatch = new(); // drapeaux de combat déjà servis par la cinématique en cours
     private CinematicData _current;
     private DialogueBox _box;
 
@@ -127,6 +128,7 @@ public partial class CinematicPlayer : Node
         _skip = false;
         _hold = 0f;
         _leaving = false;
+        _spawnBatch.Clear();
         WasSkipped = false;
         _current = data;
         ShowHint(data.Skippable);
@@ -484,12 +486,14 @@ public partial class CinematicPlayer : Node
     private bool CanSpawnEnemies(string deathFlag)
     {
         if (string.IsNullOrEmpty(deathFlag)) return true;
+        if (_spawnBatch.Contains(deathFlag)) return true; // plusieurs étapes d'un même combat dans cette cinématique
         if (_state.IsCollected(deathFlag)) return false;
         if (_deathGroups.TryGetValue(deathFlag, out var list))
         {
             list.RemoveAll(h => !IsInstanceValid(h));
             if (list.Count > 0) return false;
         }
+        _spawnBatch.Add(deathFlag);
         return true;
     }
 

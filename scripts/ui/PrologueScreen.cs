@@ -96,7 +96,7 @@ public partial class PrologueScreen : Control
     public override void _UnhandledInput(InputEvent @event)
     {
         if (_leaving || !@event.IsPressed() || @event.IsEcho()) return;
-        if (@event is not (InputEventKey or InputEventJoypadButton or InputEventMouseButton)) return;
+        if (@event is not (InputEventKey or InputEventJoypadButton or InputEventMouseButton or InputEventAction)) return;
         if (@event.IsActionPressed(ActionSkip))
         {
             Leave();
