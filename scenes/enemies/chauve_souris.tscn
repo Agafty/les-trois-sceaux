@@ -1,0 +1,55 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/BatEnemy.cs" id="script_bat"]
+[ext_resource type="SpriteFrames" path="res://art/enemies/chauve_souris_frames.tres" id="bat_frames"]
+[ext_resource type="Script" path="res://scripts/components/Health.cs" id="script_health"]
+[ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="script_hurtbox"]
+[ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="script_hitbox"]
+
+[ext_resource type="Script" path="res://scripts/components/LootDropper.cs" id="script_loot"]
+[ext_resource type="Resource" path="res://resources/loot/foret_commun.tres" id="loot_table"]
+
+[sub_resource type="CircleShape2D" id="bat_shape"]
+radius = 6.0
+
+[sub_resource type="CircleShape2D" id="bat_hitbox_shape"]
+radius = 10.0
+
+[node name="ChauveSouris" type="CharacterBody2D" groups=["vol"]]
+motion_mode = 1
+collision_layer = 0
+script = ExtResource("script_bat")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("bat_frames")
+animation = &"fly"
+autoplay = "fly"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("bat_shape")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("script_health")
+MaxHealth = 1
+
+[node name="HurtBox" type="Area2D" parent="."]
+script = ExtResource("script_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(0, 4)
+shape = SubResource("bat_shape")
+
+[node name="HitBox" type="Area2D" parent="."]
+script = ExtResource("script_hitbox")
+Team = 1
+Damage = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+position = Vector2(0, 4)
+shape = SubResource("bat_hitbox_shape")
+
+[node name="LootDropper" type="Node" parent="."]
+script = ExtResource("script_loot")
+Table = ExtResource("loot_table")

@@ -18,6 +18,13 @@ public partial class HurtBox : Area2D
     public bool Invincible { get; set; }
 
     /// <summary>
+    /// Filtre facultatif posé par le propriétaire (bouclier de face...) : reçoit la position de l'attaquant ;
+    /// s'il renvoie vrai, le coup est bloqué (signal <see cref="Blocked"/>, aucun dégât), comme avec <see cref="Invincible"/>.
+    /// À assigner une fois (pas de lambda créée à chaque frame).
+    /// </summary>
+    public System.Func<Vector2, bool> BlockFilter { get; set; }
+
+    /// <summary>
     /// Faux : cette zone ne joue aucun bruitage de coup (le propriétaire gère le sien, ex. le boss).
     /// Sinon : ennemi touché = coup_ennemi, ennemi vaincu = ennemi_mort, Brann touché = brann_touche.
     /// </summary>
@@ -34,7 +41,7 @@ public partial class HurtBox : Area2D
 
     public void ReceiveHit(int damage, Vector2 fromPosition)
     {
-        if (Invincible)
+        if (Invincible || (BlockFilter != null && BlockFilter(fromPosition)))
         {
             EmitSignal(SignalName.Blocked, damage, fromPosition);
             return;

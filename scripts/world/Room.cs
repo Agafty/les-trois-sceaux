@@ -734,14 +734,15 @@ public partial class Room : Node2D
         }
 
         var enemy = GD.Load<PackedScene>(path).Instantiate<Node2D>();
-        PhysicsLayers.BlockedByRavine(enemy);
+        bool flies = enemy.IsInGroup(PhysicsLayers.FlyingGroup); // un volant ignore ravins et trous
+        if (!flies) PhysicsLayers.BlockedByRavine(enemy);
         enemy.Position = _entities.ToLocal(worldPosition);
         if (RoomObjectCatalog.IsRedVariant(variant))
             ApplyRedVariant(enemy, type);
         else if (variant != "normal")
             WarnOnce("ennemi-variante:" + variant, $"Variante d'ennemi inconnue « {variant} » : traité comme « normal ».");
         _entities.AddChild(enemy);
-        _holes?.Track(enemy);
+        if (!flies) _holes?.Track(enemy);
 
         var health = enemy.GetNodeOrNull<Health>("Health");
         if (health != null)

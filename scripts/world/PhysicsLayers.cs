@@ -10,6 +10,9 @@ public static class PhysicsLayers
     /// <summary>Couche 5 (bit 4) : ravins.</summary>
     public const uint Ravine = 1u << 4;
 
+    /// <summary>Groupe Godot des ennemis volants (chauve-souris) : la Room ne leur ajoute pas la couche ravin et ne les surveille pas pour les trous.</summary>
+    public static readonly StringName FlyingGroup = "vol";
+
     /// <summary>Ajoute la couche des ravins au masque d'un corps qui doit être arrêté par eux (Brann, ennemis, PNJ).</summary>
     public static void BlockedByRavine(Node node)
     {
