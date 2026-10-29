@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="6">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="9">
  <properties>
   <property name="camera" value="ecran"/>
  </properties>
@@ -78,6 +78,28 @@
   <object id="5" type="Marqueur" x="272" y="208">
    <properties>
     <property name="id" value="isolde_forge"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="6" type="Ramassable" x="176" y="208">
+   <properties>
+    <property name="id" value="village_charbon_01"/>
+    <property name="contenu" value="charbon"/>
+    <property name="etape_max" value="0"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="7" type="Ramassable" x="208" y="208">
+   <properties>
+    <property name="id" value="village_charbon_02"/>
+    <property name="contenu" value="charbon"/>
+    <property name="etape_max" value="0"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="8" type="Marqueur" x="304" y="240">
+   <properties>
+    <property name="id" value="traces_forge"/>
    </properties>
    <point/>
   </object>
