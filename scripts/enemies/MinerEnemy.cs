@@ -34,6 +34,9 @@ public partial class MinerEnemy : CharacterBody2D, IBombDestructible
     [Export] public float KnockbackSpeed { get; set; } = 110f;
     [Export] public float KnockbackDuration { get; set; } = 0.12f;
 
+    private static readonly NodePath ModulateProp = "modulate";
+    private static PackedScene _deathScene;
+    private Tween _flashTween;
     private static readonly StringName PlayerGroup = "player";
     private static readonly Vector2[] Dirs = { Vector2.Down, Vector2.Up, Vector2.Left, Vector2.Right };
     // [bouclier ? 0 : 1][direction] ; ordre des directions = Dirs.
@@ -67,7 +70,7 @@ public partial class MinerEnemy : CharacterBody2D, IBombDestructible
     /// <summary>Vrai tant que le mineur est à terre (vulnérable de partout).</summary>
     public bool IsStunned => _state == State.Etourdi;
 
-    public Vector2 BombHalfExtents => new(10f, 12f);
+    public Vector2 BombHalfExtents => new(11f, 15f);
 
     public override void _Ready()
     {
@@ -171,7 +174,9 @@ public partial class MinerEnemy : CharacterBody2D, IBombDestructible
         // « Rien ne passe » : éclat bleu et bruit de choc, comme le boss Sylve.
         AudioManager.PlayAt(Sfx.FlecheImpact, fromPosition);
         _sprite.Modulate = new Color(0.3f, 0.6f, 3f);
-        CreateTween().TweenProperty(_sprite, "modulate", Colors.White, 0.25f);
+        _flashTween?.Kill();
+        _flashTween = CreateTween();
+        _flashTween.TweenProperty(_sprite, ModulateProp, Colors.White, 0.25f);
     }
 
     private void OnHit(int damage, Vector2 fromPosition)
@@ -201,9 +206,10 @@ public partial class MinerEnemy : CharacterBody2D, IBombDestructible
 
     private void EnterState(State state, float duration)
     {
+        // Le bouclier ne se retourne aussitôt qu'en reprenant la chasse depuis l'errance ou la chute, pas après un recul.
+        if (state == State.Poursuite && (_state == State.Errance || _state == State.Etourdi)) _turnTimer = 0f;
         _state = state;
         _timer = duration;
-        if (state == State.Poursuite) _turnTimer = 0f;
         if (state == State.Etourdi)
         {
             // À terre : sans bouclier, couché sur le côté, et il ne mord plus.
@@ -251,7 +257,7 @@ public partial class MinerEnemy : CharacterBody2D, IBombDestructible
     private void OnDied()
     {
         _dead = true;
-        var poof = GD.Load<PackedScene>("res://scenes/enemies/death_effect.tscn").Instantiate<Node2D>();
+        var poof = (_deathScene ??= GD.Load<PackedScene>("res://scenes/enemies/death_effect.tscn")).Instantiate<Node2D>();
         GetParent().AddChild(poof);
         poof.GlobalPosition = GlobalPosition;
         QueueFree();

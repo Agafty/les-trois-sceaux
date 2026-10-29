@@ -29,6 +29,7 @@ public partial class BatEnemy : CharacterBody2D
     [Export] public float KnockbackSpeed { get; set; } = 140f;
     [Export] public float KnockbackDuration { get; set; } = 0.12f;
 
+    private static PackedScene _deathScene;
     private static readonly StringName PlayerGroup = "player";
 
     private readonly RandomNumberGenerator _rng = new();
@@ -104,13 +105,20 @@ public partial class BatEnemy : CharacterBody2D
         }
 
         MoveAndSlide();
-        if (GetSlideCollisionCount() > 0) OnWallHit();
+        // Seuls les murs la font rebondir : Brann et les autres corps (CharacterBody2D) sont ignorés.
+        int count = GetSlideCollisionCount();
+        for (int i = 0; i < count; i++)
+        {
+            var hit = GetSlideCollision(i);
+            if (hit.GetCollider() is CharacterBody2D) continue;
+            OnWallHit(hit.GetNormal());
+            break;
+        }
     }
 
     // Seuls les murs sont solides pour elle : on rebondit, et on inverse le zigzag pour ne pas rester collée.
-    private void OnWallHit()
+    private void OnWallHit(Vector2 normal)
     {
-        var normal = GetLastSlideCollision().GetNormal();
         _dir = _dir.Bounce(normal).Normalized();
         _phase += Mathf.Pi;
         if (_state == State.Errance) _timer = _rng.RandfRange(MinWanderTime, MaxWanderTime);
@@ -125,7 +133,10 @@ public partial class BatEnemy : CharacterBody2D
     private bool TryGetPlayer(out Node2D player)
     {
         if (_player == null || !IsInstanceValid(_player))
+        {
             _player = GetTree().GetFirstNodeInGroup(PlayerGroup) as Node2D;
+            if (_player is PhysicsBody2D body) AddCollisionExceptionWith(body); // elle vole au-dessus de Brann : pas de poussée mutuelle
+        }
         player = _player;
         return player != null && player is not Player { IsDead: true };
     }
@@ -156,7 +167,7 @@ public partial class BatEnemy : CharacterBody2D
     private void OnDied()
     {
         _dead = true;
-        var poof = GD.Load<PackedScene>("res://scenes/enemies/death_effect.tscn").Instantiate<Node2D>();
+        var poof = (_deathScene ??= GD.Load<PackedScene>("res://scenes/enemies/death_effect.tscn")).Instantiate<Node2D>();
         GetParent().AddChild(poof);
         poof.GlobalPosition = GlobalPosition;
         QueueFree();
