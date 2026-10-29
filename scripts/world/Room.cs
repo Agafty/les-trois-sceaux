@@ -1113,6 +1113,7 @@ public partial class Room : Node2D
     {
         var block = (_blockScene ??= GD.Load<PackedScene>(BlockScenePath)).Instantiate<PushBlock>();
         block.Position = _entities.ToLocal(ObjectCenter(marker));
+        block.Appearance = GetString(marker, "apparence");
         _entities.AddChild(block);
         _blocks.Add(block);
         RemoveMarker(marker);

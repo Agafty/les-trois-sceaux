@@ -217,3 +217,29 @@ PROLOGUE_2,"Mais les sceaux s'affaiblissent. Quand la lune cachera le soleil, ce
 PROLOGUE_3,"Au village de Brumeval, un jeune forgeron se réveille comme chaque matin. Il s'appelle Brann.","In the village of Brumeval, a young smith wakes up like every morning. His name is Brann."
 PROLOGUE_NEXT,Appuie sur une touche,Press any key
 PROLOGUE_SKIP,Échap (Start) : passer,Esc (Start): skip
+OBJ_BOMBES_2,2 bombes,2 bombs
+OBJ_MARTEAU_CORVAN,le marteau de Corvan,Corvan's hammer
+OBJ_MARTEAU_CORVAN_DESC,"Le poinçon de Corvan est gravé sur le manche. Il était ici.","Corvan's punch mark is carved on the handle. He was here."
+OBJ_MINERAI_ETOILE,le minerai d'étoile,the starore
+OBJ_MINERAI_ETOILE_DESC,"Un métal rare qui brille de l'intérieur. Il servira à tremper une lame.","A rare metal that glows from within. It will be used to temper a blade."
+OBJ_SCEAU_MONTAGNE,le sceau de la Montagne,the Seal of the Mountain
+OBJ_SCEAU_MONTAGNE_DESC,"Le deuxième des trois sceaux est restauré.","The second of the three seals is restored."
+INDICE_POUTRES_SCIEES,"Cette poutre a été sciée net... Ce n'est pas un éboulement naturel.","This beam was sawn clean through... This is no natural collapse."
+INDICE_VEINE_ETOILE,"Une veine de minerai d'étoile brille dans la roche. Un coffre est posé juste à côté.","A vein of star ore glows in the rock. A chest sits right beside it."
+INDICE_BOMBE_RAYON,"Une bombe explose après un instant. Pose-la, puis recule d'au moins deux cases !","A bomb explodes after a moment. Place it, then step back at least two tiles!"
+SALLE_DONJON2_01,Entrée de la Mine,Mine entrance
+SALLE_DONJON2_02,Hall des wagons,Cart hall
+SALLE_DONJON2_03,Dépôt de minerai,Ore depot
+SALLE_DONJON2_04,Galerie des bennes,Skip gallery
+SALLE_DONJON2_05,Salle des wagonnets,Minecart room
+SALLE_DONJON2_06,Salle de tir,Shooting room
+SALLE_DONJON2_07,Salle du grand coffre,Great chest room
+SALLE_DONJON2_08,Galerie des étais,Prop gallery
+SALLE_DONJON2_09,Carrefour effondré,Collapsed crossroads
+SALLE_DONJON2_10,Antichambre de Gorm,Gorm's antechamber
+SALLE_DONJON2_11,Galerie basse,Lower gallery
+SALLE_DONJON2_12,Salle du brasero,Brazier room
+SALLE_DONJON2_13,Veine d'étoile,Star vein
+SALLE_DONJON2_14,Réserve de Gorm,Gorm's stockpile
+SALLE_DONJON2_15,Cave secrète,Secret cave
+SALLE_DONJON2_BOSS,Cœur de la Mine,Heart of the Mine

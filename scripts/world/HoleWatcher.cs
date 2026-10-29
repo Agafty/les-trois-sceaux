@@ -88,7 +88,7 @@ public partial class HoleWatcher : Node
     // L'ennemi est figé, rétrécit, puis disparaît sans butin (voir FallEffects.DropEnemy).
     private void StartEnemyFall(Node2D enemy) => FallEffects.DropEnemy(this, enemy, EnemyFallDuration);
 
-    // Cherche, dans le tileset du calque, les sources d'atlas des trous (temple_racines et temple_racines_sous_sol).
+    // Cherche, dans le tileset du calque, les sources d'atlas des trous (temple_racines, mine et leurs variantes sous-sol).
     private void FindHoleSource()
     {
         var tileSet = Floor?.TileSet;
@@ -98,7 +98,7 @@ public partial class HoleWatcher : Node
             int id = tileSet.GetSourceId(i);
             if (tileSet.GetSource(id) is not TileSetAtlasSource atlas || atlas.Texture == null) continue;
             string path = atlas.Texture.ResourcePath;
-            if (!path.EndsWith("/temple_racines.png") && !path.EndsWith("/temple_racines_sous_sol.png")) continue;
+            if (!HoleRules.IsHoleTilesetPath(path)) continue;
             _holeSources[id] = atlas.GetAtlasGridSize().X;
         }
     }

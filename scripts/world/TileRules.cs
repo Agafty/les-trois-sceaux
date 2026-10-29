@@ -8,6 +8,11 @@ public static class TileRules
     public const string ForestTileset = "foret";
     public const string VillageTileset = "village";
     public const string MountainTileset = "montagne";
+    public const string MineTileset = "mine";
+    public const string MineBasementTileset = "mine_sous_sol";
+
+    /// <summary>Tilesets de la Mine Effondrée (rez-de-chaussée et sous-sol : mêmes numéros).</summary>
+    public static bool IsMine(string tileset) => tileset == MineTileset || tileset == MineBasementTileset;
 
     /// <summary>Nom d'un tileset d'après le chemin de son image (« res://art/tilesets/foret.png » donne « foret »). Vide si le chemin n'est pas un PNG.</summary>
     public static string TilesetNameFromTexturePath(string path)
@@ -40,6 +45,7 @@ public static class TileRules
     public static bool IsBreakable(string tileset, int tileId) => tileset switch
     {
         VillageTileset => (tileId >= 136 && tileId <= 139) || tileId == 142,
+        MineTileset or MineBasementTileset => (tileId >= 144 && tileId <= 147) || tileId == 152 || (tileId >= 72 && tileId <= 75) || tileId == 164 || tileId == 165,
         MountainTileset => tileId == 156 || tileId == 172 || (tileId >= 176 && tileId <= 179),
         InteriorTileset => tileId == 67,
         _ => false,
@@ -53,6 +59,19 @@ public static class TileRules
     {
         openId = -1;
         layer = "";
+        if (IsMine(tileset))
+        {
+            switch (closedId)
+            {
+                // Murs fissurés : la version ouverte (trou noir, opaque) se pose dans « Decor ».
+                case 144: case 145: case 146: case 147: openId = closedId + 4; layer = "Decor"; return true;
+                case 152: openId = 153; layer = "Decor"; return true;
+                // Éboulis (dont ceux d'une ouverture de salle, 164/165) : gravats dégagés dans « Sol ».
+                case 72: case 74: case 164: openId = 76; layer = "Sol"; return true;
+                case 73: case 75: case 165: openId = 77; layer = "Sol"; return true;
+                default: return false;
+            }
+        }
         if (tileset == MountainTileset)
         {
             switch (closedId)
@@ -78,6 +97,17 @@ public static class TileRules
     public static bool TryGetClosedTile(string tileset, int openId, out int closedId)
     {
         closedId = -1;
+        if (IsMine(tileset))
+        {
+            switch (openId)
+            {
+                case 148: case 149: case 150: case 151: closedId = openId - 4; return true;
+                case 153: closedId = 152; return true;
+                case 76: closedId = 72; return true; // 74 et 164 s'ouvrent aussi en 76 : on redessine 72 (même éboulis, dessin voisin)
+                case 77: closedId = 73; return true;
+                default: return false;
+            }
+        }
         if (tileset == MountainTileset)
         {
             switch (openId)

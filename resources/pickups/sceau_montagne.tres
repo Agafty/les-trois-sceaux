@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SealEffect" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/effects/SealEffect.cs" id="1_effect"]
+
+[resource]
+script = ExtResource("1_effect")
+SealId = "montagne"
+NameKey = "OBJ_SCEAU_MONTAGNE"
+ShowNameOnPickup = true
+DescriptionKey = "OBJ_SCEAU_MONTAGNE_DESC"

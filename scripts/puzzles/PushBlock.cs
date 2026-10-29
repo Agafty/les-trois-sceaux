@@ -36,8 +36,14 @@ public partial class PushBlock : AnimatableBody2D
     /// </summary>
     public HashSet<(int, int)> ForbiddenCells { get; set; }
 
+    /// <summary>
+    /// Apparence (propriété Tiled « apparence » de BlocPoussable) : vide = art/puzzles/bloc_poussable.png ; sinon art/puzzles/bloc_&lt;apparence&gt;.png
+    /// (ex. « mine » pour le wagonnet de minerai). Réglé par la <see cref="Room"/> avant l'ajout à l'arbre.
+    /// </summary>
+    public string Appearance { get; set; } = "";
+
     private const int FrameSize = 32;
-    private const string TexturePath = "res://art/puzzles/bloc_poussable.png";
+    private const string DefaultTexturePath = "res://art/puzzles/bloc_poussable.png";
     private static readonly StringName PlayerGroup = "player";
     private static readonly StringName MoveLeft = "move_left";
     private static readonly StringName MoveRight = "move_right";
@@ -203,9 +209,15 @@ public partial class PushBlock : AnimatableBody2D
     private void SetupSprite()
     {
         var sprite = GetNode<Sprite2D>("Sprite2D");
-        if (ResourceLoader.Exists(TexturePath))
+        string path = string.IsNullOrEmpty(Appearance) ? DefaultTexturePath : $"res://art/puzzles/bloc_{Appearance}.png";
+        if (!ResourceLoader.Exists(path) && path != DefaultTexturePath)
         {
-            sprite.Texture = GD.Load<Texture2D>(TexturePath);
+            GD.PushWarning($"Bloc poussable : image {path} introuvable, image par défaut utilisée.");
+            path = DefaultTexturePath;
+        }
+        if (ResourceLoader.Exists(path))
+        {
+            sprite.Texture = GD.Load<Texture2D>(path);
             return;
         }
         _placeholder ??= BuildPlaceholder();

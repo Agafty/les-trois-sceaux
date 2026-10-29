@@ -16,6 +16,17 @@ public static class HoleRules
     /// <summary>Vrai si le numéro de tuile (id local du tileset temple_racines) est un trou.</summary>
     public static bool IsHoleTileId(int tileId) => tileId >= FirstHoleTileId && tileId <= LastHoleTileId;
 
+    /// <summary>
+    /// Vrai si l'image d'un tileset est de la famille qui porte les trous mortels en 58 à 66 : temple_racines et sa variante sous-sol,
+    /// mine et sa variante sous-sol (mêmes numéros).
+    /// </summary>
+    public static bool IsHoleTilesetPath(string path)
+    {
+        if (string.IsNullOrEmpty(path)) return false;
+        return path.EndsWith("/temple_racines.png", StringComparison.Ordinal) || path.EndsWith("/temple_racines_sous_sol.png", StringComparison.Ordinal)
+            || path.EndsWith("/mine.png", StringComparison.Ordinal) || path.EndsWith("/mine_sous_sol.png", StringComparison.Ordinal);
+    }
+
     /// <summary>Numéro de tuile (id local Tiled) d'une case de l'atlas.</summary>
     public static int TileId(int atlasX, int atlasY, int columns) => atlasY * columns + atlasX;
 

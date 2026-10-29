@@ -4,7 +4,7 @@ using Godot;
 /// Composant à placer à côté du nœud Health d'un ennemi : à sa mort, tire dans la table
 /// de butin et fait apparaître le résultat à la position de l'ennemi.
 /// Règle anti-blocage : si Brann a l'arc mais peu de flèches, l'ennemi lâche toujours des flèches
-/// (désactivable avec <see cref="GuaranteeArrows"/>).
+/// (désactivable avec <see cref="GuaranteeArrows"/>). Même règle pour les bombes (<see cref="GuaranteeBombs"/>).
 /// </summary>
 public partial class LootDropper : Node
 {
@@ -20,7 +20,15 @@ public partial class LootDropper : Node
     /// <summary>Secondes pendant lesquelles le paquet de flèches garanti reste au sol (le butin ordinaire dure moins longtemps).</summary>
     [Export(PropertyHint.Range, "5,60,1")] public float GuaranteedLifetime { get; set; } = 20f;
 
+    /// <summary>Décocher pour supprimer le butin de bombes garanti sur cet ennemi.</summary>
+    [ExportGroup("Bombes garanties")]
+    [Export] public bool GuaranteeBombs { get; set; } = true;
+
+    /// <summary>Le paquet de bombes tombe si Brann possède les bombes et en a strictement moins que cette valeur.</summary>
+    [Export(PropertyHint.Range, "1,10,1")] public int BombsBelow { get; set; } = 3;
+
     private const string ArrowsScenePath = "res://scenes/items/fleches.tscn";
+    private const string BombsScenePath = "res://scenes/items/bombes_paquet.tscn";
 
     private Health _health;
     private GameState _state;
@@ -58,15 +66,36 @@ public partial class LootDropper : Node
         PackedScene scene = Table?.Roll();
         bool arrows = GuaranteeArrows && _state != null
             && ArrowLootRule.ShouldDrop(_state.HasItem(GameState.BowItemId), _state.GetQuantity(GameState.BowItemId), ArrowsBelow);
+        bool bombs = GuaranteeBombs && _state != null
+            && BombLootRule.ShouldDrop(_state.HasItem(GameState.BombItemId), _state.GetQuantity(GameState.BombItemId), BombsBelow);
         Vector2 pos = enemy.GlobalPosition;
+
+        // Jusqu'à trois objets côte à côte (tirage normal, flèches, bombes), centrés sur l'ennemi.
+        int count = (scene != null ? 1 : 0) + (arrows ? 1 : 0) + (bombs ? 1 : 0);
+        int index = 0;
         if (scene != null)
-            Spawn(world, scene.Instantiate<Node2D>(), arrows ? pos + new Vector2(-8f, 0f) : pos, false);
+            Spawn(world, scene.Instantiate<Node2D>(), pos + SlotOffset(index++, count), false);
         if (arrows)
         {
             var arrowsScene = ResourceKeeper.Load<PackedScene>(ArrowsScenePath); // gardée en mémoire par ResourceKeeper
             if (arrowsScene != null)
-                Spawn(world, arrowsScene.Instantiate<Node2D>(), scene != null ? pos + new Vector2(8f, 0f) : pos, true);
+                Spawn(world, arrowsScene.Instantiate<Node2D>(), pos + SlotOffset(index, count), true);
+            index++;
         }
+        if (bombs)
+        {
+            var bombsScene = ResourceKeeper.Load<PackedScene>(BombsScenePath);
+            if (bombsScene != null)
+                Spawn(world, bombsScene.Instantiate<Node2D>(), pos + SlotOffset(index, count), true);
+        }
+    }
+
+    // Décalage horizontal de l'objet n°index parmi count (0 : sur place ; 2 : -8 / +8 ; 3 : -12 / 0 / +12).
+    private static Vector2 SlotOffset(int index, int count)
+    {
+        if (count <= 1) return Vector2.Zero;
+        float step = count == 2 ? 16f : 12f;
+        return new Vector2((index - (count - 1) * 0.5f) * step, 0f);
     }
 
     // Différé : Died est émis pendant un callback physique (on ne peut pas ajouter un Area2D

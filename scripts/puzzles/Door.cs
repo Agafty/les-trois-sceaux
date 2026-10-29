@@ -286,6 +286,12 @@ public partial class Door : StaticBody2D
         int frameH = Mathf.Max(1, Mathf.RoundToInt(CellSize.Y));
         string textureName = DoorRules.TextureName(Kind, Appearance);
         string path = $"res://art/puzzles/porte_{textureName}.png";
+        // Variante propre à la zone (ex. porte_interrupteur_donjon2.png : grille rouillée de la Mine) si le fichier existe.
+        if (!string.IsNullOrEmpty(Zone))
+        {
+            string zonePath = $"res://art/puzzles/porte_{textureName}_{Zone}.png";
+            if (ResourceLoader.Exists(zonePath)) path = zonePath;
+        }
         Texture2D texture = ResourceLoader.Exists(path) ? GD.Load<Texture2D>(path) : PlaceholderTexture(textureName, frameW, frameH);
         int width = texture.GetWidth();
         if ((width != frameW && width != frameW * 2) || texture.GetHeight() != frameH)

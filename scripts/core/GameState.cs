@@ -32,6 +32,7 @@ public partial class GameState : Node
 
     /// <summary>Id de l'objet « arc » : ses flèches sont sa quantité (butin garanti, tir).</summary>
     public const string BowItemId = "arc";
+    public const string BombItemId = "bombes";
 
     [Signal]
     public delegate void RupeesChangedEventHandler(int total);
