@@ -1,0 +1,85 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/boss/GormBoss.cs" id="1_gorm"]
+[ext_resource type="Script" path="res://scripts/components/Health.cs" id="2_health"]
+[ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="3_hurtbox"]
+[ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="4_hitbox"]
+[ext_resource type="Texture2D" path="res://art/bosses/gorm/gorm.png" id="5_body"]
+[ext_resource type="Texture2D" path="res://art/bosses/gorm/gorm_corruption.png" id="6_corruption"]
+[ext_resource type="Texture2D" path="res://art/bosses/gorm/gorm_ombre.png" id="7_shadow"]
+
+[sub_resource type="CircleShape2D" id="body_shape"]
+radius = 34.0
+
+[sub_resource type="RectangleShape2D" id="armor_shape"]
+size = Vector2(76, 96)
+
+[sub_resource type="RectangleShape2D" id="crystal_shape"]
+size = Vector2(56, 78)
+
+[sub_resource type="CircleShape2D" id="contact_shape"]
+radius = 38.0
+
+[node name="Gorm" type="CharacterBody2D"]
+collision_layer = 4
+motion_mode = 1
+script = ExtResource("1_gorm")
+NameKey = "BOSS_GORM_NOM"
+FarewellKey = "BOSS_GORM_REPLIQUE"
+SealPickupName = "sceau_montagne"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("body_shape")
+
+[node name="Visuel" type="Node2D" parent="."]
+position = Vector2(0, 28)
+
+[node name="Ombre" type="Sprite2D" parent="Visuel"]
+texture = ExtResource("7_shadow")
+centered = false
+offset = Vector2(-48, -94)
+
+[node name="Corps" type="Sprite2D" parent="Visuel"]
+texture = ExtResource("5_body")
+centered = false
+offset = Vector2(-48, -94)
+hframes = 17
+vframes = 3
+
+[node name="Corruption" type="Sprite2D" parent="Visuel"]
+texture = ExtResource("6_corruption")
+centered = false
+offset = Vector2(-48, -94)
+hframes = 17
+vframes = 3
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")
+MaxHealth = 6
+
+[node name="Armure" type="Area2D" parent="."]
+script = ExtResource("3_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Armure"]
+position = Vector2(0, -16)
+shape = SubResource("armor_shape")
+
+[node name="Cristal" type="Area2D" parent="."]
+script = ExtResource("3_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Cristal"]
+position = Vector2(0, -9)
+shape = SubResource("crystal_shape")
+
+[node name="HitBox" type="Area2D" parent="."]
+script = ExtResource("4_hitbox")
+Team = 1
+Damage = 1
+HitStopDuration = 0.02
+CameraShakeStrength = 2.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+position = Vector2(0, -4)
+shape = SubResource("contact_shape")

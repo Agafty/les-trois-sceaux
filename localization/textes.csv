@@ -243,3 +243,8 @@ SALLE_DONJON2_13,Veine d'étoile,Star vein
 SALLE_DONJON2_14,Réserve de Gorm,Gorm's stockpile
 SALLE_DONJON2_15,Cave secrète,Secret cave
 SALLE_DONJON2_BOSS,Cœur de la Mine,Heart of the Mine
+BOSS_GORM_NOM,"Gorm, le Golem de la Mine","Gorm, the Golem of the Mine"
+BOSS_GORM_REPLIQUE,"Un homme au tablier de cuir... il a scié mes poutres. Merci, petit forgeron : ma tête est enfin claire.","A man in a leather apron... he sawed through my beams. Thank you, little smith: my head is finally clear."
+BOSS_GORM_CONSEIL_1,"Son armure résiste à tout. Pose une bombe contre lui, puis recule vite ! Attention aux rochers : leur ombre te prévient.","His armor resists everything. Place a bomb next to him, then back away fast! Watch out for the rocks: their shadow warns you."
+BOSS_GORM_CONSEIL_2,L'épée et l'arc ne passent pas. Il faut une bombe posée tout près de lui : elle arrache une plaque d'armure.,Sword and bow can't get through. You need a bomb placed right next to him: it tears off an armor plate.
+BOSS_GORM_CONSEIL_3,"Le cristal est à nu ! Après sa frappe du sol, il reste étourdi : frappe le cristal à l'épée !",The crystal is bare! After he pounds the ground he is dazed: strike the crystal with your sword!
