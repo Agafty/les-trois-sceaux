@@ -51,9 +51,12 @@ public partial class CrackedWall : StaticBody2D, IBombDestructible
     private Sprite2D _fallback;
     private bool _destroyed;
 
+    public override void _ExitTree() => Bomb.Unregister(this);
+
     public override void _Ready()
     {
         AddToGroup(Bomb.DestructibleGroup);
+        Bomb.Register(this);
         _state = GetNode<GameState>("/root/GameState");
         _shape = GetNode<CollisionShape2D>("CollisionShape2D");
         if (string.IsNullOrEmpty(Id))
@@ -215,6 +218,7 @@ public partial class CrackedWall : StaticBody2D, IBombDestructible
     {
         _destroyed = true;
         RemoveFromGroup(Bomb.DestructibleGroup);
+        Bomb.Unregister(this);
         _shape.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
         foreach (var closed in _closedCells)
         {

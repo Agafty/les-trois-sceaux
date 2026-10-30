@@ -21,8 +21,8 @@ public partial class MinerEnemy : CharacterBody2D, IBombDestructible
     [Export] public float TurnDelay { get; set; } = 0.6f;
 
     [ExportGroup("Bouclier")]
-    /// <summary>Cosinus minimal entre le regard et la direction du coup pour qu'il soit bloqué (0.35 = environ 70° de chaque côté).</summary>
-    [Export(PropertyHint.Range, "-1,1,0.05")] public float BlockCosine { get; set; } = 0.35f;
+    /// <summary>Cosinus minimal entre le regard et la direction du coup pour qu'il soit bloqué (0.5 = 60° de chaque côté).</summary>
+    [Export(PropertyHint.Range, "-1,1,0.05")] public float BlockCosine { get; set; } = 0.5f;
 
     [ExportGroup("Chute")]
     [Export] public float StunDuration { get; set; } = 4f;
@@ -74,6 +74,7 @@ public partial class MinerEnemy : CharacterBody2D, IBombDestructible
 
     public override void _Ready()
     {
+        Bomb.Register(this);
         _sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         _hurtBox = GetNode<HurtBox>("HurtBox");
         _hurtBox.BlockFilter = ShieldBlocks;
@@ -90,6 +91,7 @@ public partial class MinerEnemy : CharacterBody2D, IBombDestructible
 
     public override void _ExitTree()
     {
+        Bomb.Unregister(this);
         if (_hurtBox != null)
         {
             _hurtBox.BlockFilter = null;

@@ -18,7 +18,7 @@ public partial class HurtBox : Area2D
     public bool Invincible { get; set; }
 
     /// <summary>
-    /// Filtre facultatif posé par le propriétaire (bouclier de face...) : reçoit la position de l'attaquant ;
+    /// Filtre facultatif posé par le propriétaire (bouclier de face...) : reçoit la position de l'attaquant (le corps qui porte la HitBox, ex. Brann, sinon la HitBox elle-même : flèche) ;
     /// s'il renvoie vrai, le coup est bloqué (signal <see cref="Blocked"/>, aucun dégât), comme avec <see cref="Invincible"/>.
     /// À assigner une fois (pas de lambda créée à chaque frame).
     /// </summary>
@@ -39,9 +39,15 @@ public partial class HurtBox : Area2D
         _sprite = GetParent().GetNodeOrNull<CanvasItem>("AnimatedSprite2D");
     }
 
-    public void ReceiveHit(int damage, Vector2 fromPosition)
+    public void ReceiveHit(int damage, Vector2 fromPosition) => ReceiveHitFrom(damage, fromPosition, fromPosition);
+
+    /// <summary>
+    /// Comme <see cref="ReceiveHit"/>, avec en plus la position du corps de l'attaquant (Brann pour l'épée), utilisée par le filtre de blocage :
+    /// la HitBox de l'épée est collée à la cible, donc sa position ne dit pas de quel côté vient le coup.
+    /// </summary>
+    public void ReceiveHitFrom(int damage, Vector2 fromPosition, Vector2 attackerPosition)
     {
-        if (Invincible || (BlockFilter != null && BlockFilter(fromPosition)))
+        if (Invincible || (BlockFilter != null && BlockFilter(attackerPosition)))
         {
             EmitSignal(SignalName.Blocked, damage, fromPosition);
             return;

@@ -30,11 +30,16 @@ public partial class HitBox : Area2D
     public bool Melee { get; set; }
 
     private bool _hasHit;
+    private Node2D _attacker; // corps qui porte cette HitBox (Brann pour l'épée) ; nul pour une flèche ou une bombe
     private static bool _hitStopActive;
 
     public override void _Ready()
     {
         AreaEntered += OnAreaEntered;
+        for (Node n = GetParent(); n != null; n = n.GetParent())
+        {
+            if (n is CharacterBody2D body) { _attacker = body; break; }
+        }
     }
 
     private void OnAreaEntered(Area2D area)
@@ -49,7 +54,7 @@ public partial class HitBox : Area2D
         if (SingleHit && _hasHit) return;
         _hasHit = true;
 
-        hurtBox.ReceiveHit(Damage, GlobalPosition);
+        hurtBox.ReceiveHitFrom(Damage, GlobalPosition, _attacker != null && IsInstanceValid(_attacker) ? _attacker.GlobalPosition : GlobalPosition);
         TriggerHitStop();
         ShakeCamera();
         EmitSignal(SignalName.HitLanded);

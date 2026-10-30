@@ -9,6 +9,14 @@ public partial class Bomb : ItemUse
 {
     public static readonly StringName DestructibleGroup = "destructible_bombe";
 
+    private static readonly System.Collections.Generic.List<Node2D> Targets = new();
+
+    /// <summary>Inscrit un destructible (en plus du groupe Godot) pour que les bombes le trouvent. À appeler quand il entre dans l'arbre.</summary>
+    public static void Register(Node2D target) { if (!Targets.Contains(target)) Targets.Add(target); }
+
+    /// <summary>Retire un destructible (détruit ou sorti de l'arbre).</summary>
+    public static void Unregister(Node2D target) => Targets.Remove(target);
+
     [Export(PropertyHint.Range, "0.2,5,0.1")] public float FuseTime { get; set; } = 1.5f;
     [Export(PropertyHint.Range, "8,120,1")] public float ExplosionRadius { get; set; } = 40f;
     /// <summary>Dégâts aux ennemis (1 PV = un demi-cœur).</summary>
@@ -99,9 +107,12 @@ public partial class Bomb : ItemUse
 
         float reach = ExplosionRadius + DestructibleMargin;
         float reachSq = reach * reach;
-        foreach (var node in GetTree().GetNodesInGroup(DestructibleGroup))
+        // Registre C# plutôt que GetNodesInGroup : pas de Godot.Collections.Array à finaliser (plantage observé à la fermeture).
+        for (int i = Targets.Count - 1; i >= 0; i--)
         {
-            if (node is not IBombDestructible target || node is not Node2D n2d) continue;
+            if (i >= Targets.Count) continue; // un destructible détruit se désinscrit pendant la boucle
+            var n2d = Targets[i];
+            if (!IsInstanceValid(n2d) || n2d is not IBombDestructible target) continue;
             // Distance de la bombe au rectangle du destructible (0 si elle est dedans).
             var half = target.BombHalfExtents;
             var offset = (GlobalPosition - n2d.GlobalPosition).Abs() - half;
