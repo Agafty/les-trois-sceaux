@@ -52,6 +52,11 @@ public partial class GormBoss : Boss, IBombDestructible
     /// <summary>Durée (s) d'avertissement de l'ombre d'un rocher.</summary>
     [Export(PropertyHint.Range, "0.4,3,0.05")] public float RockWarnSeconds { get; set; } = 1.0f;
 
+    /// <summary>Écart minimal (px) entre deux rochers d'une même frappe.</summary>
+    [Export(PropertyHint.Range, "16,96,2")] public float RockMinGap { get; set; } = 36f;
+    /// <summary>Délai minimal (s) entre deux rappels de conseil quand Brann tape l'armure.</summary>
+    [Export(PropertyHint.Range, "2,30,1")] public float HintCooldownSeconds { get; set; } = 8f;
+
     [ExportGroup("Ravitaillement en bombes")]
     /// <summary>Brann reçoit un paquet de bombes quand il en a moins que cela (et qu'il reste une plaque).</summary>
     [Export(PropertyHint.Range, "1,10,1")] public int BombSupplyBelow { get; set; } = 2;
@@ -184,6 +189,8 @@ public partial class GormBoss : Boss, IBombDestructible
     {
         Bomb.Unregister(this);
         if (!_ready) return;
+        ClearRocks();
+        FreeBombPack();
         if (_health != null) _health.Died -= OnDied;
         if (_armorBox != null) _armorBox.Blocked -= OnBlocked;
         if (_crystalBox != null) _crystalBox.Hit -= OnHit;
@@ -557,7 +564,7 @@ public partial class GormBoss : Boss, IBombDestructible
             if (BossRules.IsInsideRect(pos.X, pos.Y, r.Position.X, r.Position.Y, r.Size.X, r.Size.Y, 16f)) return false;
         }
         for (int i = 0; i < placedCount; i++)
-            if (pos.DistanceSquaredTo(_placedRocks[i]) < 36f * 36f) return false;
+            if (pos.DistanceSquaredTo(_placedRocks[i]) < RockMinGap * RockMinGap) return false;
         return true;
     }
 
@@ -598,7 +605,7 @@ public partial class GormBoss : Boss, IBombDestructible
     // Armure et corps de pierre : un éclat bleu montre que le coup n'a rien fait ; un conseil rappelle (sans spammer) qu'il faut une bombe.
     private void OnBlocked(int damage, Vector2 fromPosition)
     {
-        if (_state == State.Stunned || _bombBlockGrace > 0f) return;
+        if (_phase2 || _state == State.Stunned || _state == State.Hurt || _bombBlockGrace > 0f) return;
         FlashVisual(new Color(0.3f, 0.6f, 3f), 0.3f);
         AudioManager.PlayAt(Sfx.FlecheImpact, fromPosition);
         _sparkPos = ToLocal(fromPosition);
@@ -606,7 +613,7 @@ public partial class GormBoss : Boss, IBombDestructible
         QueueRedraw();
         if (_hintCooldown <= 0f && !_phase2 && _state != State.Dormant)
         {
-            _hintCooldown = 8f;
+            _hintCooldown = HintCooldownSeconds;
             EmitSignal(Boss.SignalName.HintRequested, "BOSS_GORM_CONSEIL_2", 6f);
         }
     }
@@ -620,9 +627,16 @@ public partial class GormBoss : Boss, IBombDestructible
 
     // --- Victoire -------------------------------------------------------------------------------
 
+    private void FreeBombPack()
+    {
+        if (_bombPack != null && IsInstanceValid(_bombPack)) _bombPack.QueueFree();
+        _bombPack = null;
+    }
+
     private void BeginPurify()
     {
         ClearRocks();
+        FreeBombPack();
         _blink?.Kill();
         _armor = GormRules.PlateCount;
         _lastCell = -1;
