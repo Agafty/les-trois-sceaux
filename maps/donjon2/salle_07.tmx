@@ -127,7 +127,7 @@
   <object id="12" type="Ramassable" x="496" y="272">
    <properties>
     <property name="id" value="donjon2_bombes_01"/>
-    <property name="contenu" value="bombes_paquet"/>
+    <property name="contenu" value="bombes_5"/>
    </properties>
    <point/>
   </object>
