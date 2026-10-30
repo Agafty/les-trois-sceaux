@@ -11,11 +11,22 @@ public partial class Bomb : ItemUse
 
     private static readonly System.Collections.Generic.List<Node2D> Targets = new();
 
-    /// <summary>Inscrit un destructible (en plus du groupe Godot) pour que les bombes le trouvent. À appeler quand il entre dans l'arbre.</summary>
-    public static void Register(Node2D target) { if (!Targets.Contains(target)) Targets.Add(target); }
+    /// <summary>
+    /// Inscrit un destructible : les bombes lisent ce registre (et non le groupe Godot, qui n'est plus lu) ; le nœud entre aussi dans le groupe
+    /// « destructible_bombe » pour l'information. À appeler depuis _EnterTree, avec <see cref="Unregister"/> dans _ExitTree.
+    /// </summary>
+    public static void Register(Node2D target)
+    {
+        if (!Targets.Contains(target)) Targets.Add(target);
+        target.AddToGroup(DestructibleGroup);
+    }
 
-    /// <summary>Retire un destructible (détruit ou sorti de l'arbre).</summary>
-    public static void Unregister(Node2D target) => Targets.Remove(target);
+    /// <summary>Retire un destructible (détruit ou sorti de l'arbre) du registre et du groupe.</summary>
+    public static void Unregister(Node2D target)
+    {
+        Targets.Remove(target);
+        if (target.IsInsideTree()) target.RemoveFromGroup(DestructibleGroup);
+    }
 
     [Export(PropertyHint.Range, "0.2,5,0.1")] public float FuseTime { get; set; } = 1.5f;
     [Export(PropertyHint.Range, "8,120,1")] public float ExplosionRadius { get; set; } = 40f;

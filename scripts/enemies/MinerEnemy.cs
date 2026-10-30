@@ -72,9 +72,10 @@ public partial class MinerEnemy : CharacterBody2D, IBombDestructible
 
     public Vector2 BombHalfExtents => new(11f, 15f);
 
+    public override void _EnterTree() => Bomb.Register(this);
+
     public override void _Ready()
     {
-        Bomb.Register(this);
         _sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         _hurtBox = GetNode<HurtBox>("HurtBox");
         _hurtBox.BlockFilter = ShieldBlocks;
@@ -160,7 +161,7 @@ public partial class MinerEnemy : CharacterBody2D, IBombDestructible
         MoveAndSlide();
     }
 
-    // Filtre du HurtBox : vrai = coup bloqué. Appelé par l'épée et par les flèches (position de leur HitBox).
+    // Filtre du HurtBox : vrai = coup bloqué. La position reçue est celle du corps attaquant (Brann), ou de la HitBox pour une flèche.
     private bool ShieldBlocks(Vector2 fromPosition)
     {
         if (_dead) return false;
