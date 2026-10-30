@@ -116,6 +116,9 @@ public partial class GormBoss : Boss, IBombDestructible
     private bool _ended;
     private bool _ready;
     private bool _moving;
+    private float _stuckTime;
+    private float _detourTimer;
+    private float _detourSide = 1f;
     private bool _hasArrival;
     private Vector2 _arrival;
     private float _hintCooldown;
@@ -268,6 +271,7 @@ public partial class GormBoss : Boss, IBombDestructible
         EmitSignal(Boss.SignalName.HintRequested, "BOSS_GORM_CONSEIL_1", 7f);
         EmitProgress();
         ShakeCamera(3f, 0.8f);
+        _bombTimer = BombPackDelay; // le premier paquet n'arrive pas dès la fin de l'intro
         SetState(State.Intro, IntroDuration);
     }
 
@@ -281,6 +285,8 @@ public partial class GormBoss : Boss, IBombDestructible
     private void BeginChase()
     {
         _strikeTimer = _phase2 ? StrikeInterval2 : StrikeInterval1;
+        _stuckTime = 0f;
+        _detourTimer = 0f;
         SetState(State.Chase, 0f);
     }
 
@@ -294,8 +300,32 @@ public partial class GormBoss : Boss, IBombDestructible
             if (to.LengthSquared() > 20f * 20f)
             {
                 _moving = true;
-                Velocity = to.Normalized() * (_phase2 ? ChaseSpeed2 : ChaseSpeed1);
-                MoveAndSlide();
+                float speed = _phase2 ? ChaseSpeed2 : ChaseSpeed1;
+                var dir = to.Normalized();
+                if (_detourTimer > 0f)
+                {
+                    _detourTimer -= dt;
+                    Velocity = (dir * 0.3f + new Vector2(-dir.Y, dir.X) * _detourSide).Normalized() * speed;
+                    MoveAndSlide();
+                }
+                else
+                {
+                    Velocity = dir * speed;
+                    MoveAndSlide();
+                    // Bloqué (pilier aligné avec Brann) : un pas de côté, vers le centre de l'arène, pour contourner.
+                    if (GetRealVelocity().LengthSquared() < speed * speed * 0.09f)
+                    {
+                        _stuckTime += dt;
+                        if (_stuckTime > 0.3f)
+                        {
+                            _stuckTime = 0f;
+                            _detourTimer = 0.8f;
+                            var side = new Vector2(-dir.Y, dir.X);
+                            _detourSide = side.Dot(ArenaBounds.GetCenter() - GlobalPosition) >= 0f ? 1f : -1f;
+                        }
+                    }
+                    else _stuckTime = 0f;
+                }
             }
         }
         ApplyPose(_moving ? GormFrames.Walk : GormFrames.Idle, true);
@@ -571,7 +601,8 @@ public partial class GormBoss : Boss, IBombDestructible
     private void PlaceRock(Vector2 impact)
     {
         var rock = _rockScene.Instantiate<FallingRock>();
-        rock.WarnDuration = RockWarnSeconds;
+        float help = _gameState.PuzzleTimeMultiplier; // option d'aide : 1, 2 ou 0 (illimité), plafonnée à x2 pour l'annonce
+        rock.WarnDuration = RockWarnSeconds * (help <= 0f ? 2f : Mathf.Min(help, 2f));
         GetParent().AddChild(rock);
         rock.GlobalPosition = impact - new Vector2(0f, FallingRock.SortOffset);
         _rocks.Add(rock);
