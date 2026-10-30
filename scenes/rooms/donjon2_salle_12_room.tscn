@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://maps/donjon2/salle_12.tmx" id="map"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
+[ext_resource type="Script" path="res://scripts/world/Room.cs" id="room_script"]
+
+[node name="Donjon2Salle12" type="Node2D"]
+script = ExtResource("room_script")
+Zone = "donjon2"
+
+[node name="Map" parent="." instance=ExtResource("map")]
+
+[node name="Entites" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Player" parent="Entites" instance=ExtResource("player")]
+position = Vector2(304, 272)

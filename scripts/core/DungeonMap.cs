@@ -140,8 +140,50 @@ public static class DungeonMap
             new MapLink("donjon1_salle_12_room", "donjon1_salle_14_room", MapDoorKind.Switch, "donjon1_porte_14"),
         });
 
+    /// <summary>Plan de la Mine Effondrée (voir maps/donjon2/plan.md §3). À mettre à jour si le plan change.</summary>
+    public static readonly DungeonLayout Donjon2 = new(
+        "donjon2",
+        new[]
+        {
+            new MapRoom("donjon2_salle_01_room", "rdc", 1, 0, "SALLE_DONJON2_01"),
+            new MapRoom("donjon2_salle_02_room", "rdc", 1, 1, "SALLE_DONJON2_02", new[] { "donjon2_coffre_01" }),
+            new MapRoom("donjon2_salle_03_room", "rdc", 0, 1, "SALLE_DONJON2_03"),
+            new MapRoom("donjon2_salle_04_room", "rdc", 2, 1, "SALLE_DONJON2_04", new[] { "donjon2_coffre_02" }, hasFall: true),
+            new MapRoom("donjon2_salle_05_room", "rdc", 3, 1, "SALLE_DONJON2_05", new[] { "donjon2_coffre_03" }, hasStairs: true),
+            new MapRoom("donjon2_salle_06_room", "rdc", 1, 2, "SALLE_DONJON2_06"),
+            new MapRoom("donjon2_salle_07_room", "rdc", 2, 2, "SALLE_DONJON2_07", new[] { "donjon2_coffre_04" }, bigChest: true),
+            new MapRoom("donjon2_salle_08_room", "rdc", 3, 2, "SALLE_DONJON2_08", new[] { "donjon2_coffre_05" }),
+            new MapRoom("donjon2_salle_09_room", "rdc", 3, 3, "SALLE_DONJON2_09"),
+            new MapRoom("donjon2_salle_10_room", "rdc", 2, 3, "SALLE_DONJON2_10", hasStairs: true),
+            new MapRoom("donjon2_salle_boss_room", "rdc", 2, 4, "SALLE_DONJON2_BOSS", isBoss: true),
+            new MapRoom("donjon2_salle_11_room", "sous_sol", 2, 3, "SALLE_DONJON2_11", hasStairs: true),
+            new MapRoom("donjon2_salle_12_room", "sous_sol", 2, 2, "SALLE_DONJON2_12"),
+            new MapRoom("donjon2_salle_13_room", "sous_sol", 3, 2, "SALLE_DONJON2_13", new[] { "donjon2_coffre_07" }, bigChest: true),
+            new MapRoom("donjon2_salle_14_room", "sous_sol", 3, 3, "SALLE_DONJON2_14", new[] { "donjon2_coffre_08" }, bigChest: true),
+            new MapRoom("donjon2_salle_15_room", "sous_sol", 3, 1, "SALLE_DONJON2_15", new[] { "donjon2_coffre_06" }, hasStairs: true),
+        },
+        new[]
+        {
+            new MapLink("donjon2_salle_01_room", "donjon2_salle_02_room"),
+            new MapLink("donjon2_salle_02_room", "donjon2_salle_03_room"),
+            new MapLink("donjon2_salle_02_room", "donjon2_salle_04_room"),
+            new MapLink("donjon2_salle_02_room", "donjon2_salle_06_room", MapDoorKind.Key, "donjon2_porte_01"),
+            new MapLink("donjon2_salle_04_room", "donjon2_salle_05_room", MapDoorKind.Enemies, "donjon2_porte_02"),
+            new MapLink("donjon2_salle_06_room", "donjon2_salle_07_room", MapDoorKind.Switch, "donjon2_porte_03"),
+            new MapLink("donjon2_salle_07_room", "donjon2_salle_08_room"),
+            new MapLink("donjon2_salle_07_room", "donjon2_salle_10_room", MapDoorKind.Switch, "donjon2_porte_06"),
+            new MapLink("donjon2_salle_08_room", "donjon2_salle_09_room", MapDoorKind.Enemies, "donjon2_porte_04"),
+            new MapLink("donjon2_salle_09_room", "donjon2_salle_10_room", MapDoorKind.Key, "donjon2_porte_05"),
+            new MapLink("donjon2_salle_10_room", "donjon2_salle_boss_room", MapDoorKind.BossKey, "donjon2_porte_07"),
+            new MapLink("donjon2_salle_11_room", "donjon2_salle_12_room"),
+            new MapLink("donjon2_salle_11_room", "donjon2_salle_14_room", MapDoorKind.Switch, "donjon2_porte_10"),
+            new MapLink("donjon2_salle_12_room", "donjon2_salle_13_room", MapDoorKind.Switch, "donjon2_porte_09"),
+            new MapLink("donjon2_salle_13_room", "donjon2_salle_14_room", MapDoorKind.Key, "donjon2_porte_08"),
+        });
+
     /// <summary>Plan d'une zone, ou null si elle n'a pas de carte.</summary>
-    public static DungeonLayout GetLayout(string zone) => zone == Donjon1.Zone ? Donjon1 : null;
+    public static DungeonLayout GetLayout(string zone) =>
+        zone == Donjon1.Zone ? Donjon1 : zone == Donjon2.Zone ? Donjon2 : null;
 
     /// <summary>Clé mémorisée pour une salle visitée : « zone/id ».</summary>
     public static string MakeVisitedKey(string zone, string roomId) => (zone ?? "") + "/" + (roomId ?? "");
