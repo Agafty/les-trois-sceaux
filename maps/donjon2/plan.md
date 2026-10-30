@@ -7,7 +7,7 @@ Les aperçus de ce fichier ont été relus par un script de vérification (bibli
 
 **Intention** : donjon des **bombes**. Brann a l'arc depuis le Temple ; ici il apprend à **poser une bombe contre un mur fissuré ou un éboulis**, à **se mettre à distance du souffle**, à **faire tomber le bouclier d'un mineur**, puis à **combiner** bombes et arc (ouvrir un éboulis pour tirer à travers, ouvrir le vestibule d'une porte à clé). La Mine est un peu plus dure que le Temple : plus d'ennemis à bouclier, une salle de tir à trois cibles, un sous-sol où chaque salle demande une bombe. Public : un adulte qui découvre, et un enfant de 5 ans qui joue aidé (combats faciles, aucune énigme ne coûte de point de vie, les fosses mortelles sont toujours hors du chemin).
 
-**Récit** : les poutres de la Mine ont été sciées (indice : le **marteau au poinçon de Corvan**, ramassé en salle 08, sur le chemin obligatoire) ; Gorm, le golem de la Mine, est devenu fou. Le **minerai d'étoile** (obligatoire pour l'Épée trempée) est dans un coffre de la salle 13, que l'on ne peut pas éviter.
+**Récit** : les poutres de la Mine ont été sciées (indice : le **marteau au poinçon de Corvan**, ramassé en salle 08, sur le chemin obligatoire) ; Gorm, le golem de la Mine, est devenu fou. Le **minerai d'étoile** (obligatoire pour l'Épée trempée) est dans un coffre de la salle 13, niché derrière un **rocher fissuré** à faire sauter à la bombe ; la salle est sur le chemin obligatoire et la veine brille dès l'arrivée.
 
 | Étape | Salle | Ce qui est appris ou testé | Tension |
 | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ Les aperçus de ce fichier ont été relus par un script de vérification (bibli
 | 3 | 03 Dépôt de minerai (facultative) | Chauve-souris (vol en zigzag) ; **premier mur fissuré**, vu mais pas franchissable (quart de cœur à prendre plus tard) | moyenne, optionnelle |
 | 4 | 04 Galerie des bennes | Porte « tous les ennemis morts » ; boussole ; **trou de passage** vers la cave secrète | moyenne |
 | 5 | 15 Cave secrète | Atterrissage calme ; **petite clé n°2** | repos |
-| 6 | 05 Salle des wagonnets | **2 blocs sur 2 plaques** (wagonnets) ; petite clé n°1 visible derrière une grille | réflexion, peu de combat |
+| 6 | 05 Salle des wagonnets | **2 wagonnets sur 2 plaques à deux hauteurs**, à contourner des piliers (34 pousses) ; petite clé n°1 visible derrière la grille | réflexion, peu de combat |
 | 7 | 06 Salle de tir | **3 cibles en 10 s** à l'arc, au-dessus de fosses | moyenne-haute (chrono) |
 | 8 | 07 Salle du grand coffre | **Bombes** ; un éboulis bloque la sortie : première bombe, sans danger | moyenne puis démo calme |
 | 9 | 08 Galerie des étais | **Mineur maudit** seul (bombe ou contournement) ; marteau de Corvan ; **petite clé n°3** derrière un mur fissuré | moyenne |
@@ -24,7 +24,7 @@ Les aperçus de ce fichier ont été relus par un script de vérification (bibli
 | 11 | 10 Antichambre | Porte du boss et statue visibles, **grande clé absente** ; levier-raccourci ; escalier vers le sous-sol | moyenne |
 | 12 | 11 Galerie basse | Arrivée au sous-sol ; grille-raccourci vue de l'ouest | calme |
 | 13 | 12 Salle du brasero | **Bombe puis arc** : l'éboulis cache la ligne de tir brasero - torche | moyenne |
-| 14 | 13 Veine d'étoile | **Minerai d'étoile** (coffre libre) ; vestibule bouché : bombe, porte à clé | calme puis moyenne |
+| 14 | 13 Veine d'étoile | **Minerai d'étoile** derrière un rocher fissuré (bombe) ; vestibule bouché : seconde bombe, porte à clé | calme puis moyenne |
 | 15 | 14 Réserve de Gorm | 2 Mineurs + chauve-souris ; **grande clé** derrière un mur fissuré ; levier-raccourci | haute (défi final) |
 | 16 | Boss | Gorm : bombes sur les plaques d'armure, puis épée sur le cristal | boss |
 
@@ -35,11 +35,11 @@ Rythme : calme (01) - fight léger (02) - fight (04) - **repos** (15) - réflexi
 Identiques au Temple (`maps/donjon1/plan.md` §2) : salle 20x11, mur du pourtour d'une case, **une seule position pour chaque ouverture** (nord (9,0), sud (9,10) ou (9,21) pour le boss, ouest (0,5), est (19,5)), `Spawn` d'arrivée `depuis_<côté>` à (9,2), (9,8), (2,5), (17,5), une `Porte` par face dans chacune des deux salles avec le même `id`, déclencheur toujours dans une salle qui contient une face de sa porte, un seul escalier par salle (`Spawn` `depuis_escalier` sur la case voisine), trous de passage `Chute` (jamais à moins de 2 cases d'un `Spawn` d'arrivée), fosses mortelles 58-66, blocs jamais dans une salle à trous, à cibles ou à torches, jamais sur ou à côté d'un `Spawn`/`Sortie`/`Porte`. Dans la salle 01, l'arrivée du dehors s'appelle `depuis_montagne` (le `Sortie` de `montagne.tmx` vise `donjon2_salle_01_room.tscn` / `depuis_montagne`) et la `Sortie` sud de la salle 01 vise `montagne_room.tscn` / `depuis_mine` (ce `Spawn` existe déjà dans `montagne.tmx`).
 
 **Règles propres aux bombes** (relevées dans `Bomb.cs`, `CrackedWall.cs`, `MinerEnemy.cs`) :
-- Bombe : mèche 1,5 s, **rayon du souffle 40 px**, **1 PV de dégâts à Brann** s'il est dans le rayon, 3 PV aux ennemis, une seule bombe posée à la fois. Stock maximal **10** (`GameState.GetMaxQuantity`), le grand coffre en donne **5** (`objet_bombes`), un paquet au sol en donne 5 (`boutique_bombes`, posé seulement si Brann possède déjà les bombes).
+- Bombe : mèche 1,5 s, **rayon du souffle 40 px**, **1 PV de dégâts à Brann** s'il est dans le rayon, 3 PV aux ennemis, une seule bombe posée à la fois. Stock maximal **10** (`GameState.GetMaxQuantity`), le grand coffre en donne **5** (`objet_bombes`), un paquet au sol en donne 5 (`bombes_paquet`, à créer sur le modèle de `boutique_bombes` : posé seulement si Brann possède déjà les bombes).
 - Portée mesurée **jusqu'au bord** du destructible : une bombe détruit les murs fissurés des **8 cases voisines** de la case où elle est posée (pas ceux à 2 cases). Un mur fissuré est donc cassé en se plaçant à côté, en posant la bombe contre lui, puis en **reculant d'au moins 2 cases** pendant la mèche. Chaque cible bombée est toujours précédée de **3 cases libres** pour reculer.
 - Mur fissuré : `MurFissure`, état mémorisé par `id` ; sur une ouverture de salle il recouvre la `Sortie` (`apparence` = `eboulis`).
 - Mineur maudit (déjà codé) : le bouclier bloque l'épée **et les flèches de face** ; de côté ou de dos il est vulnérable ; une bombe à portée le fait tomber (étourdi 4 s, sans bouclier). Il n'est donc **jamais obligatoire de le bomber** : le contourner suffit (donc aucun blocage possible).
-- **Munitions de bombes (anti-blocage)** : trois sources, détaillées au §3 : le grand coffre (5), des paquets au sol (`donjon2_bombes_01` à `04`, uniques), et surtout le **butin de bombes garanti** (NOUVEAU, §7) : tant que Brann a moins de 3 bombes, chaque ennemi vaincu lâche un paquet. Chaque salle à bombe contient au moins un ennemi qui n'est pas un Mineur (Caillou ou Chauve-souris), et les ennemis réapparaissent à chaque retour dans la salle : on ne peut donc jamais rester sans bombe devant un mur obligatoire.
+- **Munitions de bombes (anti-blocage)** : trois sources, détaillées au §3 : le grand coffre (5), des paquets au sol (`donjon2_bombes_01` à `05`, uniques), et surtout le **butin de bombes garanti** (NOUVEAU, §7) : tant que Brann a moins de 3 bombes, chaque ennemi vaincu lâche un paquet. Chaque salle à bombe contient au moins un ennemi qui n'est pas un Mineur (Caillou ou Chauve-souris), et les ennemis réapparaissent à chaque retour dans la salle : on ne peut donc jamais rester sans bombe devant un mur obligatoire.
 - Arc : comme dans le Temple (flèche 300 px/s, 10 cases de portée, butin de flèches garanti sous 10 flèches). Les salles de tir (06, 12) contiennent un ennemi qui ne tire pas.
 
 ## 3. Plan des salles
@@ -100,12 +100,12 @@ Position des salles (carte du menu pause : propriétés de carte `etage`, `carte
 | Petite clé n°2 (cachée) | salle 15, `donjon2_coffre_06` (cave atteinte par le trou de la 04 ou l'escalier de la 05) |
 | **Bombes** | salle 07, `donjon2_coffre_04` (grand coffre ; 7e salle sur 16 dans l'ordre conseillé, donc vers le **milieu** du parcours) |
 | Petite clé n°3 | salle 08, `donjon2_coffre_05` (derrière un mur fissuré : demande les bombes) |
-| **Minerai d'étoile** (obligatoire pour l'Épée trempée) | salle 13, `donjon2_coffre_07` (`important`=true, coffre libre, en vue dès l'arrivée, sur le chemin obligatoire) |
+| **Minerai d'étoile** (obligatoire pour l'Épée trempée) | salle 13, `donjon2_coffre_07` (`important`=true), dans une niche fermée par le rocher fissuré `donjon2_mur_10` : niche visible dès l'arrivée, salle sur le chemin obligatoire |
 | **Grande clé** | **salle 14 (sous-sol)**, `donjon2_coffre_08` (grand coffre, derrière un mur fissuré) ; sert à la porte 07, **à l'étage du dessus**, dans la salle 10 (la porte du boss n'est pas dans la salle de la clé) |
 | **Marteau au poinçon de Corvan** (indice d'histoire) | salle 08, `donjon2_marteau_corvan` (ramassable posé au pied d'une poutre sciée ; indice `indice_poutres_sciees`) |
 | Quart de cœur (facultatif) | salle 03, `donjon2_quart_coeur_01` (derrière le premier mur fissuré, qu'on voit dès le début et qu'on ouvre après les bombes) |
 | Plume de corbeau (facultative) | salle 09, `donjon2_plume_01` (derrière un mur épais de 3 cases) |
-| Paquets de bombes (uniques) | `donjon2_bombes_01` (07), `_02` (08), `_03` (09), `_04` (14) |
+| Paquets de bombes (uniques) | `donjon2_bombes_01` (07), `_02` (08), `_03` (09), `_04` (14), `_05` (13) |
 | Boss | salle boss (au nord de la 10) |
 
 | Porte | Entre | Type | Ouverture |
@@ -120,7 +120,7 @@ Position des salles (carte du menu pause : propriétés de carte `etage`, `carte
 | `donjon2_porte_08` | 13 (nord) et 14 (sud) | `cle` | une petite clé (derrière le vestibule bouché de la 13) |
 | `donjon2_porte_09` | 12 (est) et 13 (ouest) | `interrupteur` | torche (15,5) allumée par une flèche enflammée (salle 12) |
 | `donjon2_porte_10` | 11 (est) et 14 (ouest) | `interrupteur` | levier à l'épée (salle 14) : **raccourci** |
-| `donjon2_porte_11` | grille intérieure de la 05 (9,8) | `interrupteur` | 2 plaques (14,3) et (17,3) avec 2 blocs : petite clé n°1 |
+| `donjon2_porte_11` | grille intérieure de la 05 (9,6), qui ferme la salle du coffre | `interrupteur` | 2 plaques (16,3) et (17,5) avec 2 wagonnets : petite clé n°1 |
 
 | Mur fissuré / éboulis | Lieu | Effet |
 | --- | --- | --- |
@@ -131,6 +131,7 @@ Position des salles (carte du menu pause : propriétés de carte `etage`, `carte
 | `donjon2_mur_07` | 12 (11,5), `eboulis` | ouvre la ligne de tir brasero - torche (obligatoire) |
 | `donjon2_mur_08` | 13 (9,3), `eboulis` | vestibule de la porte à clé 08 (obligatoire) |
 | `donjon2_mur_09` | 14 (3,2) | alcôve de la grande clé (obligatoire) |
+| `donjon2_mur_10` | 13 (3,2), `rocher_fissure` (tuile 152) | niche du minerai d'étoile |
 
 | Lien d'étage | Départ | Arrivée | Sens |
 | --- | --- | --- | --- |
@@ -148,7 +149,7 @@ Position des salles (carte du menu pause : propriétés de carte `etage`, `carte
 | 08 | 1 (`donjon2_mur_03`) | il reste au moins 4 bombes en arrivant, paquet `_02`, 1 Caillou |
 | 09 | 0 (plume : 1 si bien placée) | paquet `_03`, 1 Caillou |
 | 12 | 1 (`donjon2_mur_07`) | butin garanti des 2 Cailloux, stock restant |
-| 13 | 1 (`donjon2_mur_08`) | butin garanti de la Chauve-souris et du Caillou rouge |
+| 13 | 2 (`donjon2_mur_08` et `donjon2_mur_10`, le minerai) | butin garanti de la Chauve-souris et du Caillou rouge |
 | 14 | 1 (`donjon2_mur_09`) | paquet `_04`, butin garanti de la Chauve-souris |
 
 **Parcours conseillé** (celui que le vérificateur retrouve, à quelques détours facultatifs près) :
@@ -206,12 +207,12 @@ Premier pas, volontairement identique à l'entrée du Temple : un seul Caillou r
 
 Objets Tiled (calque `Objets`). Coordonnées en pixels ; « centre » = centre de la case.
 
-- `Sortie` (288,0,32,32) côté nord : `cible_carte`=res://scenes/rooms/donjon2_salle_02_room.tscn, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
-- `Sortie` (288,320,32,32) côté sud : `cible_carte`=res://scenes/rooms/montagne_room.tscn, `cible_spawn`=`depuis_mine`, `godot_node_type`=`area`
+- `Sortie` (288,0,32,32) [côté nord] : `cible_carte`=`res://scenes/rooms/donjon2_salle_02_room.tscn`, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
+- `Sortie` (288,320,32,32) [côté sud] : `cible_carte`=`res://scenes/rooms/montagne_room.tscn`, `cible_spawn`=`depuis_mine`, `godot_node_type`=`area`
 - `Spawn` point (304,80) : `id`=`depuis_nord`
 - `Spawn` point (304,272) : `id`=`depuis_montagne`
 - `Ennemi` point (496,112) : `type`=`caillou_rampant`, `variante`=`normal`
-- `StatueCorbeau` (13,8) -> centre (432,272) : `id`=`donjon2_statue_01`
+- `StatueCorbeau` point (432,272) : `id`=`donjon2_statue_01`
 
 ### salle_02 - Hall des wagons
 
@@ -234,16 +235,16 @@ X.P....c.........P.X
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (288,0,32,32) côté nord : `cible_carte`=res://scenes/rooms/donjon2_salle_06_room.tscn, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
-- `Porte` (288,0,32,32) côté nord : `id`=`donjon2_porte_01`, `type`=`cle`
-- `Sortie` (288,320,32,32) côté sud : `cible_carte`=res://scenes/rooms/donjon2_salle_01_room.tscn, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
-- `Sortie` (0,160,32,32) côté ouest : `cible_carte`=res://scenes/rooms/donjon2_salle_03_room.tscn, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
-- `Sortie` (608,160,32,32) côté est : `cible_carte`=res://scenes/rooms/donjon2_salle_04_room.tscn, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
+- `Sortie` (288,0,32,32) [côté nord] : `cible_carte`=`res://scenes/rooms/donjon2_salle_06_room.tscn`, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
+- `Porte` (288,0,32,32) [côté nord] : `id`=`donjon2_porte_01`, `type`=`cle`
+- `Sortie` (288,320,32,32) [côté sud] : `cible_carte`=`res://scenes/rooms/donjon2_salle_01_room.tscn`, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
+- `Sortie` (0,160,32,32) [côté ouest] : `cible_carte`=`res://scenes/rooms/donjon2_salle_03_room.tscn`, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
+- `Sortie` (608,160,32,32) [côté est] : `cible_carte`=`res://scenes/rooms/donjon2_salle_04_room.tscn`, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
 - `Spawn` point (304,80) : `id`=`depuis_nord`
 - `Spawn` point (80,176) : `id`=`depuis_ouest`
 - `Spawn` point (560,176) : `id`=`depuis_est`
 - `Spawn` point (304,272) : `id`=`depuis_sud`
-- `Coffre` point (496,80) : `id`=`donjon2_coffre_01`, `contenu`=`carte_donjon`, `important`=false
+- `Coffre` point (496,80) : `id`=`donjon2_coffre_01`, `contenu`=`carte_donjon`, `important`=`false`
 - `Ennemi` point (240,176) : `type`=`caillou_rampant`, `variante`=`normal`
 - `Ennemi` point (400,208) : `type`=`caillou_rampant`, `variante`=`normal`
 
@@ -268,7 +269,7 @@ Impasse facultative. Une Chauve-souris (elle zigzague : on apprend à l'attendre
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (608,160,32,32) côté est : `cible_carte`=res://scenes/rooms/donjon2_salle_02_room.tscn, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
+- `Sortie` (608,160,32,32) [côté est] : `cible_carte`=`res://scenes/rooms/donjon2_salle_02_room.tscn`, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
 - `Spawn` point (560,176) : `id`=`depuis_est`
 - `Ramassable` point (48,48) : `id`=`donjon2_quart_coeur_01`, `contenu`=`quart_coeur`
 - `Ennemi` point (144,272) : `type`=`chauve_souris`, `variante`=`normal`
@@ -296,51 +297,52 @@ X.P.......b......P.N
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (0,160,32,32) côté ouest : `cible_carte`=res://scenes/rooms/donjon2_salle_02_room.tscn, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
-- `Sortie` (608,160,32,32) côté est : `cible_carte`=res://scenes/rooms/donjon2_salle_05_room.tscn, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
-- `Porte` (608,160,32,32) côté est : `id`=`donjon2_porte_02`, `type`=`ennemis`
+- `Sortie` (0,160,32,32) [côté ouest] : `cible_carte`=`res://scenes/rooms/donjon2_salle_02_room.tscn`, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
+- `Sortie` (608,160,32,32) [côté est] : `cible_carte`=`res://scenes/rooms/donjon2_salle_05_room.tscn`, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
+- `Porte` (608,160,32,32) [côté est] : `id`=`donjon2_porte_02`, `type`=`ennemis`
 - `Spawn` point (80,176) : `id`=`depuis_ouest`
 - `Spawn` point (560,176) : `id`=`depuis_est`
-- `Chute` (32,256,64,64) : `id`=`donjon2_chute_04`, `cible_carte`=res://scenes/rooms/donjon2_salle_15_room.tscn, `cible_spawn`=`depuis_chute_salle_04`, `godot_node_type`=`area`
+- `Chute` (32,256,64,64) : `id`=`donjon2_chute_04`, `cible_carte`=`res://scenes/rooms/donjon2_salle_15_room.tscn`, `cible_spawn`=`depuis_chute_salle_04`, `godot_node_type`=`area`
 - `Ennemi` point (208,80) : `type`=`caillou_rampant`, `variante`=`normal`
-- `Coffre` point (496,80) : `id`=`donjon2_coffre_02`, `contenu`=`boussole`, `important`=false
+- `Coffre` point (496,80) : `id`=`donjon2_coffre_02`, `contenu`=`boussole`, `important`=`false`
 - `Ennemi` point (336,176) : `type`=`chauve_souris`, `variante`=`normal`
 - `Ennemi` point (464,272) : `type`=`caillou_rampant`, `variante`=`normal`
 
 ### salle_05 - Salle des wagonnets
 
-**Deux blocs (deux wagonnets de minerai), deux plaques.** Variante en miroir vertical de la salle 05 du Temple, dont la solution est prouvée : une rangée de chevalets coupe la salle en deux ; au sud, derrière la brèche, un coffre dans une alcôve fermée par une grille (la petite clé n°1 est visible sans être prenable). Au nord, un couloir d'une case de large contient deux plaques (14,3) et (17,3) et deux wagonnets attendent dans la zone ouest. L'escalier vers la cave secrète (salle 15) est dans l'angle nord-ouest, visible dès l'arrivée.
+**Deux wagonnets, deux plaques à deux hauteurs.** Énigme nouvelle (différente du Temple) : une rangée de chevalets coupe la salle ; au milieu, une **grille** (`donjon2_porte_11`) ferme la petite pièce du sud, où l'on voit le coffre de la petite clé n°1 sans pouvoir le prendre. La grille étant dans la barrière, aucun wagonnet ne peut passer au sud : le sud ne peut pas être encombré. Au nord, une zone de 18x5 avec des piliers : deux wagonnets côte à côte à l'ouest (5,3) et (6,3), une plaque en (16,3) et une autre en (17,5). Il faut séparer les wagonnets, les faire contourner les piliers (7,4), (7,5), (11,2), (11,3), (14,5), (15,3), (16,4) et choisir lequel va sur quelle plaque. L'escalier vers la cave secrète (salle 15) est dans l'angle nord-ouest, visible dès l'arrivée.
 
-Solution (25 pousses minimum, vérifiées) : monter ou descendre chaque bloc d'une case pour l'aligner sur la rangée 3, puis le pousser vers l'est dans le couloir : le premier jusqu'à la plaque du fond (17,3), le second jusqu'à (14,3). Quand les deux plaques sont pressées en même temps, la grille (9,8) s'ouvre définitivement. Si on se trompe, **sortir de la salle et revenir remet les blocs à leur place**. Un Caillou (butin) rôde au sud.
+Solution : **34 pousses au minimum** (trouvée et prouvée par exploration complète de 2 485 états, règle « pas de bloc sur ou à côté d'un Spawn, d'une Porte ou de l'escalier » comprise). Quand les deux plaques sont pressées en même temps, la grille (9,6) s'ouvre définitivement. Dans aucun des 2 485 états Brann n'est enfermé ; en revanche des wagonnets peuvent se coincer : **sortir de la salle et revenir remet les wagonnets à leur place** (comportement de `Room`). Un Caillou (butin de flèches et de bombes) rôde au nord.
 
 <!-- salle_05 -->
 ```text
 ####################
-#vP................#
-#...B.....##########
-#.............p..p##
-#...B.....##########
-N.P................#
-#OOOOOOO...OOOOOOOO#
+#vP..........c.....#
+#..........O.......#
+#....BB....O...Op..#
+#......O........O..#
+N.P....O......O..p.#
+#OOOOOOOOIOOOOOOOOO#
 #..................#
-#........I....c....#
-#.......#C#........#
+#..................#
+#........C.........#
 ####################
 ```
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (0,160,32,32) côté ouest : `cible_carte`=res://scenes/rooms/donjon2_salle_04_room.tscn, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
-- `Porte` (0,160,32,32) côté ouest : `id`=`donjon2_porte_02`, `type`=`ennemis`
-- `Sortie` (32,32,32,32) sur la tuile d'escalier : `cible_carte`=res://scenes/rooms/donjon2_salle_15_room.tscn, `cible_spawn`=`depuis_escalier`, `transition`=`escalier`, `godot_node_type`=`area`
+- `Sortie` (0,160,32,32) [côté ouest] : `cible_carte`=`res://scenes/rooms/donjon2_salle_04_room.tscn`, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
+- `Porte` (0,160,32,32) [côté ouest] : `id`=`donjon2_porte_02`, `type`=`ennemis`
+- `Sortie` (32,32,32,32) [sur la tuile d'escalier] : `cible_carte`=`res://scenes/rooms/donjon2_salle_15_room.tscn`, `cible_spawn`=`depuis_escalier`, `transition`=`escalier`, `godot_node_type`=`area`
 - `Spawn` point (80,48) : `id`=`depuis_escalier`
 - `Spawn` point (80,176) : `id`=`depuis_ouest`
-- `Ennemi` point (464,272) : `type`=`caillou_rampant`, `variante`=`normal`
-- `Coffre` point (304,304) : `id`=`donjon2_coffre_03`, `contenu`=`cle_petite`, `important`=false
-- `BlocPoussable` (4,2) -> centre (144,80) et (4,4) -> centre (144,144)
-- `PlaqueDePression` (448,96,32,32) : `id`=`donjon2_plaque_01`, `cible`=`donjon2_porte_11`, `declencheur`=`bloc`, `godot_node_type`=`area`
-- `PlaqueDePression` (544,96,32,32) : `id`=`donjon2_plaque_02`, `cible`=`donjon2_porte_11`, `declencheur`=`bloc`, `godot_node_type`=`area`
-- `Porte` (288,256,32,32) intérieure (grille) : `id`=`donjon2_porte_11`, `type`=`interrupteur`
+- `Ennemi` point (432,48) : `type`=`caillou_rampant`, `variante`=`normal`
+- `BlocPoussable` point (176,112) [wagonnet] : `apparence`=`mine`
+- `BlocPoussable` point (208,112) [wagonnet] : `apparence`=`mine`
+- `PlaqueDePression` (512,96,32,32) : `id`=`donjon2_plaque_01`, `cible`=`donjon2_porte_11`, `declencheur`=`bloc`, `godot_node_type`=`area`
+- `PlaqueDePression` (544,160,32,32) : `id`=`donjon2_plaque_02`, `cible`=`donjon2_porte_11`, `declencheur`=`bloc`, `godot_node_type`=`area`
+- `Porte` (288,192,32,32) [intérieure (grille)] : `id`=`donjon2_porte_11`, `type`=`interrupteur`
+- `Coffre` point (304,304) : `id`=`donjon2_coffre_03`, `contenu`=`cle_petite`, `important`=`false`
 
 ### salle_06 - Salle de tir
 
@@ -363,17 +365,17 @@ Objets Tiled (calque `Objets`).
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (288,320,32,32) côté sud : `cible_carte`=res://scenes/rooms/donjon2_salle_02_room.tscn, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
-- `Porte` (288,320,32,32) côté sud : `id`=`donjon2_porte_01`, `type`=`cle`
-- `Sortie` (608,160,32,32) côté est : `cible_carte`=res://scenes/rooms/donjon2_salle_07_room.tscn, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
-- `Porte` (608,160,32,32) côté est : `id`=`donjon2_porte_03`, `type`=`interrupteur`
+- `Sortie` (288,320,32,32) [côté sud] : `cible_carte`=`res://scenes/rooms/donjon2_salle_02_room.tscn`, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
+- `Porte` (288,320,32,32) [côté sud] : `id`=`donjon2_porte_01`, `type`=`cle`
+- `Sortie` (608,160,32,32) [côté est] : `cible_carte`=`res://scenes/rooms/donjon2_salle_07_room.tscn`, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
+- `Porte` (608,160,32,32) [côté est] : `id`=`donjon2_porte_03`, `type`=`interrupteur`
 - `Spawn` point (560,176) : `id`=`depuis_est`
 - `Spawn` point (304,272) : `id`=`depuis_sud`
-- `Interrupteur` (18,2) -> centre (592,80) : `id`=`donjon2_interrupteur_01`, `cible`=`donjon2_porte_03`, `mode`=`fleche`, `duree`=10
+- `Interrupteur` point (592,80) : `id`=`donjon2_interrupteur_01`, `cible`=`donjon2_porte_03`, `mode`=`fleche`, `duree`=`10`
 - `Ennemi` point (112,144) : `type`=`caillou_rampant`, `variante`=`normal`
-- `Interrupteur` (1,5) -> centre (48,176) : `id`=`donjon2_interrupteur_02`, `cible`=`donjon2_porte_03`, `mode`=`fleche`, `duree`=10
+- `Interrupteur` point (48,176) : `id`=`donjon2_interrupteur_02`, `cible`=`donjon2_porte_03`, `mode`=`fleche`, `duree`=`10`
 - `Ennemi` point (400,208) : `type`=`caillou_rampant`, `variante`=`normal`
-- `Interrupteur` (18,8) -> centre (592,272) : `id`=`donjon2_interrupteur_03`, `cible`=`donjon2_porte_03`, `mode`=`fleche`, `duree`=10
+- `Interrupteur` point (592,272) : `id`=`donjon2_interrupteur_03`, `cible`=`donjon2_porte_03`, `mode`=`fleche`, `duree`=`10`
 
 ### salle_07 - Salle du grand coffre
 
@@ -396,18 +398,18 @@ I.P..............P.e
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (0,160,32,32) côté ouest : `cible_carte`=res://scenes/rooms/donjon2_salle_06_room.tscn, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
-- `Porte` (0,160,32,32) côté ouest : `id`=`donjon2_porte_03`, `type`=`interrupteur`
-- `Sortie` (288,0,32,32) côté nord : `cible_carte`=res://scenes/rooms/donjon2_salle_10_room.tscn, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
-- `Porte` (288,0,32,32) côté nord : `id`=`donjon2_porte_06`, `type`=`interrupteur`
-- `Sortie` (608,160,32,32) côté est : `cible_carte`=res://scenes/rooms/donjon2_salle_08_room.tscn, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
-- `MurFissure` (608,160,32,32) (même rectangle que la `Sortie`, qui n'est active qu'une fois le mur détruit) : `id`=`donjon2_mur_02`, `apparence`=`eboulis`
+- `Sortie` (0,160,32,32) [côté ouest] : `cible_carte`=`res://scenes/rooms/donjon2_salle_06_room.tscn`, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
+- `Porte` (0,160,32,32) [côté ouest] : `id`=`donjon2_porte_03`, `type`=`interrupteur`
+- `Sortie` (288,0,32,32) [côté nord] : `cible_carte`=`res://scenes/rooms/donjon2_salle_10_room.tscn`, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
+- `Porte` (288,0,32,32) [côté nord] : `id`=`donjon2_porte_06`, `type`=`interrupteur`
+- `Sortie` (608,160,32,32) [côté est] : `cible_carte`=`res://scenes/rooms/donjon2_salle_08_room.tscn`, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
+- `MurFissure` (608,160,32,32) [même rectangle que la `Sortie`, active une fois détruit] : `id`=`donjon2_mur_02`, `apparence`=`eboulis`
 - `Spawn` point (304,80) : `id`=`depuis_nord`
 - `Spawn` point (80,176) : `id`=`depuis_ouest`
 - `Spawn` point (560,176) : `id`=`depuis_est`
-- `Coffre` point (400,112) : `id`=`donjon2_coffre_04`, `contenu`=`objet_bombes`, `important`=true
+- `Coffre` point (400,112) : `id`=`donjon2_coffre_04`, `contenu`=`objet_bombes`, `important`=`true`
 - `Ennemi` point (176,240) : `type`=`caillou_rampant`, `variante`=`normal`
-- `Ramassable` point (496,272) : `id`=`donjon2_bombes_01`, `contenu`=`boutique_bombes` (5 bombes, posé seulement si Brann possède les bombes)
+- `Ramassable` point (496,272) [paquet de bombes, posé seulement si Brann possède les bombes] : `id`=`donjon2_bombes_01`, `contenu`=`bombes_paquet`
 - `Ennemi` point (304,304) : `type`=`caillou_rampant`, `variante`=`normal`
 
 ### salle_08 - Galerie des étais
@@ -431,19 +433,19 @@ e.P........m.......#
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (0,160,32,32) côté ouest : `cible_carte`=res://scenes/rooms/donjon2_salle_07_room.tscn, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
-- `MurFissure` (0,160,32,32) (même rectangle que la `Sortie`, qui n'est active qu'une fois le mur détruit) : `id`=`donjon2_mur_02`, `apparence`=`eboulis`
-- `Sortie` (288,0,32,32) côté nord : `cible_carte`=res://scenes/rooms/donjon2_salle_09_room.tscn, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
-- `Porte` (288,0,32,32) côté nord : `id`=`donjon2_porte_04`, `type`=`ennemis`
+- `Sortie` (0,160,32,32) [côté ouest] : `cible_carte`=`res://scenes/rooms/donjon2_salle_07_room.tscn`, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
+- `MurFissure` (0,160,32,32) [même rectangle que la `Sortie`, active une fois détruit] : `id`=`donjon2_mur_02`, `apparence`=`eboulis`
+- `Sortie` (288,0,32,32) [côté nord] : `cible_carte`=`res://scenes/rooms/donjon2_salle_09_room.tscn`, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
+- `Porte` (288,0,32,32) [côté nord] : `id`=`donjon2_porte_04`, `type`=`ennemis`
 - `Spawn` point (304,80) : `id`=`depuis_nord`
 - `Spawn` point (80,176) : `id`=`depuis_ouest`
-- `Coffre` point (560,48) : `id`=`donjon2_coffre_05`, `contenu`=`cle_petite`, `important`=false
+- `Coffre` point (560,48) : `id`=`donjon2_coffre_05`, `contenu`=`cle_petite`, `important`=`false`
 - `Ennemi` point (368,176) : `type`=`mineur_maudit`, `variante`=`normal`
-- `Ramassable` point (112,272) : `id`=`donjon2_bombes_02`, `contenu`=`boutique_bombes` (5 bombes, posé seulement si Brann possède les bombes)
+- `Ramassable` point (112,272) [paquet de bombes, posé seulement si Brann possède les bombes] : `id`=`donjon2_bombes_02`, `contenu`=`bombes_paquet`
 - `Ennemi` point (208,272) : `type`=`caillou_rampant`, `variante`=`normal`
 - `Ramassable` point (368,272) : `id`=`donjon2_marteau_corvan`, `contenu`=`marteau_corvan`
 - `MurFissure` (512,64,32,32) : `id`=`donjon2_mur_03`, `apparence`=`mur`
-- Rectangle nommé `indice_poutres_sciees` (320,224,96,64) : `godot_node_type`=`area` (texte `INDICE_POUTRES_SCIEES`)
+- Rectangle nommé `indice_poutres_sciees` (320,224,96,64) [texte `INDICE_POUTRES_SCIEES`] : `godot_node_type`=`area`
 
 ### salle_09 - Carrefour effondré
 
@@ -466,16 +468,16 @@ D.P................#
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (288,320,32,32) côté sud : `cible_carte`=res://scenes/rooms/donjon2_salle_08_room.tscn, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
-- `Porte` (288,320,32,32) côté sud : `id`=`donjon2_porte_04`, `type`=`ennemis`
-- `Sortie` (0,160,32,32) côté ouest : `cible_carte`=res://scenes/rooms/donjon2_salle_10_room.tscn, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
-- `Porte` (0,160,32,32) côté ouest : `id`=`donjon2_porte_05`, `type`=`cle`
+- `Sortie` (288,320,32,32) [côté sud] : `cible_carte`=`res://scenes/rooms/donjon2_salle_08_room.tscn`, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
+- `Porte` (288,320,32,32) [côté sud] : `id`=`donjon2_porte_04`, `type`=`ennemis`
+- `Sortie` (0,160,32,32) [côté ouest] : `cible_carte`=`res://scenes/rooms/donjon2_salle_10_room.tscn`, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
+- `Porte` (0,160,32,32) [côté ouest] : `id`=`donjon2_porte_05`, `type`=`cle`
 - `Spawn` point (80,176) : `id`=`depuis_ouest`
 - `Spawn` point (304,272) : `id`=`depuis_sud`
 - `Ramassable` point (592,80) : `id`=`donjon2_plume_01`, `contenu`=`plume_corbeau`
 - `Ennemi` point (240,208) : `type`=`mineur_maudit`, `variante`=`normal`
 - `Ennemi` point (528,240) : `type`=`mineur_maudit`, `variante`=`normal`
-- `Ramassable` point (496,272) : `id`=`donjon2_bombes_03`, `contenu`=`boutique_bombes` (5 bombes, posé seulement si Brann possède les bombes)
+- `Ramassable` point (496,272) [paquet de bombes, posé seulement si Brann possède les bombes] : `id`=`donjon2_bombes_03`, `contenu`=`bombes_paquet`
 - `Ennemi` point (144,304) : `type`=`caillou_rampant`, `variante`=`normal`
 - `MurFissure` (512,32,32,32) : `id`=`donjon2_mur_04`, `apparence`=`mur`
 - `MurFissure` (512,64,32,32) : `id`=`donjon2_mur_05`, `apparence`=`mur`
@@ -502,20 +504,20 @@ La **porte de la grande clé est visible dès l'arrivée, mais la clé n'est pas
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (608,160,32,32) côté est : `cible_carte`=res://scenes/rooms/donjon2_salle_09_room.tscn, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
-- `Porte` (608,160,32,32) côté est : `id`=`donjon2_porte_05`, `type`=`cle`
-- `Sortie` (288,320,32,32) côté sud : `cible_carte`=res://scenes/rooms/donjon2_salle_07_room.tscn, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
-- `Porte` (288,320,32,32) côté sud : `id`=`donjon2_porte_06`, `type`=`interrupteur`
-- `Sortie` (288,0,32,32) côté nord : `cible_carte`=res://scenes/rooms/donjon2_salle_boss_room.tscn, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
-- `Porte` (288,0,32,32) côté nord : `id`=`donjon2_porte_07`, `type`=`grande_cle`
-- `Sortie` (576,256,32,32) sur la tuile d'escalier : `cible_carte`=res://scenes/rooms/donjon2_salle_11_room.tscn, `cible_spawn`=`depuis_escalier`, `transition`=`escalier`, `godot_node_type`=`area`
+- `Sortie` (608,160,32,32) [côté est] : `cible_carte`=`res://scenes/rooms/donjon2_salle_09_room.tscn`, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
+- `Porte` (608,160,32,32) [côté est] : `id`=`donjon2_porte_05`, `type`=`cle`
+- `Sortie` (288,320,32,32) [côté sud] : `cible_carte`=`res://scenes/rooms/donjon2_salle_07_room.tscn`, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
+- `Porte` (288,320,32,32) [côté sud] : `id`=`donjon2_porte_06`, `type`=`interrupteur`
+- `Sortie` (288,0,32,32) [côté nord] : `cible_carte`=`res://scenes/rooms/donjon2_salle_boss_room.tscn`, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
+- `Porte` (288,0,32,32) [côté nord] : `id`=`donjon2_porte_07`, `type`=`grande_cle`
+- `Sortie` (576,256,32,32) [sur la tuile d'escalier] : `cible_carte`=`res://scenes/rooms/donjon2_salle_11_room.tscn`, `cible_spawn`=`depuis_escalier`, `transition`=`escalier`, `godot_node_type`=`area`
 - `Spawn` point (304,80) : `id`=`depuis_nord`
 - `Spawn` point (560,176) : `id`=`depuis_est`
 - `Spawn` point (304,272) : `id`=`depuis_sud`
 - `Spawn` point (560,272) : `id`=`depuis_escalier`
 - `Ennemi` point (464,48) : `type`=`chauve_souris`, `variante`=`normal`
-- `StatueCorbeau` (6,2) -> centre (208,80) : `id`=`donjon2_statue_02`
-- `Interrupteur` (2,3) -> centre (80,112) : `id`=`donjon2_interrupteur_04`, `cible`=`donjon2_porte_06`, `mode`=`epee` (levier)
+- `StatueCorbeau` point (208,80) : `id`=`donjon2_statue_02`
+- `Interrupteur` point (80,112) [levier] : `id`=`donjon2_interrupteur_04`, `cible`=`donjon2_porte_06`, `mode`=`epee`
 - `Ennemi` point (176,240) : `type`=`caillou_rampant`, `variante`=`normal`
 - `Ennemi` point (144,304) : `type`=`chauve_souris`, `variante`=`normal`
 
@@ -540,10 +542,10 @@ Arrivée au sous-sol par l'escalier : un lieu calme avec deux Cailloux. L'ouvert
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (288,320,32,32) côté sud : `cible_carte`=res://scenes/rooms/donjon2_salle_12_room.tscn, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
-- `Sortie` (608,160,32,32) côté est : `cible_carte`=res://scenes/rooms/donjon2_salle_14_room.tscn, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
-- `Porte` (608,160,32,32) côté est : `id`=`donjon2_porte_10`, `type`=`interrupteur`
-- `Sortie` (576,64,32,32) sur la tuile d'escalier : `cible_carte`=res://scenes/rooms/donjon2_salle_10_room.tscn, `cible_spawn`=`depuis_escalier`, `transition`=`escalier`, `godot_node_type`=`area`
+- `Sortie` (288,320,32,32) [côté sud] : `cible_carte`=`res://scenes/rooms/donjon2_salle_12_room.tscn`, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
+- `Sortie` (608,160,32,32) [côté est] : `cible_carte`=`res://scenes/rooms/donjon2_salle_14_room.tscn`, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
+- `Porte` (608,160,32,32) [côté est] : `id`=`donjon2_porte_10`, `type`=`interrupteur`
+- `Sortie` (576,64,32,32) [sur la tuile d'escalier] : `cible_carte`=`res://scenes/rooms/donjon2_salle_10_room.tscn`, `cible_spawn`=`depuis_escalier`, `transition`=`escalier`, `godot_node_type`=`area`
 - `Spawn` point (560,80) : `id`=`depuis_escalier`
 - `Spawn` point (560,176) : `id`=`depuis_est`
 - `Spawn` point (304,272) : `id`=`depuis_sud`
@@ -571,49 +573,51 @@ Objets Tiled (calque `Objets`).
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (288,0,32,32) côté nord : `cible_carte`=res://scenes/rooms/donjon2_salle_11_room.tscn, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
-- `Sortie` (608,160,32,32) côté est : `cible_carte`=res://scenes/rooms/donjon2_salle_13_room.tscn, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
-- `Porte` (608,160,32,32) côté est : `id`=`donjon2_porte_09`, `type`=`interrupteur`
+- `Sortie` (288,0,32,32) [côté nord] : `cible_carte`=`res://scenes/rooms/donjon2_salle_11_room.tscn`, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
+- `Sortie` (608,160,32,32) [côté est] : `cible_carte`=`res://scenes/rooms/donjon2_salle_13_room.tscn`, `cible_spawn`=`depuis_ouest`, `godot_node_type`=`area`
+- `Porte` (608,160,32,32) [côté est] : `id`=`donjon2_porte_09`, `type`=`interrupteur`
 - `Spawn` point (304,80) : `id`=`depuis_nord`
 - `Spawn` point (560,176) : `id`=`depuis_est`
+- `Torche` point (432,176) [brasero] : `id`=`donjon2_brasero_01`, `etat`=`allumee`, `permanente`=`true`
+- `Torche` point (496,176) : `id`=`donjon2_torche_01`, `etat`=`eteinte`, `permanente`=`false`, `duree`=`0`, `cible`=`donjon2_porte_09`
 - `Ennemi` point (112,240) : `type`=`caillou_rampant`, `variante`=`normal`
 - `Ennemi` point (528,272) : `type`=`caillou_rampant`, `variante`=`normal`
 - `MurFissure` (352,160,32,32) : `id`=`donjon2_mur_07`, `apparence`=`eboulis`
-- `Torche` (13,5) -> centre (432,176) : `id`=`donjon2_brasero_01`, `etat`=`allumee`, `permanente`=true (brasero)
-- `Torche` (15,5) -> centre (496,176) : `id`=`donjon2_torche_01`, `etat`=`eteinte`, `permanente`=false, `duree`=0, `cible`=`donjon2_porte_09`
 
 ### salle_13 - Veine d'étoile (sous-sol)
 
-La **veine de minerai d'étoile** brille dans le mur nord-ouest (décor lumineux) : le **coffre du minerai** (`donjon2_coffre_07`) est libre, en vue dès l'arrivée, dans la salle que tout le monde traverse. Le vestibule de la porte à clé nord est fermé par un éboulis en (9,3) : bombe depuis (9,4) en reculant (4 cases libres vers le sud), puis petite clé n°3 ou toute autre clé. Une Chauve-souris et un Caillou rouge (vie x2) gardent la salle.
+La **veine de minerai d'étoile** brille dans le mur nord-ouest (murs lumineux autour d'une niche) : le **coffre du minerai** (`donjon2_coffre_07`) est dans la niche (3,1), fermée par un **rocher fissuré** en (3,2) (`donjon2_mur_10`). Bombe depuis (3,4), en reculant vers le sud ou l'est (4 cases libres) ; la niche est visible dès l'arrivée, dans la salle que tout le monde traverse. Le vestibule de la porte à clé nord est fermé par un éboulis en (9,3) : seconde bombe depuis (9,4), puis une petite clé. Une Chauve-souris et un Caillou rouge (vie x2) gardent la salle ; un paquet de bombes `donjon2_bombes_05` est au sud-est.
 
 <!-- salle_13 -->
 ```text
 #########D##########
-#.......#.#........#
-#..C....#P#........#
+#.#C#...#.#........#
+#..M....#P#........#
 #.......#e#........#
 #..................#
 I.P................#
 #.............b....#
 #..................#
-#..........r.......#
+#..........r....o..#
 #..................#
 ####################
 ```
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (0,160,32,32) côté ouest : `cible_carte`=res://scenes/rooms/donjon2_salle_12_room.tscn, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
-- `Porte` (0,160,32,32) côté ouest : `id`=`donjon2_porte_09`, `type`=`interrupteur`
-- `Sortie` (288,0,32,32) côté nord : `cible_carte`=res://scenes/rooms/donjon2_salle_14_room.tscn, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
-- `Porte` (288,0,32,32) côté nord : `id`=`donjon2_porte_08`, `type`=`cle`
+- `Sortie` (0,160,32,32) [côté ouest] : `cible_carte`=`res://scenes/rooms/donjon2_salle_12_room.tscn`, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
+- `Porte` (0,160,32,32) [côté ouest] : `id`=`donjon2_porte_09`, `type`=`interrupteur`
+- `Sortie` (288,0,32,32) [côté nord] : `cible_carte`=`res://scenes/rooms/donjon2_salle_14_room.tscn`, `cible_spawn`=`depuis_sud`, `godot_node_type`=`area`
+- `Porte` (288,0,32,32) [côté nord] : `id`=`donjon2_porte_08`, `type`=`cle`
 - `Spawn` point (304,80) : `id`=`depuis_nord`
 - `Spawn` point (80,176) : `id`=`depuis_ouest`
-- `Coffre` point (112,80) : `id`=`donjon2_coffre_07`, `contenu`=`minerai_etoile`, `important`=true
+- `Coffre` point (112,48) : `id`=`donjon2_coffre_07`, `contenu`=`minerai_etoile`, `important`=`true`
 - `Ennemi` point (464,208) : `type`=`chauve_souris`, `variante`=`normal`
 - `Ennemi` point (368,272) : `type`=`caillou_rampant`, `variante`=`rouge`
+- `Ramassable` point (528,272) [paquet de bombes, posé seulement si Brann possède les bombes] : `id`=`donjon2_bombes_05`, `contenu`=`bombes_paquet`
 - `MurFissure` (288,96,32,32) : `id`=`donjon2_mur_08`, `apparence`=`eboulis`
-- Rectangle nommé `indice_veine_etoile` (64,32,96,64) : `godot_node_type`=`area` (texte `INDICE_VEINE_ETOILE`)
+- `MurFissure` (96,64,32,32) : `id`=`donjon2_mur_10`, `apparence`=`mur`
+- Rectangle nommé `indice_veine_etoile` (64,32,96,64) [texte `INDICE_VEINE_ETOILE`] : `godot_node_type`=`area`
 
 ### salle_14 - Réserve de Gorm (sous-sol)
 
@@ -636,17 +640,17 @@ I.P................#
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (288,320,32,32) côté sud : `cible_carte`=res://scenes/rooms/donjon2_salle_13_room.tscn, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
-- `Porte` (288,320,32,32) côté sud : `id`=`donjon2_porte_08`, `type`=`cle`
-- `Sortie` (0,160,32,32) côté ouest : `cible_carte`=res://scenes/rooms/donjon2_salle_11_room.tscn, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
-- `Porte` (0,160,32,32) côté ouest : `id`=`donjon2_porte_10`, `type`=`interrupteur`
+- `Sortie` (288,320,32,32) [côté sud] : `cible_carte`=`res://scenes/rooms/donjon2_salle_13_room.tscn`, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
+- `Porte` (288,320,32,32) [côté sud] : `id`=`donjon2_porte_08`, `type`=`cle`
+- `Sortie` (0,160,32,32) [côté ouest] : `cible_carte`=`res://scenes/rooms/donjon2_salle_11_room.tscn`, `cible_spawn`=`depuis_est`, `godot_node_type`=`area`
+- `Porte` (0,160,32,32) [côté ouest] : `id`=`donjon2_porte_10`, `type`=`interrupteur`
 - `Spawn` point (80,176) : `id`=`depuis_ouest`
 - `Spawn` point (304,272) : `id`=`depuis_sud`
-- `Coffre` point (80,48) : `id`=`donjon2_coffre_08`, `contenu`=`grande_cle`, `important`=true
+- `Coffre` point (80,48) : `id`=`donjon2_coffre_08`, `contenu`=`grande_cle`, `important`=`true`
 - `Ennemi` point (240,208) : `type`=`mineur_maudit`, `variante`=`normal`
 - `Ennemi` point (400,240) : `type`=`mineur_maudit`, `variante`=`normal`
-- `Interrupteur` (2,8) -> centre (80,272) : `id`=`donjon2_interrupteur_06`, `cible`=`donjon2_porte_10`, `mode`=`epee` (levier)
-- `Ramassable` point (464,272) : `id`=`donjon2_bombes_04`, `contenu`=`boutique_bombes` (5 bombes, posé seulement si Brann possède les bombes)
+- `Interrupteur` point (80,272) [levier] : `id`=`donjon2_interrupteur_06`, `cible`=`donjon2_porte_10`, `mode`=`epee`
+- `Ramassable` point (464,272) [paquet de bombes, posé seulement si Brann possède les bombes] : `id`=`donjon2_bombes_04`, `contenu`=`bombes_paquet`
 - `Ennemi` point (240,304) : `type`=`chauve_souris`, `variante`=`normal`
 - `MurFissure` (96,64,32,32) : `id`=`donjon2_mur_09`, `apparence`=`mur`
 
@@ -671,15 +675,15 @@ Objets Tiled (calque `Objets`).
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (32,64,32,32) sur la tuile d'escalier : `cible_carte`=res://scenes/rooms/donjon2_salle_05_room.tscn, `cible_spawn`=`depuis_escalier`, `transition`=`escalier`, `godot_node_type`=`area`
+- `Sortie` (32,64,32,32) [sur la tuile d'escalier] : `cible_carte`=`res://scenes/rooms/donjon2_salle_05_room.tscn`, `cible_spawn`=`depuis_escalier`, `transition`=`escalier`, `godot_node_type`=`area`
 - `Spawn` point (80,80) : `id`=`depuis_escalier`
 - `Spawn` point (304,176) : `id`=`depuis_chute_salle_04`
-- `Coffre` point (496,240) : `id`=`donjon2_coffre_06`, `contenu`=`cle_petite`, `important`=false
+- `Coffre` point (496,240) : `id`=`donjon2_coffre_06`, `contenu`=`cle_petite`, `important`=`false`
 - `Ennemi` point (400,272) : `type`=`caillou_rampant`, `variante`=`normal`
 
 ### salle_boss - Salle du boss : Cœur de la Mine (Gorm)
 
-Arène de Gorm, 20x22 (deux écrans en hauteur, `camera` = `ecran`). Gorm (colosse de roche de 96x96 environ, cristal rouge dans la poitrine) apparaît au nord, au centre. **Ce dont le boss a besoin côté carte** :
+Arène de Gorm, 20x22 (deux écrans en hauteur ; comme la salle de Sylve, aucune propriété `camera` : la caméra suit Brann). Gorm (colosse de roche de 96x96 environ, cristal rouge dans la poitrine) apparaît au nord, au centre. **Ce dont le boss a besoin côté carte** :
 - Point `boss_gorm` en (9,4) (la scène `scenes/enemies/boss/gorm.tscn`, id `donjon2_boss_gorm`).
 - 4 rectangles `pilier` de 2x2 cases (comme Sylve) : ils arrêtent le corps de Gorm (couche 3) et masquent Brann des rochers de la phase 2. Le couloir central fait 10 cases de large ; les **couloirs latéraux ne font que 2 cases** : Gorm (3 cases) n'y passe pas, ce sont les refuges de Brann contre son corps à corps (pas contre les rochers).
 - **Bombes** : phase 1 = faire sauter les plaques d'armure à la bombe, puis frapper le cristal. Quatre `Marqueur` `gorm_bombes_1` à `4` dans les couloirs latéraux sont les points où le boss fait apparaître un paquet de bombes (quand Brann en a moins de 3, avec un délai) ; Brann arrive avec au moins 3 bombes grâce au butin garanti de la salle 10 (Caillou, Chauves-souris) et à la statue qui précède. Le sol est sans fosse (rien ne peut bloquer la partie).
@@ -714,12 +718,18 @@ Arène de Gorm, 20x22 (deux écrans en hauteur, `camera` = `ecran`). Gorm (colos
 
 Objets Tiled (calque `Objets`).
 
-- `Sortie` (288,672,32,32) côté sud : `cible_carte`=res://scenes/rooms/donjon2_salle_10_room.tscn, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
-- `Porte` (288,672,32,32) côté sud : `id`=`donjon2_porte_07`, `type`=`grande_cle`
+- `Sortie` (288,672,32,32) [côté sud] : `cible_carte`=`res://scenes/rooms/donjon2_salle_10_room.tscn`, `cible_spawn`=`depuis_nord`, `godot_node_type`=`area`
+- `Porte` (288,672,32,32) [côté sud] : `id`=`donjon2_porte_07`, `type`=`grande_cle`
 - `Spawn` point (304,624) : `id`=`depuis_sud`
-- Rectangle ou point nommé `boss_gorm` : apparition de Gorm, centre de la case (9,4) -> (304,144)
-- 4 rectangles nommés `pilier` (96,224,64,64), (480,224,64,64), (96,416,64,64), (480,416,64,64)
-- 4 `Marqueur` dans les couloirs latéraux : `id`=`gorm_bombes_1` (48,336), `gorm_bombes_2` (592,336), `gorm_bombes_3` (48,560), `gorm_bombes_4` (592,560) (lieux où Gorm fait apparaître des bombes)
+- Point nommé `boss_gorm` (304,144) [apparition de Gorm, centre de la case (9,4)]
+- Rectangle nommé `pilier` (96,224,64,64)
+- Rectangle nommé `pilier` (480,224,64,64)
+- Rectangle nommé `pilier` (96,416,64,64)
+- Rectangle nommé `pilier` (480,416,64,64)
+- `Marqueur` point (48,336) [lieu où Gorm fait apparaître des bombes] : `id`=`gorm_bombes_1`
+- `Marqueur` point (592,336) [lieu où Gorm fait apparaître des bombes] : `id`=`gorm_bombes_2`
+- `Marqueur` point (48,560) [lieu où Gorm fait apparaître des bombes] : `id`=`gorm_bombes_3`
+- `Marqueur` point (592,560) [lieu où Gorm fait apparaître des bombes] : `id`=`gorm_bombes_4`
 
 ## 5. Vérification des clés, des portes, des étages et des énigmes
 
@@ -728,7 +738,7 @@ Script de vérification (bibliothèque standard seulement, non commité) appliqu
 - **Structure** : 16 aperçus de la bonne taille (20x11, boss 20x22), ouvertures uniquement aux positions fixes, chaque objet (coffres, leviers, torches, plaques, paquets de bombes, quart de cœur, plume, marteau, statues, sorties) **atteignable** depuis les arrivées de sa salle une fois les murs fissurés de la salle ouverts (les cibles de la 06 se tirent depuis 5, 11 et 5 cases de tir), aucun ennemi à moins de 3 cases d'une arrivée.
 - **Parcours sur l'état du joueur** (salle, petites clés en poche, portes ouvertes et leviers actionnés, objets obtenus) : **8 704 états atteignables, 0 état d'où le boss est hors de portée**. La salle du boss est donc atteignable quel que soit l'ordre dans lequel le joueur ouvre les portes, prend les coffres, tombe dans le trou, descend ou remonte l'escalier, revient en arrière. Les 16 salles sont atteintes ; les 10 objets de progression (carte, boussole, 3 clés, bombes, grande clé, minerai, quart de cœur, plume) sont tous obtenables.
 - **Clés** : 3 petites clés pour 3 portes à clé (01, 05, 08), **au plus 2 en poche à la fois**. Retirer l'une des trois portes du modèle rend le boss inatteignable (les trois sont donc obligatoires, comme les trois clés).
-- **Énigmes** : salle 05, solution trouvée en **25 pousses** (exploration complète de 3 490 états, règle « pas de bloc près d'une arrivée »). Salle 06 : temps minimal des 3 cibles **6,6 s** pour 10 s accordées (66 %, à 3,125 cases/s et 0,7 s par tir ; le critère est de rester sous 70 %). Salles 03, 07, 08, 09, 12, 13, 14 : une bombe suffit à chaque obstacle obligatoire (1 en 07, 1 en 08, 1 en 12, 1 en 13, 1 en 14), plus 1 facultative (03) et 1 facultative (09).
+- **Énigmes** : salle 05, solution trouvée en **34 pousses** (exploration complète de 2 485 états, règle « pas de bloc près d'une arrivée », **0 état où Brann est enfermé**). Salle 06 : temps minimal des 3 cibles **6,6 s** pour 10 s accordées (66 %, à 3,125 cases/s et 0,7 s par tir ; le critère est de rester sous 70 %). Salles 03, 07, 08, 09, 12, 13, 14 : une bombe suffit à chaque obstacle obligatoire (1 en 07, 1 en 08, 1 en 12, 2 en 13, 1 en 14), plus 1 facultative (03) et 1 facultative (09). Le minerai (rocher fissuré de la 13) demande une bombe de plus mais n'est pas nécessaire pour avancer : la niche est visible depuis l'arrivée de la salle et l'indice `indice_veine_etoile` la désigne.
 - **Blocs** : un seul puzzle de blocs (salle 05) ; comme dans le Temple, il existe des états où les blocs sont coincés : **sortir de la salle et y revenir remet les blocs en place** (déjà le comportement de `Room`).
 - **Bombes** : voir le tableau « munitions de bombes » du §3 ; aucun état d'attente sans solution grâce au butin garanti (NOUVEAU) et au fait que les ennemis réapparaissent.
 
@@ -745,7 +755,7 @@ Hypothèses : arc acquis (Temple fait), les ennemis ne bloquent pas les flèches
 7. **Torche derrière un éboulis (12)** : la flèche ne doit passer qu'une fois l'éboulis détruit (`CrackedWall` est un corps solide qui arrête la flèche) ; la flèche traverse ensuite le brasero (donc `IArrowInteractor`) puis allume la torche (`duree` = 0, reste allumée).
 8. **Cibles chronométrées de la 06** : durée 10 s x le multiplicateur d'aide (x2, ou illimité) ; l'anneau `cible_chrono` doit se voir.
 9. **Longueur** : 16 salles (11 au sol dont le boss, 5 au sous-sol) ; temps estimé 70 à 100 minutes la première fois, à valider par un test.
-10. **Minerai d'étoile** : il est dans un coffre libre sur le chemin obligatoire ; si le joueur le laisse (coffre non ouvert), il pourra revenir (donjon accessible, coffre mémorisé). Prévoir que la forge/Hulda demande le minerai et le dise (dialogue).
+10. **Minerai d'étoile** : il est dans une niche fermée par un rocher fissuré, dans la salle 13 du chemin obligatoire ; si le joueur ne le prend pas, il pourra revenir (donjon accessible, état mémorisé). Prévoir que la forge/Hulda demande le minerai et le dise (dialogue).
 
 ## 7. Conventions et ressources manquantes (à demander)
 
@@ -758,10 +768,11 @@ Hypothèses : arc acquis (Temple fait), les ennemis ne bloquent pas les flèches
 
 ### Classes d'objets utilisées (toutes déjà prévues dans `CLAUDE.md`)
 
-`Spawn`, `Sortie` (`transition`=`escalier`), `Porte` (`cle`, `grande_cle`, `ennemis`, `interrupteur`), `Interrupteur` (`fleche` avec `duree`, `epee` levier), `PlaqueDePression`, `BlocPoussable`, `Torche` (brasero et torche), `Chute`, `MurFissure` (`mur` et `eboulis`), `Coffre`, `Ramassable`, `StatueCorbeau`, `Ennemi` (`caillou_rampant`, `chauve_souris`, `mineur_maudit`), rectangle `indice_*`, `boss_gorm`, `pilier`, `Marqueur`. Propriétés de carte : `etage`, `carte_x`, `carte_y`, `camera` (boss : `ecran`).
+`Spawn`, `Sortie` (`transition`=`escalier`), `Porte` (`cle`, `grande_cle`, `ennemis`, `interrupteur`), `Interrupteur` (`fleche` avec `duree`, `epee` levier), `PlaqueDePression`, `BlocPoussable`, `Torche` (brasero et torche), `Chute`, `MurFissure` (`mur` et `eboulis`), `Coffre`, `Ramassable`, `StatueCorbeau`, `Ennemi` (`caillou_rampant`, `chauve_souris`, `mineur_maudit`), rectangle `indice_*`, `boss_gorm`, `pilier`, `Marqueur`. Propriétés de carte : `etage`, `carte_x`, `carte_y`.
 
 ### Ressources de ramassage à créer (développeur)
 
+- `resources/pickups/bombes_paquet.tres` : 5 bombes, `OnlyIfOwned` (copie de `boutique_bombes.tres`, utilisée par les `Ramassable` `donjon2_bombes_01` à `05`).
 - `resources/pickups/marteau_corvan.tres` : `FlagEffect` posant le drapeau `marteau_corvan` (indice d'histoire, `ShowNameOnPickup`, texte de Brann ; Icon et NameKey `OBJ_MARTEAU_CORVAN`), à rappeler dans le dialogue de Gorm (« l'homme au tablier de cuir »).
 - `resources/pickups/minerai_etoile.tres` : objet de quête (flag ou item `minerai_etoile`, Icon, NameKey `OBJ_MINERAI_ETOILE`, `important`) lu par la forge pour l'Épée trempée.
 - `sceau_montagne.tres` (`SealEffect`), `receptacle.tres` existe déjà. `quart_coeur.tres`, `plume_corbeau.tres`, `objet_bombes.tres`, `boutique_bombes.tres`, `cle_petite.tres`, `grande_cle.tres`, `carte_donjon.tres`, `boussole.tres` existent déjà.
@@ -771,7 +782,8 @@ Hypothèses : arc acquis (Temple fait), les ennemis ne bloquent pas les flèches
 
 - Scènes de salle : `scenes/rooms/donjon2_salle_01_room.tscn` à `donjon2_salle_15_room.tscn` et `donjon2_salle_boss_room.tscn`, `Zone` = `donjon2`.
 - `HoleWatcher` / `HoleRules` : reconnaître les tuiles 58 à 66 (fosses mortelles) des tilesets `mine` et `mine_sous_sol` (comme pour `temple_racines` et `temple_racines_sous_sol`) ; `Chute` : tuiles `trou_passage` 31 à 39 décoratives.
-- `TileRules` : paires fermée → ouverte des murs fissurés et éboulis du tileset `mine` (voir §ci-dessous).
+- `TileRules` : paires fermée → ouverte du tileset `mine` / `mine_sous_sol` (voir `art/tilesets/mine_plan.md`) : murs fissurés 144→148 à 147→151, rocher fissuré 152→153 (niche du minerai et alcôves), éboulis 72→76, 73→77, 74→76, 75→77, éboulis d'ouverture 164→76, 165→77.
+- `BlocPoussable` : propriété string `apparence` = `mine` (image `art/puzzles/bloc_mine.png`).
 - `DungeonMap.cs` : plan du donjon 2 (positions du tableau du §3, liens, escaliers, chute, ids de portes, coffres des salles).
 - Boss `Gorm` : scène `scenes/enemies/boss/gorm.tscn` (sous-classe de `Boss`), plaques d'armure, cristal, rochers et ombres.
 - Retour après le boss et sortie vers la montagne (à décider avec le Temple).
@@ -799,6 +811,8 @@ Garder les **mêmes numéros que `temple_racines`** pour les éléments reconnus
 | Sprites hors tileset | `art/puzzles/bloc_mine`, `torche` / `brasero` (existent), `levier` (existe), `plaque_pression` (existe), `cible_chrono` (existe), `bombes_paquet`, icônes `marteau_corvan` et `minerai_etoile`, sprites de Gorm (plaques d'armure, cristal, rochers, ombres) |
 
 ## 8. Suite
+
+**Plan validé (changements demandés : minerai derrière un mur fissuré, énigme de blocs nouvelle en 05).** Les 16 cartes `salle_01.tmx` à `salle_15.tmx` et `salle_boss.tmx` sont peintes d'après ce plan avec les tilesets `mine` (salles 01 à 10 et boss) et `mine_sous_sol` (salles 11 à 15).
 
 À valider par la personne qui joue au projet. Après validation (étape 2) :
 
