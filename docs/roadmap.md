@@ -379,7 +379,7 @@ But : un donjon de 14 à 16 salles sur deux étages (décision du 2026-10-24 : 1
 - [x] Portes : verrouillées par petite clé, par grande clé (boss), ou qui s'ouvrent quand tous les ennemis sont morts
 - [x] Interrupteurs au sol (plaque de pression) et interrupteurs à frapper
 - [x] Blocs poussables (alignés sur la grille 32×32)
-- [ ] Torches à allumer, murs fissurés (bombes), trous qui font tomber à l'étage inférieur (torches et trous faits ; murs fissurés : avec les bombes, donjon 2)
+- [x] Torches à allumer, murs fissurés (bombes), trous qui font tomber à l'étage inférieur (murs fissurés faits avec les bombes dans le donjon 2)
 - [x] Un petit système « déclencheur → cible » via signaux, pour câbler une énigme dans l'éditeur sans écrire de code
 
 **Structure du donjon**
