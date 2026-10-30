@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="GiveItemEffect" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/effects/GiveItemEffect.cs" id="1_effect"]
+[ext_resource type="Resource" path="res://resources/items/bombes.tres" id="2_item"]
+[ext_resource type="Texture2D" path="res://art/ui/icone_bombes_paquet.png" id="3_icon"]
+
+[resource]
+script = ExtResource("1_effect")
+Item = ExtResource("2_item")
+Quantity = 5
+OnlyIfOwned = true
+PickupIcon = ExtResource("3_icon")
+Icon = ExtResource("3_icon")
+NameKey = "OBJ_BOMBES_5"
