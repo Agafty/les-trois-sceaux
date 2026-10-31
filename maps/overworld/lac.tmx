@@ -152,7 +152,7 @@
    <properties>
     <property name="id" value="lac_rocher_ilot"/>
     <property name="type" value="interrupteur"/>
-    <property name="apparence" value="rocher"/>
+    <property name="apparence" value="rocher_eau"/>
    </properties>
   </object>
   <object id="15" type="Interrupteur" x="1872" y="304">

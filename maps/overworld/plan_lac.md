@@ -134,7 +134,7 @@ Point = centre de la case (colonne × 32 + 16, ligne × 32 + 16). `etape_min` / 
 | 11 | `Ennemi` | (2032, 144) | idem |
 | 12 | `Ennemi` | (2000, 240) | idem |
 | 13 | `Ennemi` | (2320, 208) | `type`=`chauve_souris`, `variante`=`normal`, `etape_max`=2 |
-| 14 | `Porte` | 1728, 256, 32×32 | `id`=`lac_rocher_ilot`, `type`=`interrupteur`, `apparence`=`rocher` (sans `Sortie`) |
+| 14 | `Porte` | 1728, 256, 32×32 | `id`=`lac_rocher_ilot`, `type`=`interrupteur`, `apparence`=`rocher_eau` (sans `Sortie`) |
 | 15 | `Interrupteur` | (1872, 304) | `id`=`lac_cible_ilot`, `cible`=`lac_rocher_ilot`, `mode`=`fleche`, `ordre`=0, `duree`=0, `symbole`=`feuille` |
 | 16 | `Ramassable` | (1744, 304) | `id`=`lac_quart_coeur_ilot`, `contenu`=`quart_coeur` (îlot derrière le rocher) |
 | 17 | `Ramassable` | (2416, 240) | `id`=`lac_rubis_02`, `contenu`=`rubis_bleu` (sur le quai : récompense de la traversée) |
