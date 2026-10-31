@@ -113,6 +113,17 @@
         "ouverture_debut",
         "ouv_place"
       ]
+    },
+    {
+      "salle": "forge_room",
+      "cinematique": "epee_trempee",
+      "si": [
+        "minerai_etoile",
+        "sceau:montagne"
+      ],
+      "sauf": [
+        "epee_trempee"
+      ]
     }
   ],
   "reperes": []

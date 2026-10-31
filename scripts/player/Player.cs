@@ -40,6 +40,10 @@ public partial class Player : CharacterBody2D
     [Export(PropertyHint.Range, "0,6,1")]
     public int FallDamage { get; set; } = 1;
 
+    /// <summary>Multiplicateur des dégâts de l'épée une fois trempée (flag « epee_trempee »). Épée seulement : ni flèches ni bombes.</summary>
+    [Export(PropertyHint.Range, "1,5,1")]
+    public int TemperedDamageMultiplier { get; set; } = 2;
+
     /// <summary>Distance (px) à laquelle un objet utilisé est posé devant Brann, depuis ses pieds.</summary>
     [Export]
     public float UseDistance { get; set; } = 24f;
@@ -78,6 +82,8 @@ public partial class Player : CharacterBody2D
     private AnimatedSprite2D _sprite;
     private AnimatedSprite2D _swordSprite;
     private HitBox _swordHitBox;
+    private int _baseSwordDamage = 1; // dégâts de la HitBox dans la scène, lus une fois
+
     private Health _health;
     private HurtBox _hurtBox;
 
@@ -88,6 +94,7 @@ public partial class Player : CharacterBody2D
         _sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         _swordSprite = GetNode<AnimatedSprite2D>("SwordSlash");
         _swordHitBox = GetNode<HitBox>("SwordSlash/HitBox");
+        _baseSwordDamage = _swordHitBox.Damage;
         _health = GetNode<Health>("Health");
         _camera = GetNodeOrNull<Camera2D>("Camera2D");
         _hurtBox = GetNode<HurtBox>("HurtBox");
@@ -515,6 +522,7 @@ public partial class Player : CharacterBody2D
         _swordSprite.Play(animSlash);
         _swordSprite.Position = slashOffset;
         _swordSprite.Visible = true;
+        _swordHitBox.Damage = SwordRules.Damage(_baseSwordDamage, TemperedDamageMultiplier, _isFlagSet);
         _swordHitBox.Monitoring = true;
         AudioManager.Play(Sfx.Epee);
     }

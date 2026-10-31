@@ -431,6 +431,7 @@ But : construire le reste du jeu avec les briques déjà validées. Ici on code 
 
 **Donjons 2 et 3**
 
+- [x] Épée trempée : minerai d'étoile de la Mine reforgé à la forge après le 2ᵉ sceau (dégâts ×2)
 - [ ] Un nouvel objet par donjon (bombes pour le donjon 2, lanterne pour le donjon 3), chacun réutilisé dans les donjons suivants
 - [ ] 2 nouveaux ennemis par donjon + variantes de couleur des anciens
 - [ ] Difficulté progressive ; un boss par donjon

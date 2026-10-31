@@ -248,3 +248,10 @@ BOSS_GORM_REPLIQUE,"Un homme au tablier de cuir... il a scié mes poutres. Merci
 BOSS_GORM_CONSEIL_1,"Son armure résiste à tout. Pose une bombe contre lui, puis recule vite ! Attention aux rochers : leur ombre te prévient.","His armor resists everything. Place a bomb next to him, then back away fast! Watch out for the rocks: their shadow warns you."
 BOSS_GORM_CONSEIL_2,L'épée et l'arc ne passent pas. Il faut une bombe posée tout près de lui : elle arrache une plaque d'armure.,Sword and bow can't get through. You need a bomb placed right next to him: it tears off an armor plate.
 BOSS_GORM_CONSEIL_3,"Le cristal est à nu ! Après sa frappe du sol, il reste étourdi : frappe le cristal à l'épée !",The crystal is bare! After he pounds the ground he is dazed: strike the crystal with your sword!
+OBJ_EPEE_TREMPEE,l'épée trempée,the tempered sword
+OBJ_EPEE_TREMPEE_DESC,"Forgée avec le minerai d'étoile : elle frappe deux fois plus fort.","Forged with starore: it hits twice as hard."
+DLG_EPEE_TREMPEE_1,"Le minerai d'étoile, le feu de la forge... Maître Corvan m'a tout appris. À moi de jouer.","Starore, the forge fire... Master Corvan taught me everything. My turn now."
+DLG_EPEE_TREMPEE_2,"La lame chante. Elle frappera deux fois plus fort !","The blade sings. It will hit twice as hard!"
+DLG_ISOLDE_2_1,"Des sceaux sont rétablis. Dans la Mine, on parle d'un minerai d'étoile : un forgeron pourrait en tirer une lame bien plus forte.","Some seals are restored. In the Mine, they speak of starore: a smith could forge a far stronger blade from it."
+DLG_ISOLDE_2_2,"Tu as du minerai d'étoile ? Va vite à la forge : une épée trempée t'attend.","You have starore? Hurry to the forge: a tempered sword awaits."
+DLG_ISOLDE_2_3,"Ton épée trempée est magnifique. Corvan serait fier... ou jaloux.","Your tempered sword is magnificent. Corvan would be proud... or jealous."

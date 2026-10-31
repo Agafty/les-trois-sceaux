@@ -16,7 +16,7 @@ public partial class ScenarioWatcher : Node
     private CinematicPlayer _player;
     private Player _brann;
     private GameState _state;
-    private System.Func<string, bool> _isSet; // GameState.IsCollected, mémorisé (pas de délégué créé à chaque vérification)
+    private System.Func<string, bool> _isSet; // IsFlagOrSeal, mémorisé (évalué ~10 fois/s ; l'allocation du Substring ne concerne que les pseudo-drapeaux sceau:) (pas de délégué créé à chaque vérification)
     private SceneManager _sceneManager;
     private List<ScenarioDef> _defs;
     private readonly HashSet<string> _fired = new();
@@ -28,8 +28,14 @@ public partial class ScenarioWatcher : Node
         _brann = brann;
         _defs = defs;
         _state = GetNode<GameState>("/root/GameState");
-        _isSet = _state.IsCollected;
+        _isSet = IsFlagOrSeal;
         _sceneManager = GetNode<SceneManager>("/root/SceneManager");
+    }
+
+    private bool IsFlagOrSeal(string flag)
+    {
+        if (ScenarioRules.TryGetSealId(flag, out string sealId)) return _state.HasSeal(sealId);
+        return _state.IsCollected(flag);
     }
 
     public override void _PhysicsProcess(double delta)

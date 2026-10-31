@@ -375,7 +375,12 @@ public static class CinematicParser
         foreach (var f in arr.EnumerateArray())
         {
             string flag = f.ValueKind == JsonValueKind.String ? f.GetString() ?? "" : "";
-            if (!IsName(flag)) errors.Add($"{where} : drapeau invalide dans « {name} »");
+            if (ScenarioRules.TryGetSealId(flag, out string sealId))
+            {
+                if (!IsName(sealId)) errors.Add($"{where} : sceau invalide dans « {name} »");
+                else result.Add(ScenarioRules.SealPrefix + sealId);
+            }
+            else if (!IsName(flag)) errors.Add($"{where} : drapeau invalide dans « {name} »");
             else result.Add(flag);
         }
         return result;

@@ -16,6 +16,36 @@
         "DLG_ISOLDE_1_2",
         "DLG_ISOLDE_1_3"
       ]
+    },
+    {
+      "stage": 2,
+      "flags": [
+        "epee_trempee"
+      ],
+      "lines": [
+        "DLG_ISOLDE_2_3"
+      ]
+    },
+    {
+      "stage": 2,
+      "flags": [
+        "minerai_etoile"
+      ],
+      "lines": [
+        "DLG_ISOLDE_2_2"
+      ],
+      "not_flags": [
+        "epee_trempee"
+      ]
+    },
+    {
+      "stage": 2,
+      "not_flags": [
+        "minerai_etoile"
+      ],
+      "lines": [
+        "DLG_ISOLDE_2_1"
+      ]
     }
   ]
 }

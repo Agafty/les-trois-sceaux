@@ -120,6 +120,18 @@ public sealed class ScenarioFile
 /// <summary>Règles de déclenchement (C# pur).</summary>
 public static class ScenarioRules
 {
+    /// <summary>Préfixe d'un pseudo-drapeau « sceau:racines » : vrai si ce sceau est restauré (les sceaux ne sont pas des drapeaux).</summary>
+    public const string SealPrefix = "sceau:";
+
+    /// <summary>Si le drapeau est un pseudo-drapeau de sceau (préfixe insensible à la casse), donne l'id du sceau normalisé (minuscules, sans espaces).</summary>
+    public static bool TryGetSealId(string flag, out string sealId)
+    {
+        sealId = "";
+        if (flag == null || !flag.StartsWith(SealPrefix, StringComparison.OrdinalIgnoreCase)) return false;
+        sealId = flag.Substring(SealPrefix.Length).Trim().ToLowerInvariant();
+        return true;
+    }
+
     /// <summary>Vrai si les conditions de drapeaux sont remplies et que la cinématique n'est pas déjà finie (drapeau de fin).</summary>
     public static bool Matches(ScenarioDef def, string endFlag, Func<string, bool> isSet)
     {

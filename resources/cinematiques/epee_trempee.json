@@ -1,0 +1,25 @@
+{
+  "id": "epee_trempee",
+  "drapeau_fin": "epee_trempee",
+  "etapes": [
+    { "action": "deplacer", "acteur": "brann", "vers": "corvan_forge", "decalage": [0, 36], "vitesse": 90 },
+    { "action": "regarder", "acteur": "brann", "direction": "up" },
+    { "action": "dialogue", "orateur": "PNJ_BRANN", "lignes": ["DLG_EPEE_TREMPEE_1"] },
+    { "action": "teinte", "couleur": "#ffb070", "duree": 0.6 },
+    { "action": "son", "nom": "coup_ennemi" },
+    { "action": "secousse", "force": 2, "duree": 0.15 },
+    { "action": "attendre", "secondes": 0.5 },
+    { "action": "son", "nom": "coup_ennemi" },
+    { "action": "secousse", "force": 2, "duree": 0.15 },
+    { "action": "attendre", "secondes": 0.5 },
+    { "action": "son", "nom": "coup_ennemi" },
+    { "action": "secousse", "force": 3, "duree": 0.2 },
+    { "action": "fondu", "vers": "noir", "duree": 0.8 },
+    { "action": "attendre", "secondes": 0.6 },
+    { "action": "teinte", "couleur": "normal", "duree": 0 },
+    { "action": "fondu", "vers": "clair", "duree": 0.8 },
+    { "action": "donner", "contenu": "epee_trempee", "id": "forge_epee_trempee" },
+    { "action": "dialogue", "orateur": "PNJ_BRANN", "lignes": ["DLG_EPEE_TREMPEE_2"] },
+    { "action": "sauvegarder" }
+  ]
+}
