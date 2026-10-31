@@ -30,7 +30,7 @@ public static class DoorRules
     public const string DefaultAppearance = "porte";
 
     /// <summary>Apparences connues (propriété Tiled « apparence » d'une Porte) ; image art/puzzles/porte_&lt;apparence&gt;.png.</summary>
-    public static readonly string[] Appearances = { DefaultAppearance, "pont_levis", "tronc", "rocher", "eboulis" };
+    public static readonly string[] Appearances = { DefaultAppearance, "pont_levis", "tronc", "rocher", "rocher_eau", "eboulis" };
 
     /// <summary>Vrai si <paramref name="value"/> est une apparence connue. Vide = « porte ».</summary>
     public static bool TryParseAppearance(string value, out string appearance)

@@ -25,7 +25,7 @@ public partial class Door : StaticBody2D
     [Export] public DoorKind Kind { get; set; } = DoorKind.Cle;
 
     /// <summary>
-    /// Apparence (propriété Tiled « apparence ») : « porte » (défaut, image choisie d'après le type), « pont_levis », « tronc », « rocher »,
+    /// Apparence (propriété Tiled « apparence ») : « porte » (défaut, image choisie d'après le type), « pont_levis », « tronc », « rocher », « rocher_eau » (rocher dans l'eau),
     /// « eboulis ». Image art/puzzles/porte_&lt;apparence&gt;.png : une image de la taille de la porte, ou deux (fermée puis ouverte) côte à côte.
     /// Sans fichier, un placeholder est dessiné par le code.
     /// </summary>
@@ -329,6 +329,7 @@ public partial class Door : StaticBody2D
                 for (int x = 8; x < w; x += 16) image.FillRect(new Rect2I(x, h / 4 + 6, 2, h / 2 - 12), dark);
                 break;
             case "rocher":
+            case "rocher_eau":
             case "eboulis":
                 var stone = new Color(0.5f, 0.5f, 0.54f);
                 image.FillRect(new Rect2I(1, 4, w - 2, h - 6), stone);

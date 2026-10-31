@@ -1028,7 +1028,7 @@ public partial class Room : Node2D
         string typeValue = GetString(marker, "type");
         string appearanceValue = GetString(marker, "apparence");
         if (!DoorRules.TryParseAppearance(appearanceValue, out string appearance))
-            WarnOnce("porte-apparence:" + appearanceValue, $"Porte « {id} » : apparence inconnue « {appearanceValue} » (porte, pont_levis, tronc, rocher ou eboulis) dans {Name}, traitée comme « porte ».");
+            WarnOnce("porte-apparence:" + appearanceValue, $"Porte « {id} » : apparence inconnue « {appearanceValue} » (porte, pont_levis, tronc, rocher, rocher_eau ou eboulis) dans {Name}, traitée comme « porte ».");
         var kind = DoorKind.Interrupteur; // sans « type », un tronc ou un rocher ne s'ouvre que par le code (interrupteur) ou disparaît avec etape_max
         if (!(string.IsNullOrEmpty(typeValue) && DoorRules.TypeOptional(appearance)) && !DoorRules.TryParseKind(typeValue, out kind))
         {
