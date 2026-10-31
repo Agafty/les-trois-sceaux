@@ -84,6 +84,14 @@ public static class GameOptions
 
     public static void ApplyLanguage() => TranslationServer.SetLocale(Current.Language);
 
+    /// <summary>Phrase d'essai (clé OPT_READ_TEST) lue quand le joueur active la lecture ou change sa vitesse.</summary>
+    public static void ReadTest()
+    {
+        if (!Current.ReadAloud) return;
+        var tree = Engine.GetMainLoop() as SceneTree;
+        TextReader.SpeakAlways(tree?.Root.Tr("OPT_READ_TEST") ?? "", TextSource.Dialogue);
+    }
+
     public static void ApplyHelp()
     {
         if (Engine.GetMainLoop() is SceneTree tree && tree.Root.GetNodeOrNull<GameState>("GameState") is { } state)

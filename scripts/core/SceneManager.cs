@@ -50,6 +50,7 @@ public partial class SceneManager : CanvasLayer
     {
         if (_transitioning) return false;
         _transitioning = true;
+        TextReader.Stop(); // un changement de salle coupe la lecture à voix haute
         _fadeDuration = fadeDuration > 0f ? fadeDuration : FadeDuration;
         EmitSignal(SignalName.TransitionStarted, kind);
         _pendingSpawnId = spawnId;

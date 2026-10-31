@@ -5,7 +5,7 @@
 public class OptionsData
 {
     /// <summary>Version du format du fichier d'options. À incrémenter si le format change.</summary>
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 
     public int Version { get; set; } = CurrentVersion;
 
@@ -25,4 +25,10 @@ public class OptionsData
 
     /// <summary>Langue : « fr » ou « en ».</summary>
     public string Language { get; set; } = "fr";
+
+    /// <summary>Lecture à voix haute des textes (synthèse vocale du système). Désactivée par défaut.</summary>
+    public bool ReadAloud { get; set; }
+
+    /// <summary>Vitesse de lecture : 0 = lente (défaut), 1 = normale. Sans effet si la lecture est désactivée.</summary>
+    public int ReadSpeed { get; set; }
 }

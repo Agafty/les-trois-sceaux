@@ -76,6 +76,7 @@ public partial class PrologueScreen : Control
         _page = index;
         _age = 0f;
         _text.Text = Tr(PageKeys[index]);
+        TextReader.Speak(_text.Text, TextSource.Dialogue);
         _text.Modulate = new Color(1f, 1f, 1f, 0f);
         _next.Visible = false;
     }
@@ -118,6 +119,7 @@ public partial class PrologueScreen : Control
     private void Leave()
     {
         _leaving = true;
+        TextReader.Stop();
         if (_sceneManager.GoToScene(NextScene, NextSpawn))
             SetProcess(false);
     }

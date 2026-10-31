@@ -53,6 +53,7 @@ public partial class PickupBanner : CanvasLayer
     {
         if (_label == null) Build();
         _label.Text = text;
+        TextReader.Speak(text, TextSource.Banner);
         float height = hasDescription ? 64f : 28f;
         _back.Position = new Vector2(16f, BottomY - height); // juste au-dessus de la boîte d'indice (16,272,608,64) : pas de chevauchement
         _back.Size = new Vector2(608f, height);

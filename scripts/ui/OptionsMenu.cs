@@ -13,9 +13,9 @@ public partial class OptionsMenu : Control
     [Signal]
     public delegate void ClosedEventHandler();
 
-    private enum Row { Music, Sfx, Fullscreen, Scale, Help, Language, Back }
+    private enum Row { Music, Sfx, Fullscreen, Scale, Help, ReadAloud, ReadSpeed, Language, Back }
 
-    private const int RowCount = 7;
+    private const int RowCount = 9;
     private const int RowHeight = 22;
 
     private static readonly StringName ActionUp = "move_up";
@@ -156,10 +156,23 @@ public partial class OptionsMenu : Control
                 GameOptions.ApplyHelp();
                 AudioManager.Play(Sfx.MenuDeplace);
                 break;
+            case Row.ReadAloud:
+                o.ReadAloud = !o.ReadAloud;
+                AudioManager.Play(Sfx.MenuDeplace);
+                if (o.ReadAloud) GameOptions.ReadTest();
+                else TextReader.Stop();
+                break;
+            case Row.ReadSpeed:
+                if (!o.ReadAloud) return; // réglage inactif tant que la lecture est désactivée
+                o.ReadSpeed = OptionsRules.CycleReadSpeed(o.ReadSpeed, direction);
+                AudioManager.Play(Sfx.MenuDeplace);
+                GameOptions.ReadTest();
+                break;
             case Row.Language:
                 o.Language = OptionsRules.CycleLanguage(o.Language, direction);
                 GameOptions.ApplyLanguage();
                 AudioManager.Play(Sfx.MenuDeplace);
+                GameOptions.ReadTest();
                 break;
             default:
                 return;
@@ -185,6 +198,10 @@ public partial class OptionsMenu : Control
             2 => "OPT_HELP_DOUBLE",
             _ => "OPT_HELP_NORMAL",
         }), false);
+        // Sans voix de la langue dans le système, la lecture ne peut pas fonctionner : on le dit à la place de « Oui ».
+        string readValue = !o.ReadAloud ? Tr("OPT_OFF") : TextReader.HasVoice ? Tr("OPT_ON") : Tr(TextReader.IsSupported ? "OPT_READ_NOVOICE" : "OPT_READ_UNSUPPORTED");
+        SetRow(Row.ReadAloud, Tr("OPT_READ"), readValue, false);
+        SetRow(Row.ReadSpeed, Tr("OPT_READ_SPEED"), Tr(o.ReadSpeed == 1 ? "OPT_READ_NORMAL" : "OPT_READ_SLOW"), !o.ReadAloud);
         SetRow(Row.Language, Tr("OPT_LANGUAGE"), Tr(o.Language == "en" ? "OPT_LANG_EN" : "OPT_LANG_FR"), false);
         SetRow(Row.Back, Tr("TITLE_BACK"), "", false);
     }

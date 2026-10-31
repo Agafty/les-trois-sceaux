@@ -16,6 +16,9 @@ public static class OptionsRules
     /// <summary>Valeurs de l'aide au jeune joueur, dans l'ordre du menu : Normal, Doublé, Sans limite.</summary>
     public static readonly int[] HelpValues = { 1, 2, 0 };
 
+    /// <summary>Vitesses de lecture : 0 = lente, 1 = normale.</summary>
+    public static readonly int[] ReadSpeeds = { 0, 1 };
+
     /// <summary>Remet toutes les valeurs dans leurs bornes (volume au pas de 10 le plus proche, échelle 0..4...).</summary>
     public static void Normalize(OptionsData d)
     {
@@ -24,6 +27,7 @@ public static class OptionsRules
         if (d.WindowScale < 0 || d.WindowScale > MaxScale) d.WindowScale = 0;
         if (Array.IndexOf(HelpValues, d.PuzzleTimeMultiplier) < 0) d.PuzzleTimeMultiplier = 1;
         if (d.Language == null || Array.IndexOf(Languages, d.Language) < 0) d.Language = "fr";
+        if (Array.IndexOf(ReadSpeeds, d.ReadSpeed) < 0) d.ReadSpeed = 0;
         d.Version = OptionsData.CurrentVersion;
     }
 
@@ -50,6 +54,13 @@ public static class OptionsRules
         int index = Math.Max(0, Array.IndexOf(HelpValues, value));
         int count = HelpValues.Length;
         return HelpValues[((index + Math.Sign(direction)) % count + count) % count];
+    }
+
+    public static int CycleReadSpeed(int value, int direction)
+    {
+        int index = Math.Max(0, Array.IndexOf(ReadSpeeds, value));
+        int count = ReadSpeeds.Length;
+        return ReadSpeeds[((index + Math.Sign(direction)) % count + count) % count];
     }
 
     public static string CycleLanguage(string language, int direction)

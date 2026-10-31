@@ -39,11 +39,16 @@ public partial class HintBox : Node
         if (text == textKey) GD.PushWarning($"Conseil « {textKey} » : pas de traduction dans textes.csv.");
         _label.Text = text;
         _layer.Visible = true;
+        TextReader.Speak(text, TextSource.Hint);
         _timedToken++;
         int token = _timedToken;
         GetTree().CreateTimer(seconds).Timeout += () =>
         {
-            if (token == _timedToken && _occupied.Count == 0 && _layer != null && IsInsideTree()) _layer.Visible = false;
+            if (token == _timedToken && _occupied.Count == 0 && _layer != null && IsInsideTree())
+            {
+                _layer.Visible = false;
+                TextReader.Stop(TextSource.Hint);
+            }
         };
     }
 
@@ -60,7 +65,11 @@ public partial class HintBox : Node
     {
         if (_occupied.Count == 0)
         {
-            if (_layer != null) _layer.Visible = false;
+            if (_layer != null)
+            {
+                if (_layer.Visible) TextReader.Stop(TextSource.Hint);
+                _layer.Visible = false;
+            }
             return;
         }
         if (_layer == null) Build();
@@ -70,6 +79,7 @@ public partial class HintBox : Node
             GD.PushWarning($"Indice « {current.TextKey} » : pas de traduction dans textes.csv.");
         _label.Text = text;
         _layer.Visible = true;
+        TextReader.Speak(text, TextSource.Hint);
     }
 
     // Fond sombre + texte qui passe à la ligne, dans un CanvasLayer au-dessus du HUD (5) et sous le fondu (10).

@@ -131,6 +131,7 @@ public partial class InventoryMenu : Control
         if (_sceneManager.IsTransitioning) return;
         if (GetTree().GetFirstNodeInGroup("player") is Player { IsDead: true }) return;
 
+        TextReader.Stop(); // la pause coupe la lecture à voix haute
         Engine.TimeScale = 1f; // sécurité : jamais de menu au ralenti (hit-stop en cours)
         _open = true;
         _mapOpen = false;

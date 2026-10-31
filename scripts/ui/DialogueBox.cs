@@ -130,6 +130,7 @@ public partial class DialogueBox : CanvasLayer
     public override void _ExitTree()
     {
         // La salle est déchargée en pleine conversation : ne jamais laisser le jeu figé.
+        if (!_finished) TextReader.Stop(TextSource.Dialogue); // boîte libérée sans Finish
         if (_pausedByBox && GetTree() != null) GetTree().Paused = false;
         _pausedByBox = false;
     }
@@ -205,6 +206,7 @@ public partial class DialogueBox : CanvasLayer
     {
         _lineIndex = index;
         _label.Text = _texts[index];
+        TextReader.Speak(_label.Text, TextSource.Dialogue); // la réplique entière, dès qu'elle commence à défiler (le nom du personnage n'est pas lu)
         _label.VisibleCharacters = 0;
         _typewriter = new TypewriterState(_label.Text.Length, CharsPerSecond);
         _lastBeepVisible = 0;
@@ -273,6 +275,7 @@ public partial class DialogueBox : CanvasLayer
             _selected = DefaultChoice >= 0 && DefaultChoice < _choices.Count ? DefaultChoice : 0;
             _choicesTab.Visible = true;
             RefreshChoices();
+            TextReader.Speak(_choices[_selected], TextSource.Dialogue, false); // après la question
         }
     }
 
@@ -308,6 +311,7 @@ public partial class DialogueBox : CanvasLayer
         int next = Mathf.Clamp(_selected + step, 0, _choices.Count - 1);
         if (next == _selected) return;
         _selected = next;
+        TextReader.Speak(_choices[_selected], TextSource.Dialogue);
         AudioManager.Play(Sfx.MenuDeplace);
         RefreshChoices();
     }
@@ -327,6 +331,7 @@ public partial class DialogueBox : CanvasLayer
     {
         if (_finished) return;
         _finished = true;
+        TextReader.Stop(TextSource.Dialogue);
         if (_pausedByBox)
         {
             GetTree().Paused = false;

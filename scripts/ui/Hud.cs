@@ -292,6 +292,7 @@ public partial class Hud : CanvasLayer
 
     private void OnHealthChanged(int current, int max)
     {
+        if (current <= 0) TextReader.Stop(); // mort de Brann : plus rien n'est lu
         int heartCount = (max + 1) / 2;
         if (heartCount != _hearts.Length)
             RebuildHearts(heartCount);
