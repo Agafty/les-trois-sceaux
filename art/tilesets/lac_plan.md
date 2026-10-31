@@ -1,11 +1,11 @@
 # Plan du tileset `lac` — Le lac (overworld : cascade, Sanctuaire Englouti à demi noyé, quai, îlot et gué)
 
-> Fichier généré par `tools/sprites/lac.py` : modifier le script, pas ce fichier. **État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro).
+> Fichier généré par `tools/sprites/lac.py` : modifier le script, pas ce fichier. **État : DESSIN FINAL** (les numéros sont ceux du plan, aucune tuile n'a bougé).
 
 - Image : `art/tilesets/lac.png`, 256×480 px, 8 colonnes × 15 lignes de tuiles 32×32, sans marge ni espacement (120 cases). Tileset Tiled : `maps/tilesets/lac.tsx` (collisions et terrains définis). `art/tilesets/lac_numeros.png` = la planche ×2 avec les numéros.
 - **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 12 à 15 (ids 88 à 119) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
 - Collisions en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche). Les terrains (Wang par coins) sont dans le panneau Terrains de Tiled.
-- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px. Palette : bleus-verts froids de l'eau, pierre gris-violet du Sanctuaire, brume. Dans le plan, la couleur indique la famille ; une zone plus sombre dans une tuile = zone solide.
+- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px. Palette : bleus-verts froids de l'eau, pierre gris-violet du Sanctuaire. Les collisions sont dans le tileset (voir la colonne Collision).
 - **Ce tileset ne contient que ce qui manque.** À utiliser avec `village` (firstgid 1), `foret` (401) et `lac` (le troisième). Eau peu profonde : `village` 63 `rive_plein` et 64 `lac_base` (Sol), bords `rive_*` 48-62 (terrain `Rive`). Eau profonde : `village` 65-79 (terrain `Lac profond`, sur `Murs`, solide). Ponton : `village` 312-317 (Decor) + pilotis 318, bitte 319, roseaux 324-325, nénuphars 326, rocher dans l'eau 327. Éboulis : `village` 138/139. Falaises : `village` 120-132. Buissons coupables : `village` 300, `foret` 96-99.
 - **Aucun terrain (Wang) nouveau** : l'autotiling de l'eau est celui de `village` (`Rive`, `Lac profond`). Les tuiles de ce tileset se posent à la main (ou avec le pinceau « tampon » pour les assemblages).
 - **Animations** (déjà dans le `.tsx`, 250 ms par image) : `cascade_chute_a` -> `_b` et `cascade_voile_a` -> `_b`. Peindre uniquement les tuiles `_a`.
