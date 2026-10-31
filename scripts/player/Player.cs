@@ -44,6 +44,18 @@ public partial class Player : CharacterBody2D
     [Export(PropertyHint.Range, "1,5,1")]
     public int TemperedDamageMultiplier { get; set; } = 2;
 
+    /// <summary>Portée de l'épée : distance (px) entre le bord du CORPS de Brann et le bord avant de la zone de coup, identique dans les 4 directions.</summary>
+    [Export(PropertyHint.Range, "8,48,1")]
+    public float SwordReach { get; set; } = 24f;
+
+    /// <summary>Largeur (px) de la zone de coup, perpendiculaire à la direction du coup.</summary>
+    [Export(PropertyHint.Range, "8,64,1")]
+    public float SwordWidth { get; set; } = 28f;
+
+    /// <summary>Distance (px) entre le centre du corps de Brann et le bord arrière de la zone (elle touche un ennemi collé). Doit rester inférieure à la portée totale (SwordRearEdge &lt; SwordReach + demi-corps).</summary>
+    [Export(PropertyHint.Range, "0,16,1")]
+    public float SwordRearEdge { get; set; } = 4f;
+
     /// <summary>Distance (px) à laquelle un objet utilisé est posé devant Brann, depuis ses pieds.</summary>
     [Export]
     public float UseDistance { get; set; } = 24f;
@@ -82,6 +94,11 @@ public partial class Player : CharacterBody2D
     private AnimatedSprite2D _sprite;
     private AnimatedSprite2D _swordSprite;
     private HitBox _swordHitBox;
+    private static readonly Vector2 BodyCenter = new(0f, 6f); // CollisionShape2D du joueur
+    private const float BodyHalfHeight = 10f; // capsule : hauteur 20
+    private const float BodyHalfWidth = 8f;   // capsule : rayon 8
+    private CollisionShape2D _swordShapeNode;
+    private RectangleShape2D _swordShape;
     private int _baseSwordDamage = 1; // dégâts de la HitBox dans la scène, lus une fois
 
     private Health _health;
@@ -95,6 +112,9 @@ public partial class Player : CharacterBody2D
         _swordSprite = GetNode<AnimatedSprite2D>("SwordSlash");
         _swordHitBox = GetNode<HitBox>("SwordSlash/HitBox");
         _baseSwordDamage = _swordHitBox.Damage;
+        _swordShapeNode = _swordHitBox.GetNode<CollisionShape2D>("CollisionShape2D");
+        _swordShape = _swordShapeNode.Shape as RectangleShape2D; // une seule forme, redimensionnée à chaque coup
+        if (_swordShape == null) GD.PushError("Player : la forme de SwordSlash/HitBox doit être une RectangleShape2D.");
         _health = GetNode<Health>("Health");
         _camera = GetNodeOrNull<Camera2D>("Camera2D");
         _hurtBox = GetNode<HurtBox>("HurtBox");
@@ -517,14 +537,34 @@ public partial class Player : CharacterBody2D
             _ => ("attack_down", "slash_down", new Vector2(0, 16)),
         };
 
+        Vector2 slashDir = slashOffset.Normalized();
+        slashOffset += BodyCenter; // le coup est centré sur le corps (0,6), pas sur l'origine
         _swordSprite.Modulate = OpeningRules.HasRealSword(_isFlagSet) ? Colors.White : WoodSwordColor; // épée en bois : lame brune
         _sprite.Play(animBody);
         _swordSprite.Play(animSlash);
         _swordSprite.Position = slashOffset;
         _swordSprite.Visible = true;
+        ShapeSwordHitBox(slashDir, slashOffset);
         _swordHitBox.Damage = SwordRules.Damage(_baseSwordDamage, TemperedDamageMultiplier, _isFlagSet);
         _swordHitBox.Monitoring = true;
         AudioManager.Play(Sfx.Epee);
+    }
+
+    /// <summary>
+    /// Oriente la zone de coup, mesurée depuis le centre du corps (0,6) : le bord avant est à SwordReach du bord du corps
+    /// (demi-hauteur 10 en vertical, demi-largeur 8 en latéral), le bord arrière à SwordRearEdge du centre.
+    /// La HitBox est enfant de SwordSlash (décalé de slashOffset) : on compense pour la poser par rapport au corps.
+    /// </summary>
+    private void ShapeSwordHitBox(Vector2 dir, Vector2 slashOffset)
+    {
+        if (_swordShape == null) return;
+        bool vertical = dir.X == 0f;
+        float front = (vertical ? BodyHalfHeight : BodyHalfWidth) + SwordReach;
+        float depth = Mathf.Max(front - SwordRearEdge, 1f);
+        float width = Mathf.Max(SwordWidth, 1f);
+        _swordShape.Size = vertical ? new Vector2(width, depth) : new Vector2(depth, width);
+        Vector2 center = BodyCenter + dir * (SwordRearEdge + depth * 0.5f);
+        _swordShapeNode.Position = center - slashOffset;
     }
 
     private void ProcessAttack(float delta)

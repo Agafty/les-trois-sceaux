@@ -13,6 +13,7 @@ radius = 8.0
 height = 20.0
 
 [sub_resource type="RectangleShape2D" id="sword_hitbox_shape"]
+resource_local_to_scene = true
 size = Vector2(18, 18)
 
 [node name="Player" type="CharacterBody2D"]
