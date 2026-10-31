@@ -1,6 +1,6 @@
 # Plan du lac (`lac.tmx`) et de la grotte du sud-ouest (`grotte_sw.tmx`) - phase 6, étape 1
 
-Document de conception. **Aucun `.tmx` de ce plan n'existe encore** : on attend la validation (section 6). Il complète `maps/overworld/plan.md` (§1 découpage et raccords, §2.4 blocages, §4.3 plumes, §7 cohérence) et suit le format de `maps/donjon2/plan.md`. Les aperçus ont été relus par un script de vérification (Python, bibliothèque standard seulement, non versionné) : parcours (BFS) depuis l'arrivée, avant et après chaque ouverture ; résultats en section 5.
+Document de conception. Plan **validé le 2026-10-31** (section 6). Il complète `maps/overworld/plan.md` (§1 découpage et raccords, §2.4 blocages, §4.3 plumes, §7 cohérence) et suit le format de `maps/donjon2/plan.md`. Les aperçus ont été relus par un script de vérification (Python, bibliothèque standard seulement, non versionné) : parcours (BFS) depuis l'arrivée, avant et après chaque ouverture ; résultats en section 5.
 
 Rappels de numérotation : `GameState.StoryStage` vaut 0 (début), 1 (après la forêt), 2 (après la montagne, **c'est à cette étape que Brann a les bombes et vient au lac**), 3 (après le Sanctuaire), 4 (épilogue). Les densités de `Brume` sont donc 5 valeurs (étapes 0 à 4).
 
@@ -257,7 +257,9 @@ Cohérence de progression :
 - **Pas de soft-lock** : aucun bloc, aucun trou, aucune porte à clé ; l'éboulis, le rocher et le mur fissuré sont des états sauvegardés par `id` ; l'eau profonde ne blesse pas. Bombes : les ennemis du lac et de la grotte lâchent du butin de bombes sous 3 en stock, ils réapparaissent à chaque retour, et la boutique de Garrick en vend. Le Sanctuaire est ré-accessible à tout moment (portail ouvert).
 - **Import Godot** : non lançable à ce stade (aucun `.tmx` n'existe encore).
 
-## 6. Décisions à faire valider
+## 6. Décisions (validées le 2026-10-31)
+
+L'utilisatrice a validé les quatre recommandations : (1) îlot ouvert à l'**arc** (cible + rocher) ; (2) grotte du sud-ouest en Zone `foret` (ids `foret_receptacle_secret`, `foret_grotte_*`) ; (3) **Têtard d'encre créé maintenant** (type `tetard_encre`, scène en cours côté développeur) ; (4) cascade **libre**. Le détail des options reste ci-dessous.
 
 1. **Quart de cœur de l'îlot : arc (cible dans l'eau) ou bombe ?** Recommandation : **arc**. La cible est un geste que le joueur connaît déjà (forêt), la bombe a son moment avec l'éboulis, et l'arc fait vivre le ponton (on s'arrête pour viser). L'alternative (un éboulis dans le gué) ferait trois blocages à la bombe de suite (éboulis, grotte, îlot).
 2. **Zone de la grotte du sud-ouest : `foret` ou une zone à part (`grotte`) ?** Recommandation : **`foret`**, donc les ids `foret_receptacle_secret` et `foret_grotte_*` : pas de sauvegarde automatique parasite en entrant dans un cul-de-sac, et le réceptacle compte comme un secret de la forêt. (Ce que l'on perd : rien, la grotte n'a pas de musique propre prévue.)
