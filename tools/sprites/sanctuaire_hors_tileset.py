@@ -153,13 +153,27 @@ def steel(c):
     return (min(255, int(L * 0.72 + 14)), min(255, int(L * 0.9 + 28)), min(255, int(L * 1.12 + 60)), a)
 
 
-def crabe_charge():
-    src = read_png(os.path.join(ART, 'enemies', 'crabe_armure.png'))
+def steel_red(c):
+    """Variante rouge : la carapace d'acier prend une teinte rouille-rose (le contour sombre reste)."""
+    r, g, b, a = c
+    if not a:
+        return c
+    L = 0.3 * r + 0.59 * g + 0.11 * b
+    if L < 40:
+        return c
+    if is_red(c):
+        L = 130
+    return (min(255, int(L * 1.05 + 50)), min(255, int(L * 0.62 + 26)), min(255, int(L * 0.72 + 40)), a)
+
+
+def crabe_charge(red=False):
+    src = read_png(os.path.join(ART, 'enemies', 'crabe_armure_red.png' if red else 'crabe_armure.png'))
+    steel_fn = steel_red if red else steel
     out = canvas(64, 128)
     for row in range(4):                                  # bas, haut, gauche, droite
         for col in range(2):
             ox, oy = col * 32, row * 32
-            cell = [[steel(src[oy + y][ox + x]) for x in range(32)] for y in range(32)]
+            cell = [[steel_fn(src[oy + y][ox + x]) for x in range(32)] for y in range(32)]
             xs = [x for y in range(32) for x in range(32) if cell[y][x][3]]
             ys = [y for y in range(32) for x in range(32) if cell[y][x][3]]
             x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
@@ -171,8 +185,8 @@ def crabe_charge():
             for y in range(32):
                 for x in range(32):
                     c = out[oy + y][ox + x]
-                    if c[3] and c[2] > 150 and c[0] > 130:
-                        put(out, ox + x, oy + y, (230, 245, 255, 255))
+                    if c[3] and ((not red and c[2] > 150 and c[0] > 130) or (red and c[0] > 245)):
+                        put(out, ox + x, oy + y, (255, 232, 236, 255) if red else (230, 245, 255, 255))
             # lignes de vitesse derrière (côté opposé au déplacement)
             for k in range(3):
                 off = (col * 2 + k * 3) % 5
@@ -180,12 +194,12 @@ def crabe_charge():
                     ex = x0 - 2 - off if dx > 0 else x1 + 2 + off
                     ey = y0 + 3 + k * 4
                     for s in range(4):
-                        put(out, ox + ex - dx * s, oy + ey, (200, 232, 255, 255))
+                        put(out, ox + ex - dx * s, oy + ey, (255, 206, 212, 255) if red else (200, 232, 255, 255))
                 else:
                     ey = y0 - 2 - off if dy > 0 else y1 + 2 + off
                     ex = x0 + 4 + k * 8
                     for s in range(4):
-                        put(out, ox + ex, oy + ey - dy * s, (200, 232, 255, 255))
+                        put(out, ox + ex, oy + ey - dy * s, (255, 206, 212, 255) if red else (200, 232, 255, 255))
     return out
 
 
@@ -272,6 +286,7 @@ def main():
     save_png(os.path.join(ART, 'puzzles', 'porte_mur_rune.png'), porte_mur_rune())
     save_png(os.path.join(ART, 'items', 'sceau_lac.png'), sceau_lac())
     save_png(os.path.join(ART, 'enemies', 'crabe_armure_charge.png'), crabe_charge())
+    save_png(os.path.join(ART, 'enemies', 'crabe_armure_red_charge.png'), crabe_charge(True))
     save_png(os.path.join(ART, 'enemies', 'morceau_armure.png'), morceaux())
     save_png(os.path.join(ART, 'characters', 'corvan_ombre.png'), corvan_sheet())
     print('ok')

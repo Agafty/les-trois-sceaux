@@ -1,0 +1,116 @@
+{
+ "cellule": [
+  96,
+  96
+ ],
+ "origine": [
+  48,
+  94
+ ],
+ "ligne_d_eau_y": 84,
+ "ondine.png": {
+  "colonnes": 19,
+  "animations": {
+   "cache": {
+    "cases": [
+     0
+    ],
+    "fps": 1.0,
+    "boucle": false
+   },
+   "surgit": {
+    "cases": [
+     1,
+     2,
+     3
+    ],
+    "fps": 8.0,
+    "boucle": false
+   },
+   "plonge": {
+    "cases": [
+     3,
+     2,
+     1,
+     0
+    ],
+    "fps": 8.0,
+    "boucle": false
+   },
+   "idle": {
+    "cases": [
+     4,
+     5
+    ],
+    "fps": 3.0,
+    "boucle": true
+   },
+   "attaque": {
+    "cases": [
+     6,
+     7,
+     8
+    ],
+    "fps": 6.0,
+    "boucle": false
+   },
+   "touche": {
+    "cases": [
+     9
+    ],
+    "fps": 1.0,
+    "boucle": false
+   },
+   "eclate": {
+    "cases": [
+     10,
+     11,
+     12
+    ],
+    "fps": 5.0,
+    "boucle": false
+   },
+   "agenouillee": {
+    "cases": [
+     13,
+     14
+    ],
+    "fps": 2.0,
+    "boucle": true
+   },
+   "liberee": {
+    "cases": [
+     15,
+     16,
+     17,
+     18
+    ],
+    "fps": 4.0,
+    "boucle": false
+   }
+  }
+ },
+ "ondine_armure.png": "memes cases : calque a superposer et a faire clignoter (vide pour cache, agenouillee, liberee)",
+ "ondine_ombre.png": "ombre au sol 96x96 (phase 2)",
+ "anneau.png": {
+  "cellule": [
+   96,
+   32
+  ],
+  "centre": [
+   48,
+   16
+  ],
+  "annonce": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "pulse": [
+   4,
+   5
+  ],
+  "note": "anneau d'ondes du bassin : 'annonce' une fois (1,5 s), puis 'pulse' en boucle jusqu'au surgissement"
+ }
+}
