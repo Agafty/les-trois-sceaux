@@ -86,7 +86,7 @@ Village de montagne au bord du lac, souvent dans la brume, sur 2 écrans : place
 | Pip, le gamin | Astuces de gameplay, tutoriel discret | Suit Brann partout |
 | Old Tobias, le bûcheron | Ouvre le chemin du bois après l'acte 1 | Indice acte 1 : Corvan allait souvent en forêt |
 | Dame Isolde, l'archiviste | Raconte l'histoire des sceaux (une scène, pas un pavé) | Acte 3 : retrouve le nom de Corvan dans les registres des anciens gardiens |
-| Garrick, le marchand | Boutique : flèches, bombes, huile de lanterne, quart de cœur | Radin, touche d'humour |
+| Garrick, le marchand | Boutique : flèches, bombes, quart de cœur | Radin, touche d'humour |
 
 **Évolution du village**
 
@@ -116,7 +116,7 @@ Overworld de 5×4 écrans (3200×1760 px, 100×44 tuiles) :
 | Overworld (village 2, forêt 5, montagne 4, lac et rives 5, route/falaise/château 4) | 20 écrans |
 | Temple des Racines (donjon tutoriel) | 16 salles sur 2 étages |
 | Mine Effondrée | 16 salles sur 2 étages |
-| Sanctuaire Englouti | 12 salles |
+| Sanctuaire Englouti | 12 salles sur 2 étages + boss (plan `maps/donjon3/plan.md`) |
 | Château final (couloir, 1-2 énigmes avec les 3 objets, combat contre Corvan) | 4 à 5 salles |
 | Intérieurs (forge, Hulda, boutique, archives, 1-2 grottes secrètes), plus petits qu'un écran | 5 à 6 pièces |
 
@@ -140,7 +140,7 @@ Une salle de donjon = 1 écran ; les salles de boss peuvent en faire 2.
 | Montagne / Mine Effondrée | Chauve-souris des mines | Chasseur | 1 | Vol en zigzag, difficile à toucher |
 | Montagne / Mine Effondrée | Mineur maudit | Spécial | 2 | Bouclier de pierre qui bloque l'épée ; une bombe le fait tomber |
 | Lac / Sanctuaire Englouti | Têtard d'encre | Errant | 2 | Nage en eau peu profonde, éclabousse |
-| Lac / Sanctuaire Englouti | Crabe-armure | Chasseur | 3 | Vulnérable seulement de dos |
+| Lac / Sanctuaire Englouti | Crabe-armure | Chasseur | 3 | Carapace qui bloque les coups pendant sa charge : esquiver, puis frapper |
 | Lac / Sanctuaire Englouti | Ombre noyée | Spécial | 2 | Invisible dans le noir ; la lanterne la révèle et l'immobilise |
 | Château | Chevalier corrompu | Chasseur | 4 | Pare de face, attaque en série |
 | Château | Œil de Morvath | Tireur | 1 flèche | Sentinelle murale ; la détruire à l'arc ouvre certaines portes |
@@ -223,7 +223,7 @@ C'est Brann qui forge lui-même ses améliorations : il passe d'apprenti à forg
 
 - Rubis : vert = 1, bleu = 5, rouge = 20 ; bourse limitée à 300
 - Hulda : potion rouge (rend toute la vie) à 40 rubis, 2 potions maximum dans l'inventaire
-- Garrick : 10 flèches à 20, 5 bombes à 30, huile de lanterne à 10, quart de cœur à 150
+- Garrick : 10 flèches à 20, 5 bombes à 30, quart de cœur à 150 (pas d'huile : la lanterne est passive)
 - Cave secrète : grand carquois à 100, grand sac de bombes à 100
 - Les ennemis et les buissons lâchent assez de rubis pour les munitions ; les gros achats (quart de cœur, sacs) demandent d'économiser ou d'explorer
 

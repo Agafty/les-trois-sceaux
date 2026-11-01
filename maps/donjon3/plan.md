@@ -853,6 +853,13 @@ Garder les **mêmes numéros que les autres tilesets de donjon** pour ce que le 
 4. **Histoire : deux silhouettes muettes (salles 02 et 07), Corvan qui se dévoile sur un balcon avant le boss (salle 08), puis Corvan qui surgit quand Brann ramasse le sceau d'Ondine, absorbe l'énergie (Brann garde le sceau, étape 3), disparaît, et retour au lac sous l'éclipse ?** Recommandation : **oui** ; tout s'appuie sur les cinématiques et la sortie automatique qui existent déjà.
 5. **Le Crabe-armure (vulnérable seulement de dos, 3 coups) est-il trop difficile pour l'enfant de 5 ans ?** Recommandation : le **garder**, avec un ventre ou un dos pâle bien visible et la bombe comme solution de secours (3 PV), et jamais obligatoire de le vaincre.
 
+**Décisions validées le 2026-11-01** :
+1. Lanterne passive, toujours allumée, sans huile (l'huile est retirée de la boutique de Garrick).
+2. Pénombre bleue.
+3. Deux étages, sans niveau d'eau variable, sans trou ni bloc.
+4. Histoire comme proposée (2 silhouettes, balcon, Corvan absorbe l'énergie, retour au lac sous l'éclipse).
+5. **Crabe-armure simplifié** : vulnérable de partout (3 coups) **sauf pendant sa charge**, où sa carapace bloque les coups (`HurtBox.BlockFilter` actif seulement en état de charge). Il suffit d'esquiver la charge puis de frapper. Les descriptions « frapper dans le dos » des salles 07, 11 et 12 se lisent donc « esquiver la charge puis frapper ».
+
 ## 12. Suite
 
 À valider par la personne qui joue au projet (surtout la lanterne, §2). Après validation (étape 2) :
