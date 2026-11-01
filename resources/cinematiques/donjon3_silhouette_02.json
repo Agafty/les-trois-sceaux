@@ -1,0 +1,32 @@
+{
+  "id": "donjon3_silhouette_02",
+  "drapeau_fin": "silhouette_vue_2",
+  "passable": true,
+  "etapes": [
+    {
+      "action": "apparaitre",
+      "cible": "pnj",
+      "id": "corvan_ombre",
+      "sprite": "corvan_ombre",
+      "a": "silhouette_pont",
+      "direction": "down"
+    },
+    {
+      "action": "attendre",
+      "secondes": 1.5
+    },
+    {
+      "action": "regarder",
+      "acteur": "corvan_ombre",
+      "vers": "@brann"
+    },
+    {
+      "action": "attendre",
+      "secondes": 2.0
+    },
+    {
+      "action": "disparaitre",
+      "acteur": "corvan_ombre"
+    }
+  ]
+}

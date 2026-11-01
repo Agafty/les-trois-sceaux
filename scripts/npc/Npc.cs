@@ -25,6 +25,8 @@ public partial class Npc : CharacterBody2D
     private static readonly StringName[] IdleAnims = { "idle_down", "idle_up", "idle_left", "idle_right" };
     private static readonly StringName[] WalkAnims = { "walk_down", "walk_up", "walk_left", "walk_right" };
     private const string FramesFolder = "res://art/characters/";
+    // Planches faites par le code/les cinématiques (silhouette de Corvan...) : repli si le graphiste n'a pas livré art/characters/<nom>_frames.tres.
+    private const string FallbackFramesFolder = "res://resources/characters/";
 
     private AnimatedSprite2D _sprite;
     private InteractionZone _zone;
@@ -51,8 +53,11 @@ public partial class Npc : CharacterBody2D
 
         string name = string.IsNullOrEmpty(SpriteName) ? Id : SpriteName;
         string path = $"{FramesFolder}{name}_frames.tres";
+        string fallbackPath = $"{FallbackFramesFolder}{name}_frames.tres";
         if (RoomObjectCatalog.IsSafeName(name) && ResourceLoader.Exists(path))
             _sprite.SpriteFrames = GD.Load<SpriteFrames>(path);
+        else if (RoomObjectCatalog.IsSafeName(name) && ResourceLoader.Exists(fallbackPath))
+            _sprite.SpriteFrames = GD.Load<SpriteFrames>(fallbackPath);
         else
             GD.PushWarning($"PNJ « {Id} » : planche {path} introuvable, le sprite reste vide.");
         PlayIdle();

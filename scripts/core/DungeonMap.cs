@@ -181,9 +181,44 @@ public static class DungeonMap
             new MapLink("donjon2_salle_13_room", "donjon2_salle_14_room", MapDoorKind.Key, "donjon2_porte_08"),
         });
 
+    /// <summary>Plan du Sanctuaire Englouti (voir maps/donjon3/plan.md §5). Escalier 07 (rdc) vers 09 (sous-sol) : pas de lien, seulement hasStairs.</summary>
+    public static readonly DungeonLayout Donjon3 = new(
+        "donjon3",
+        new[]
+        {
+            new MapRoom("donjon3_salle_01_room", "rdc", 1, 0, "SALLE_DONJON3_01"),
+            new MapRoom("donjon3_salle_02_room", "rdc", 1, 1, "SALLE_DONJON3_02", new[] { "donjon3_coffre_01" }),
+            new MapRoom("donjon3_salle_03_room", "rdc", 0, 1, "SALLE_DONJON3_03", new[] { "donjon3_coffre_02" }),
+            new MapRoom("donjon3_salle_04_room", "rdc", 2, 1, "SALLE_DONJON3_04", new[] { "donjon3_coffre_03" }, bigChest: true),
+            new MapRoom("donjon3_salle_05_room", "rdc", 3, 1, "SALLE_DONJON3_05", new[] { "donjon3_coffre_04" }),
+            new MapRoom("donjon3_salle_06_room", "rdc", 1, 2, "SALLE_DONJON3_06"),
+            new MapRoom("donjon3_salle_07_room", "rdc", 1, 3, "SALLE_DONJON3_07", hasStairs: true),
+            new MapRoom("donjon3_salle_08_room", "rdc", 1, 4, "SALLE_DONJON3_08"),
+            new MapRoom("donjon3_salle_boss_room", "rdc", 1, 5, "SALLE_DONJON3_BOSS", isBoss: true),
+            new MapRoom("donjon3_salle_09_room", "sous_sol", 1, 3, "SALLE_DONJON3_09", hasStairs: true),
+            new MapRoom("donjon3_salle_10_room", "sous_sol", 1, 2, "SALLE_DONJON3_10", new[] { "donjon3_coffre_05" }),
+            new MapRoom("donjon3_salle_11_room", "sous_sol", 2, 2, "SALLE_DONJON3_11"),
+            new MapRoom("donjon3_salle_12_room", "sous_sol", 2, 3, "SALLE_DONJON3_12", new[] { "donjon3_coffre_06" }, bigChest: true),
+        },
+        new[]
+        {
+            new MapLink("donjon3_salle_01_room", "donjon3_salle_02_room"),
+            new MapLink("donjon3_salle_02_room", "donjon3_salle_03_room"),
+            new MapLink("donjon3_salle_02_room", "donjon3_salle_04_room"),
+            new MapLink("donjon3_salle_02_room", "donjon3_salle_06_room", MapDoorKind.Key, "donjon3_porte_01"),
+            new MapLink("donjon3_salle_04_room", "donjon3_salle_05_room", MapDoorKind.Enemies, "donjon3_porte_02"),
+            new MapLink("donjon3_salle_06_room", "donjon3_salle_07_room", MapDoorKind.Switch, "donjon3_porte_04"),
+            new MapLink("donjon3_salle_07_room", "donjon3_salle_08_room", MapDoorKind.Key, "donjon3_porte_07"),
+            new MapLink("donjon3_salle_08_room", "donjon3_salle_boss_room", MapDoorKind.BossKey, "donjon3_porte_08"),
+            new MapLink("donjon3_salle_09_room", "donjon3_salle_10_room"),
+            new MapLink("donjon3_salle_09_room", "donjon3_salle_12_room", MapDoorKind.Switch, "donjon3_porte_10"),
+            new MapLink("donjon3_salle_10_room", "donjon3_salle_11_room"),
+            new MapLink("donjon3_salle_11_room", "donjon3_salle_12_room", MapDoorKind.Switch, "donjon3_porte_09"),
+        });
+
     /// <summary>Plan d'une zone, ou null si elle n'a pas de carte.</summary>
     public static DungeonLayout GetLayout(string zone) =>
-        zone == Donjon1.Zone ? Donjon1 : zone == Donjon2.Zone ? Donjon2 : null;
+        zone == Donjon1.Zone ? Donjon1 : zone == Donjon2.Zone ? Donjon2 : zone == Donjon3.Zone ? Donjon3 : null;
 
     /// <summary>Clé mémorisée pour une salle visitée : « zone/id ».</summary>
     public static string MakeVisitedKey(string zone, string roomId) => (zone ?? "") + "/" + (roomId ?? "");

@@ -272,3 +272,27 @@ MENU_RETOUR,Retour,Back
 CONFIRM_RETOUR_TITRE,Retourner à l'écran titre ?,Go back to the title screen?
 CONFIRM_QUITTER,Quitter le jeu ?,Quit the game?
 CONFIRM_PERTE_PROGRESSION,La progression depuis la dernière sauvegarde sera perdue.,Progress since the last save will be lost.
+OBJ_SCEAU_LAC,le sceau du Lac,the Seal of the Lake
+OBJ_SCEAU_LAC_DESC,Le dernier des trois sceaux est restauré.,The last of the three seals is restored.
+SALLE_DONJON3_01,Parvis du Sanctuaire,Sanctuary forecourt
+SALLE_DONJON3_02,Nef inondée,Flooded nave
+SALLE_DONJON3_03,Bassin des Têtards,Tadpole pool
+SALLE_DONJON3_04,Chapelle de la lanterne,Lantern chapel
+SALLE_DONJON3_05,Galerie des veilleuses,Gallery of night lights
+SALLE_DONJON3_06,Salle des runes,Rune room
+SALLE_DONJON3_07,Pont des Crabes,Crab bridge
+SALLE_DONJON3_08,Antichambre d'Ondine,Ondine's antechamber
+SALLE_DONJON3_09,Crypte d'arrivée,Arrival crypt
+SALLE_DONJON3_10,Salle des Ombres,Hall of Shadows
+SALLE_DONJON3_11,Galerie des cibles,Target gallery
+SALLE_DONJON3_12,Reliquaire,Reliquary
+SALLE_DONJON3_BOSS,Bassin d'Ondine,Ondine's basin
+INDICE_RUNE_MUR,Une rune bleue brille faiblement dans le mur. Une lumière pourrait la réveiller.,A blue rune glows faintly in the wall. A light might awaken it.
+INDICE_LANTERNE_GRAVEE,Une lanterne est gravée sur le piédestal. Elle éclairera les salles sombres.,A lantern is carved on the pedestal. It will light up the dark rooms.
+INDICE_SALLE_SOMBRE,Il fait sombre ici... Ta lanterne éclaire devant toi. Approche-la des torches pour les allumer !,It is dark in here... Your lantern lights the way ahead. Bring it close to the torches to light them!
+INDICE_OMBRE,"Des ombres rôdent dans le noir. Quand ta lumière les touche, elles s'immobilisent : c'est le moment de frapper !",Shadows lurk in the dark. When your light touches them they freeze: that is the moment to strike!
+DLG_D3_REVELE_1,Maître Corvan ? Vous êtes vivant !,Master Corvan? You're alive!
+DLG_D3_REVELE_2,"Tu es doué, Brann. Je t'ai bien formé.","You are gifted, Brann. I trained you well."
+DLG_D3_REVELE_3,"Mes yeux me trahissent, mes mains tremblent. Morvath me rendra ma jeunesse.","My eyes betray me, my hands tremble. Morvath will give me back my youth."
+DLG_D3_REVELE_4,Pourquoi ? Les sceaux protègent tout le monde !,Why? The seals protect everyone!
+DLG_D3_REVELE_5,"Libère Ondine, petit. Il ne manque plus qu'un sceau.","Free Ondine, boy. Only one seal is missing now."

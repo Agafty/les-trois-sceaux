@@ -1,0 +1,14 @@
+[gd_resource type="SpriteFrames" load_steps=4 format=3]
+
+[ext_resource type="Texture2D" path="res://art/characters/corvan_ombre.png" id="1_ombre"]
+
+[sub_resource type="AtlasTexture" id="A1"]
+atlas = ExtResource("1_ombre")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="A2"]
+atlas = ExtResource("1_ombre")
+region = Rect2(32, 0, 32, 32)
+
+[resource]
+animations = [{"frames": [{"duration": 1.0, "texture": SubResource("A1")}, {"duration": 1.0, "texture": SubResource("A2")}], "loop": true, "name": &"idle_down", "speed": 1.5}, {"frames": [{"duration": 1.0, "texture": SubResource("A1")}, {"duration": 1.0, "texture": SubResource("A2")}], "loop": true, "name": &"idle_up", "speed": 1.5}, {"frames": [{"duration": 1.0, "texture": SubResource("A1")}, {"duration": 1.0, "texture": SubResource("A2")}], "loop": true, "name": &"idle_left", "speed": 1.5}, {"frames": [{"duration": 1.0, "texture": SubResource("A1")}, {"duration": 1.0, "texture": SubResource("A2")}], "loop": true, "name": &"idle_right", "speed": 1.5}]

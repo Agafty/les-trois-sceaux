@@ -101,7 +101,7 @@ public partial class CrabeArmureEnemy : CharacterBody2D, IBombDestructible
 
     // Les animations de charge viennent de art/enemies/crabe_armure_charge.png (64x128 : 2 images x 4 directions, ordre bas/haut/gauche/droite).
     // Elles sont ajoutées une fois aux SpriteFrames (ressource partagée, jamais enregistrée) car le .tres est dans art/.
-    // La variante rouge n'a pas encore sa planche de charge : elle reste sur l'animation de marche (repli, accélérée).
+    // La variante rouge a sa planche art/enemies/crabe_armure_red_charge.png ; sans fichier, repli sur la marche accélérée.
     private static bool EnsureChargeAnimations(SpriteFrames frames)
     {
         if (frames == null) return false;
@@ -165,7 +165,15 @@ public partial class CrabeArmureEnemy : CharacterBody2D, IBombDestructible
         if (_timer <= 0f)
         {
             // Direction verrouillée au départ : jamais corrigée ensuite.
-            if (TryGetPlayer(out var p)) _facing = CardinalToward(p.GlobalPosition - GlobalPosition);
+            if (!TryGetPlayer(out var p))
+            {
+                // Brann n'est plus là (mort, parti) : pas de charge dans le vide, retour à l'errance.
+                _cooldownTimer = Cooldown;
+                EnterState(State.Errance, 0f);
+                PickWanderDirection();
+                return;
+            }
+            _facing = CardinalToward(p.GlobalPosition - GlobalPosition);
             EnterState(State.Charge, ChargeMaxDuration);
         }
     }
@@ -258,7 +266,7 @@ public partial class CrabeArmureEnemy : CharacterBody2D, IBombDestructible
         return false;
     }
 
-    // Choc de face seulement : la normale de la collision s'oppose à la direction de charge (pas d'étourdissement en frôlant un mur ou l'arête d'un pilier).
+    // Choc de face seulement : la normale de la collision s'oppose à la direction de charge (seuil -0,8 : pas d'étourdissement en frôlant un mur ou en mordant 2-3 px sur l'arête d'un pilier).
     private bool HitFrontWall()
     {
         int count = GetSlideCollisionCount();
@@ -266,7 +274,7 @@ public partial class CrabeArmureEnemy : CharacterBody2D, IBombDestructible
         for (int i = 0; i < count; i++)
         {
             var c = GetSlideCollision(i);
-            if (c.GetCollider() is not CharacterBody2D && c.GetNormal().Dot(dir) < -0.5f)
+            if (c.GetCollider() is not CharacterBody2D && c.GetNormal().Dot(dir) < -0.8f)
                 return true;
         }
         return false;

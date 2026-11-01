@@ -1,0 +1,66 @@
+{
+  "id": "donjon3_corvan_revele",
+  "drapeau_fin": "corvan_revele",
+  "passable": true,
+  "etapes": [
+    {
+      "action": "camera",
+      "vers": "corvan_balcon",
+      "duree": 1.2
+    },
+    {
+      "action": "apparaitre",
+      "cible": "pnj",
+      "id": "corvan",
+      "sprite": "corvan",
+      "a": "corvan_balcon",
+      "direction": "down"
+    },
+    {
+      "action": "attendre",
+      "secondes": 0.6
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_BRANN",
+      "lignes": [
+        "DLG_D3_REVELE_1"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_CORVAN",
+      "lignes": [
+        "DLG_D3_REVELE_2",
+        "DLG_D3_REVELE_3"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_BRANN",
+      "lignes": [
+        "DLG_D3_REVELE_4"
+      ]
+    },
+    {
+      "action": "dialogue",
+      "orateur": "PNJ_CORVAN",
+      "lignes": [
+        "DLG_D3_REVELE_5"
+      ]
+    },
+    {
+      "action": "disparaitre",
+      "acteur": "corvan"
+    },
+    {
+      "action": "attendre",
+      "secondes": 0.6
+    },
+    {
+      "action": "camera",
+      "vers": "brann",
+      "duree": 1.2
+    }
+  ]
+}
