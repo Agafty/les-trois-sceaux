@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 using Godot;
 
 /// <summary>
-/// Coffre solide. Brann le touche par le bas, face vers le haut, et appuie sur « interact » :
+/// Coffre solide. Brann le touche par n'importe quel côté (haut, bas, gauche, droite), tourné vers lui, sans obstacle
+/// entre eux (mur, rocher fissuré, porte...), et appuie sur « interact » :
 /// le coffre s'ouvre, Brann brandit le contenu, le jeu est figé le temps de l'animation,
 /// puis l'effet est appliqué. L'ouverture est mémorisée dans GameState (flag = Id).
 /// </summary>
@@ -29,8 +30,11 @@ public partial class Chest : StaticBody2D
     /// <summary>Largeur (px) de la collision du grand coffre (le petit utilise celle de la scène).</summary>
     [Export(PropertyHint.Range, "8,64,1")] public float ImportantBodyWidth { get; set; } = 28f;
 
-    /// <summary>Écart horizontal maximal (px) entre Brann et le centre du coffre pour l'ouvrir.</summary>
+    /// <summary>Écart latéral maximal (px) entre Brann et le centre du coffre, perpendiculairement à la direction de Brann.</summary>
     [Export(PropertyHint.Range, "4,64,1")] public float MaxHorizontalOffset { get; set; } = 20f;
+
+    /// <summary>Distance maximale (px) entre le centre du corps de Brann et celui du coffre, dans la direction de Brann.</summary>
+    [Export(PropertyHint.Range, "16,64,1")] public float MaxReach { get; set; } = 32f;
 
     [Export(PropertyHint.Range, "0.2,5,0.1")] public float LiftDuration { get; set; } = 1f;
 
@@ -42,6 +46,10 @@ public partial class Chest : StaticBody2D
     private static readonly Vector2 TextTop = new(0, 290);
     private const string ThemePath = "res://resources/ui/theme_jeu.tres";
 
+    private static readonly Vector2 PlayerBodyCenter = new(0f, 6f); // CollisionShape2D de Brann
+    private const int MaxRayAttempts = 8;
+    private const uint WallMask = 1u;
+
     private const int ClosedFrame = 0;
     private const int OpenFrame = 1;
 
@@ -49,6 +57,7 @@ public partial class Chest : StaticBody2D
     private static readonly List<Chest> Candidates = new();
     private static Theme _theme;
 
+    private Vector2 _bodyCenter = new(0f, -9f); // relu dans la CollisionShape2D au _Ready
     private Sprite2D _sprite;
     private Area2D _zone;
     private GameState _state;
@@ -75,6 +84,8 @@ public partial class Chest : StaticBody2D
 
         if (Important)
             ApplyImportantLook();
+        var bodyShape = GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+        if (bodyShape != null) _bodyCenter = bodyShape.Position;
 
         if (string.IsNullOrEmpty(Id))
         {
@@ -153,25 +164,67 @@ public partial class Chest : StaticBody2D
         }
         var player = _playerInside;
         if (player.IsDead || !player.CanInteract) return;
-        if (player.FacingDirection != Vector2.Up) return; // le coffre s'ouvre par le bas
-        if (Mathf.Abs(player.GlobalPosition.X - GlobalPosition.X) >= MaxHorizontalOffset) return; // pas en face
         if (_sceneManager.IsTransitioning || GetTree().Paused) return;
+        if (!IsInFront(player)) return;
         if (!IsClosestCandidate(player)) return;
+        if (!IsPathClear(player)) return;
 
         _ = OpenAsync(player);
     }
 
-    // Plusieurs coffres côte à côte : seul le plus proche de Brann répond (les autres cèdent).
+    // Centre du corps du coffre en monde (lu dans sa CollisionShape2D au _Ready).
+    private Vector2 BodyCenterWorld => GlobalPosition + _bodyCenter;
+
+    // Test géométrique sans rayon : le coffre est devant Brann (4 côtés), collé à lui.
+    private bool IsInFront(Player player)
+    {
+        Vector2 facing = player.FacingDirection;
+        Vector2 delta = BodyCenterWorld - (player.GlobalPosition + PlayerBodyCenter);
+        float forward = delta.Dot(facing);
+        if (forward <= 0f || forward > MaxReach) return false;
+        // Astuce : (facing.Y, facing.X) est perpendiculaire à une direction cardinale (haut/bas -> (±1,0), gauche/droite -> (0,±1)),
+        // donc le produit scalaire donne l'écart latéral (|.|).
+        float lateral = Mathf.Abs(delta.Dot(new Vector2(facing.Y, facing.X)));
+        return lateral < MaxHorizontalOffset;
+    }
+
+    // Plusieurs coffres côte à côte : seul le plus proche de Brann répond, parmi ceux qui sont devant lui (les autres cèdent).
     private bool IsClosestCandidate(Player player)
     {
-        float mine = GlobalPosition.DistanceSquaredTo(player.GlobalPosition);
+        Vector2 brann = player.GlobalPosition + PlayerBodyCenter;
+        float mine = BodyCenterWorld.DistanceSquaredTo(brann);
         for (int i = 0; i < Candidates.Count; i++)
         {
             var other = Candidates[i];
-            if (other == this || other._opened || !other._valid) continue;
-            if (other.GlobalPosition.DistanceSquaredTo(player.GlobalPosition) < mine) return false;
+            if (other == this || other._opened || !other._valid || !other.IsInFront(player)) continue;
+            float theirs = other.BodyCenterWorld.DistanceSquaredTo(brann);
+            if (theirs < mine || (Mathf.IsEqualApprox(theirs, mine) && other.GetInstanceId() < GetInstanceId())) return false;
         }
         return true;
+    }
+
+    // Rayon physique Brann -> coffre (une seule fois, pour le coffre retenu). Les CharacterBody2D (ennemis, PNJ, poules) ne sont pas des murs :
+    // on les exclut et on relance (comme Player.TryUseItem). Exclude renvoie une copie : on réassigne la liste à chaque ajout.
+    private bool IsPathClear(Player player)
+    {
+        var query = PhysicsRayQueryParameters2D.Create(player.GlobalPosition + PlayerBodyCenter, BodyCenterWorld, WallMask);
+        var exclude = new Godot.Collections.Array<Rid> { player.GetRid(), GetRid() };
+        query.Exclude = exclude;
+        query.CollideWithAreas = false;
+        var space = GetWorld2D().DirectSpaceState;
+        for (int attempt = 0; attempt < MaxRayAttempts; attempt++)
+        {
+            var hit = space.IntersectRay(query);
+            if (hit.Count == 0) return true;
+            if (hit["collider"].AsGodotObject() is CharacterBody2D body)
+            {
+                exclude.Add(body.GetRid());
+                query.Exclude = exclude;
+                continue;
+            }
+            return false;
+        }
+        return false;
     }
 
     private void OnBodyEntered(Node2D body)

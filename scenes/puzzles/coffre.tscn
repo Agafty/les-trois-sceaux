@@ -8,7 +8,7 @@
 size = Vector2(24, 14)
 
 [sub_resource type="RectangleShape2D" id="zone_shape"]
-size = Vector2(72, 40)
+size = Vector2(80, 56)
 
 [node name="Coffre" type="StaticBody2D"]
 script = ExtResource("script_chest")
@@ -27,5 +27,5 @@ shape = SubResource("body_shape")
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ZoneInteraction"]
-position = Vector2(0, 16)
+position = Vector2(0, -12)
 shape = SubResource("zone_shape")
