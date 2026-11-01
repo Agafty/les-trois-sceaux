@@ -29,6 +29,21 @@ public partial class Room : Node2D
     [Export(PropertyHint.Range, "0.1,2,0.05")]
     public float StairsFadeDuration { get; set; } = 0.6f;
 
+    /// <summary>
+    /// Salle de boss : scène où Brann est renvoyé (devant l'entrée du donjon, dehors) une fois les deux récompenses
+    /// (réceptacle de cœur et sceau) ramassées. Vide = pas de sortie automatique.
+    /// </summary>
+    [Export(PropertyHint.File, "*.tscn")]
+    public string VictoryExitScene { get; set; } = "";
+
+    /// <summary>Id du Spawn d'arrivée dans <see cref="VictoryExitScene"/> (ex. « depuis_temple »).</summary>
+    [Export]
+    public string VictoryExitSpawn { get; set; } = "";
+
+    /// <summary>Délai (s) entre le dernier objet ramassé et la sortie, pour lire le bandeau « Vous obtenez ».</summary>
+    [Export(PropertyHint.Range, "0.5,6,0.1")]
+    public float VictoryExitDelay { get; set; } = 2.2f;
+
     [ExportGroup("Variante rouge")]
     /// <summary>Multiplicateur de points de vie d'un ennemi de variante « rouge ».</summary>
     [Export(PropertyHint.Range, "1,5,0.5")]
@@ -667,6 +682,7 @@ public partial class Room : Node2D
     private void SpawnBossRewards(string bossId, bool heart, string sealName, Vector2 center, bool animate)
     {
         const float gap = 28f;
+        var rewardIds = new List<string>();
         if (heart)
         {
             var heartScene = GD.Load<PackedScene>("res://scenes/items/receptacle.tscn");
@@ -676,6 +692,7 @@ public partial class Room : Node2D
             {
                 var pickup = heartScene.Instantiate<Pickup>();
                 pickup.UniqueId = BossRules.RewardId(bossId, "receptacle");
+                rewardIds.Add(pickup.UniqueId);
                 PlaceReward(pickup, center + new Vector2(-gap, 0f), animate);
             }
         }
@@ -686,10 +703,84 @@ public partial class Room : Node2D
             {
                 var pickup = GD.Load<PackedScene>(PickupScenePath).Instantiate<ItemPickup>();
                 pickup.UniqueId = BossRules.RewardId(bossId, "sceau");
+                rewardIds.Add(pickup.UniqueId);
                 pickup.Effect = effect;
                 PlaceReward(pickup, center + new Vector2(gap, 0f), animate);
             }
         }
+        WatchRewards(rewardIds);
+    }
+
+    // --- Sortie après la victoire (façon A Link to the Past) ---------------------------------
+
+    private List<string> _rewardIds;
+    private Timer _rewardTimer;
+    private GameState _rewardState;
+    private SaveSystem _rewardSave;
+    private SceneManager _rewardScenes;
+    private bool _allCollected;
+    private double _exitCountdown;
+    private bool _exitStarted;
+    private const double RewardPollSeconds = 0.25;
+
+    // Surveille les récompenses restantes : chaque ramassage du réceptacle déclenche une sauvegarde auto (le sceau en fait déjà une),
+    // et quand il n'en reste aucune, Brann est renvoyé dehors après un court délai. Rien si tout est déjà ramassé.
+    private void WatchRewards(List<string> ids)
+    {
+        if (_rewardTimer != null || ids.Count == 0) return;
+        _rewardState = GetNode<GameState>("/root/GameState");
+        _rewardSave = GetNode<SaveSystem>("/root/SaveSystem");
+        _rewardScenes = GetNode<SceneManager>("/root/SceneManager");
+        _rewardIds = ids.FindAll(id => !_rewardState.IsCollected(id));
+        if (_rewardIds.Count == 0) { _rewardIds = null; return; }
+        if (string.IsNullOrEmpty(VictoryExitScene) || !ResourceLoader.Exists(VictoryExitScene))
+            GD.PushWarning($"{Name} : VictoryExitScene vide ou introuvable (« {VictoryExitScene} »), pas de sortie après la victoire.");
+        else if (string.IsNullOrEmpty(VictoryExitSpawn))
+            GD.PushWarning($"{Name} : VictoryExitSpawn vide, Brann arrivera sans point d'entrée à la sortie du boss.");
+        _allCollected = false;
+        _exitCountdown = VictoryExitDelay;
+        _rewardTimer = new Timer { Name = "SurveillanceRecompenses", WaitTime = RewardPollSeconds, OneShot = false, Autostart = true };
+        _rewardTimer.Timeout += OnRewardPoll;
+        AddChild(_rewardTimer);
+    }
+
+    private void OnRewardPoll()
+    {
+        if (_exitStarted || _rewardIds == null) return;
+        if (!_allCollected)
+        {
+            for (int i = _rewardIds.Count - 1; i >= 0; i--)
+            {
+                if (!_rewardState.IsCollected(_rewardIds[i])) continue;
+                if (_rewardIds[i].EndsWith("_receptacle")) _rewardSave.RequestAutoSave(); // rien de perdu si on part à pied
+                _rewardIds.RemoveAt(i);
+            }
+            if (_rewardIds.Count > 0) return;
+            _allCollected = true;
+        }
+
+        if (string.IsNullOrEmpty(VictoryExitScene)) { StopRewardWatch(); return; }
+        if (_exitCountdown > 0)
+        {
+            _exitCountdown -= RewardPollSeconds; // décompte pour lire le bandeau (le Timer s'arrête avec la pause)
+            return;
+        }
+        // Conditions de report (pause, cinématique, mort, transition en cours) : on réessaie au prochain tick.
+        if (GetTree().Paused || CinematicPlayer.Active || (Cinematics?.IsPlaying ?? false)) return;
+        var player = FindPlayer(this);
+        if (player == null || player.IsDead) return;
+        if (_rewardScenes.IsTransitioning) return;
+        if (!_rewardScenes.GoToScene(VictoryExitScene, VictoryExitSpawn, null, "", 1.0f)) return;
+        _exitStarted = true;
+        StopRewardWatch();
+    }
+
+    private void StopRewardWatch()
+    {
+        if (_rewardTimer == null) return;
+        _rewardTimer.Timeout -= OnRewardPoll;
+        _rewardTimer.QueueFree();
+        _rewardTimer = null;
     }
 
     private void PlaceReward(Pickup pickup, Vector2 worldPosition, bool animate)

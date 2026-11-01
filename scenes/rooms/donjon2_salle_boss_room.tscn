@@ -7,6 +7,8 @@
 [node name="Donjon2SalleBoss" type="Node2D"]
 script = ExtResource("room_script")
 Zone = "donjon2"
+VictoryExitScene = "res://scenes/rooms/montagne_room.tscn"
+VictoryExitSpawn = "depuis_mine"
 
 [node name="Map" parent="." instance=ExtResource("map")]
 
