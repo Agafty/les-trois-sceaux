@@ -25,3 +25,6 @@ __pycache__/
 
 # Copies de travail des agents
 .claude/worktrees/
+
+# Export de la démo
+/build/
