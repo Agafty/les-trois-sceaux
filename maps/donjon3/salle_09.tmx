@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="11">
+ <properties>
+  <property name="carte_x" type="int" value="1"/>
+  <property name="carte_y" type="int" value="3"/>
+  <property name="etage" value="sous_sol"/>
+  <property name="obscurite" value="penombre"/>
+ </properties>
+ <tileset firstgid="1" source="../tilesets/sanctuaire_crypte.tsx"/>
+ <layer id="1" name="Sol" width="20" height="11">
+  <data encoding="csv">
+7,7,7,8,10,10,8,9,9,7,7,7,8,8,7,9,8,7,8,7,
+8,10,7,8,7,9,7,9,7,7,7,7,10,7,7,7,7,9,7,8,
+8,7,9,9,8,7,9,9,10,7,7,7,9,10,7,8,7,7,57,8,
+7,9,10,9,10,7,9,7,7,8,10,7,7,7,10,7,8,7,7,7,
+7,7,8,10,7,7,7,7,7,8,10,7,10,8,7,8,8,7,9,7,
+10,9,7,90,82,82,91,7,9,10,10,7,7,7,8,7,7,7,9,8,
+7,7,8,84,81,81,85,9,7,7,8,9,8,7,7,7,7,7,7,7,
+7,7,9,92,83,83,93,7,7,7,10,7,7,7,7,7,8,8,8,7,
+9,9,7,7,9,7,9,7,8,7,9,7,8,7,7,7,7,7,10,7,
+7,7,8,7,7,7,10,8,7,10,7,7,9,8,9,10,7,9,9,8,
+7,9,9,7,9,7,9,8,7,10,7,9,7,9,8,8,8,9,10,7
+</data>
+ </layer>
+ <layer id="2" name="Decor" width="20" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,15,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,128,0,0,0,0,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,0,0,0,0,0,0,0,128,11,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="3" name="Murs" width="20" height="11">
+  <data encoding="csv">
+21,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,22,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,114,0,0,0,0,0,0,114,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,44,
+19,0,0,0,0,0,0,0,0,0,114,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+23,18,18,18,18,18,18,18,18,42,18,18,18,18,18,18,18,18,18,24
+</data>
+ </layer>
+ <objectgroup id="4" name="Objets">
+  <object id="1" type="Sortie" x="288" y="320" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/donjon3_salle_10_room.tscn"/>
+    <property name="cible_spawn" value="depuis_nord"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="2" type="Sortie" x="608" y="160" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/donjon3_salle_12_room.tscn"/>
+    <property name="cible_spawn" value="depuis_ouest"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="3" type="Porte" x="608" y="160" width="32" height="32">
+   <properties>
+    <property name="id" value="donjon3_porte_10"/>
+    <property name="type" value="interrupteur"/>
+   </properties>
+  </object>
+  <object id="4" type="Sortie" x="576" y="64" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/donjon3_salle_07_room.tscn"/>
+    <property name="cible_spawn" value="depuis_escalier"/>
+    <property name="transition" value="escalier"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="5" type="Spawn" x="304" y="272">
+   <properties>
+    <property name="id" value="depuis_sud"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="6" type="Spawn" x="560" y="176">
+   <properties>
+    <property name="id" value="depuis_est"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="7" type="Spawn" x="560" y="80">
+   <properties>
+    <property name="id" value="depuis_escalier"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="8" type="Torche" x="176" y="80">
+   <properties>
+    <property name="id" value="donjon3_brasero_11"/>
+    <property name="etat" value="allumee"/>
+    <property name="permanente" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="9" type="Torche" x="432" y="80">
+   <properties>
+    <property name="id" value="donjon3_brasero_12"/>
+    <property name="etat" value="allumee"/>
+    <property name="permanente" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="10" type="Ennemi" x="144" y="208">
+   <properties>
+    <property name="type" value="tetard_encre"/>
+    <property name="variante" value="normal"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <layer id="5" name="Dessus" width="20" height="11">
+  <data encoding="csv">
+0,0,0,0,0,120,0,0,0,0,0,0,0,0,0,120,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,113,0,0,0,0,0,0,113,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,113,0,0,0,0,0,0,0,0,48,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,46,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>

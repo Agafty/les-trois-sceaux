@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="9">
+ <properties>
+  <property name="carte_x" type="int" value="0"/>
+  <property name="carte_y" type="int" value="1"/>
+  <property name="etage" value="rdc"/>
+ </properties>
+ <tileset firstgid="1" source="../tilesets/sanctuaire.tsx"/>
+ <layer id="1" name="Sol" width="20" height="11">
+  <data encoding="csv">
+2,0,2,0,0,0,0,0,0,0,0,0,4,2,4,0,0,2,0,0,
+2,0,0,0,0,4,0,0,4,3,0,0,0,3,0,3,3,0,0,3,
+3,0,3,90,82,82,82,82,91,0,0,0,2,2,0,0,6,2,0,2,
+0,2,0,84,81,81,81,81,85,0,2,3,0,2,0,3,2,0,0,3,
+6,0,3,92,83,88,81,89,93,4,3,4,2,0,0,0,2,0,0,3,
+2,6,0,2,0,84,81,85,3,2,0,0,0,2,0,0,4,0,0,2,
+0,6,4,2,0,92,83,93,0,3,3,0,6,2,4,0,3,0,0,2,
+2,0,3,0,6,0,3,2,0,0,0,90,82,91,0,4,0,0,0,0,
+0,0,0,2,3,0,6,6,2,0,6,92,83,93,0,3,0,2,0,0,
+6,3,2,2,6,4,0,0,0,0,4,0,3,3,0,0,0,4,6,3,
+2,2,6,0,2,2,2,0,3,4,3,0,0,0,4,2,4,0,0,0
+</data>
+ </layer>
+ <layer id="2" name="Decor" width="20" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,15,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,0,0,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,128,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,
+0,15,13,0,14,0,128,0,128,0,0,0,0,16,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="3" name="Murs" width="20" height="11">
+  <data encoding="csv">
+21,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,22,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,44,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+21,17,17,26,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+23,18,18,23,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,24
+</data>
+ </layer>
+ <objectgroup id="4" name="Objets">
+  <object id="1" type="Sortie" x="608" y="160" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/donjon3_salle_02_room.tscn"/>
+    <property name="cible_spawn" value="depuis_ouest"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="2" type="Spawn" x="560" y="176">
+   <properties>
+    <property name="id" value="depuis_est"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="3" type="Coffre" x="464" y="80">
+   <properties>
+    <property name="id" value="donjon3_coffre_02"/>
+    <property name="contenu" value="boussole"/>
+    <property name="important" type="bool" value="false"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="4" type="Ennemi" x="176" y="112">
+   <properties>
+    <property name="type" value="tetard_encre"/>
+    <property name="variante" value="normal"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="5" type="Ennemi" x="240" y="208">
+   <properties>
+    <property name="type" value="tetard_encre"/>
+    <property name="variante" value="normal"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="6" type="Ennemi" x="400" y="240">
+   <properties>
+    <property name="type" value="tetard_encre"/>
+    <property name="variante" value="normal"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="7" type="Ramassable" x="48" y="304">
+   <properties>
+    <property name="id" value="donjon3_quart_coeur_01"/>
+    <property name="contenu" value="quart_coeur"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="8" type="MurFissure" x="96" y="288" width="32" height="32">
+   <properties>
+    <property name="id" value="donjon3_mur_01"/>
+    <property name="apparence" value="mur"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer id="5" name="Dessus" width="20" height="11">
+  <data encoding="csv">
+0,0,119,0,0,0,0,0,119,118,0,0,119,0,0,119,119,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>
