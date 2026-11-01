@@ -76,7 +76,7 @@ SALLE_DONJON1_14,Galerie des torches,Torch gallery
 SALLE_DONJON1_15,Cave secrète,Secret cave
 SALLE_DONJON1_BOSS,Clairière de Sylve,Sylve's glade
 TITLE_OPTIONS,Options,Options
-INVENTAIRE_AIDE_OPTIONS,O/LB : options,O/LB: options
+INVENTAIRE_AIDE_OPTIONS,{0}/LB : options,{0}/LB: options
 OPT_TITLE,Options,Options
 OPT_MUSIC,Musique,Music
 OPT_SFX,Bruitages,Sound effects
@@ -262,3 +262,11 @@ OPT_READ_NORMAL,Normale,Normal
 OPT_READ_NOVOICE,Aucune voix,No voice found
 OPT_READ_UNSUPPORTED,Indisponible,Unavailable
 OPT_READ_TEST,Bonjour Brann ! Je peux lire les textes à voix haute.,Hello Brann! I can read the texts aloud.
+INVENTAIRE_AIDE_QUITTER,{0}/RB : quitter,{0}/RB: quit
+MENU_SYSTEME,Quitter la partie,Leave the game
+MENU_RETOUR_TITRE,Retour à l'écran titre,Back to title screen
+MENU_QUITTER_JEU,Quitter le jeu,Quit the game
+MENU_RETOUR,Retour,Back
+CONFIRM_RETOUR_TITRE,Retourner à l'écran titre ?,Go back to the title screen?
+CONFIRM_QUITTER,Quitter le jeu ?,Quit the game?
+CONFIRM_PERTE_PROGRESSION,La progression depuis la dernière sauvegarde sera perdue.,Progress since the last save will be lost.

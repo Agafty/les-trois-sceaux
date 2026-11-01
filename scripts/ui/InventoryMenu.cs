@@ -24,6 +24,7 @@ public partial class InventoryMenu : Control
     private static readonly StringName ActionRight = "move_right";
     private static readonly StringName ActionMapPage = "map_page";
     private static readonly StringName ActionOptions = "options_page";
+    private static readonly StringName ActionQuit = "quit_page";
     private static readonly StringName PanelStyleName = "panel";
 
     private static readonly Vector2 PanelPos = new(140, 50);
@@ -38,7 +39,9 @@ public partial class InventoryMenu : Control
     private Label _description;
     private Label _mapHint;
     private Label _optionsHint;
+    private Label _quitHint;
     private OptionsMenu _options;
+    private SystemMenu _system;
     private DungeonMapPage _mapPage;
     private Control _cursor;
     private readonly TextureRect[] _frames = new TextureRect[SlotCount];
@@ -81,12 +84,13 @@ public partial class InventoryMenu : Control
             _gameState.InventoryChanged -= RefreshIfOpen;
             _gameState.EquippedItemChanged -= OnEquippedChanged;
         }
+        if (_system != null) _system.LeaveRequested -= OnLeaveRequested;
         if (_pausedByMenu) GetTree().Paused = false; // ne jamais laisser le jeu figé
     }
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (_options.IsOpen) return; // « pause » sert alors à fermer les options
+        if (_options.IsOpen || _system.IsOpen) return; // « pause » sert alors à fermer le sous-menu
         if (!@event.IsActionPressed(ActionPause) || @event.IsEcho()) return;
 
         if (_open) Close();
@@ -97,10 +101,15 @@ public partial class InventoryMenu : Control
     // Actif seulement quand le menu est ouvert (SetProcess).
     public override void _Process(double delta)
     {
-        if (_options.IsOpen) return; // les options gèrent leurs propres touches
+        if (_options.IsOpen || _system.IsOpen) return; // les sous-menus gèrent leurs propres touches
         if (Input.IsActionJustPressed(ActionOptions))
         {
             _options.Open();
+            return;
+        }
+        if (Input.IsActionJustPressed(ActionQuit))
+        {
+            _system.Open();
             return;
         }
         if (Input.IsActionJustPressed(ActionMapPage))
@@ -143,6 +152,18 @@ public partial class InventoryMenu : Control
         SetProcess(true);
         Refresh();
         AudioManager.Play(Sfx.MenuValide);
+    }
+
+    // Le joueur a confirmé « retour au titre » : on referme le menu et on sort de la pause sans bruit.
+    private void OnLeaveRequested()
+    {
+        _open = false;
+        _mapOpen = false;
+        _mapPage.Close();
+        Visible = false;
+        SetProcess(false);
+        if (_pausedByMenu) GetTree().Paused = false;
+        _pausedByMenu = false;
     }
 
     private void Close()
@@ -228,7 +249,8 @@ public partial class InventoryMenu : Control
     {
         _title.Text = Tr("MENU_INVENTAIRE");
         _mapHint.Text = Tr("INVENTAIRE_AIDE_CARTE");
-        _optionsHint.Text = Tr("INVENTAIRE_AIDE_OPTIONS");
+        _optionsHint.Text = string.Format(Tr("INVENTAIRE_AIDE_OPTIONS"), KeyName(Key.O));
+        _quitHint.Text = string.Format(Tr("INVENTAIRE_AIDE_QUITTER"), KeyName(Key.Q));
         var ids = _gameState.InventoryIds;
         for (int i = 0; i < SlotCount; i++)
         {
@@ -248,6 +270,13 @@ public partial class InventoryMenu : Control
             }
         }
         UpdateCursor();
+    }
+
+    // Nom de la touche telle qu'elle est étiquetée sur le clavier du joueur (AZERTY : la touche physique Q s'appelle A).
+    private static string KeyName(Key physical)
+    {
+        var label = DisplayServer.GetName() != "headless" ? DisplayServer.KeyboardGetLabelFromPhysical(physical) : Key.None;
+        return OS.GetKeycodeString(label == Key.None ? physical : label);
     }
 
     private void UpdateCursor()
@@ -302,6 +331,8 @@ public partial class InventoryMenu : Control
         _mapHint = CreateLabel(new Vector2(PanelPos.X + 16, PanelPos.Y + PanelSize.Y - 18), PanelSize.X - 32, 12);
         _mapHint.HorizontalAlignment = HorizontalAlignment.Right;
         _optionsHint = CreateLabel(new Vector2(PanelPos.X + 16, PanelPos.Y + PanelSize.Y - 18), PanelSize.X - 32, 12);
+        _quitHint = CreateLabel(new Vector2(PanelPos.X + 16, PanelPos.Y + PanelSize.Y - 18), PanelSize.X - 32, 12);
+        _quitHint.HorizontalAlignment = HorizontalAlignment.Center;
 
         // Page carte : en dernier pour être dessinée par-dessus l'inventaire.
         _mapPage = new DungeonMapPage { Position = PanelPos, Size = PanelSize };
@@ -311,6 +342,11 @@ public partial class InventoryMenu : Control
         _options = GD.Load<PackedScene>("res://scenes/ui/options.tscn").Instantiate<OptionsMenu>();
         AddChild(_options);
         _options.Closed += Refresh; // la langue a pu changer : on réécrit les textes
+
+        // Menu système (retour au titre / quitter) : au-dessus de tout.
+        _system = new SystemMenu();
+        AddChild(_system);
+        _system.LeaveRequested += OnLeaveRequested;
     }
 
     private Control CreatePanel()
