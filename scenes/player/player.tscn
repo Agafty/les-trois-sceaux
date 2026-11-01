@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/Player.cs" id="script_player"]
 [ext_resource type="SpriteFrames" path="res://art/characters/brann_frames.tres" id="brann_frames"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="script_hurtbox"]
 [ext_resource type="Script" path="res://scripts/components/Health.cs" id="script_health"]
 [ext_resource type="Script" path="res://scripts/components/CameraShake.cs" id="script_camera_shake"]
+[ext_resource type="Script" path="res://scripts/player/LanternLight.cs" id="script_lantern"]
 
 [sub_resource type="CapsuleShape2D" id="capsule_player"]
 radius = 8.0
@@ -57,3 +58,6 @@ monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SwordSlash/HitBox"]
 shape = SubResource("sword_hitbox_shape")
+
+[node name="Lanterne" type="Node2D" parent="."]
+script = ExtResource("script_lantern")

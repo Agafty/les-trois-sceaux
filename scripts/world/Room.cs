@@ -154,6 +154,20 @@ public partial class Room : Node2D
     /// <summary>Ennemis de la carte marqués « apparition = scenario » : créés seulement par une cinématique.</summary>
     public IReadOnlyList<ScenarioEnemyInfo> ScenarioEnemies => _scenarioEnemies;
 
+    /// <summary>Salle en pénombre (propriété de carte « obscurite » = penombre) : teinte bleue sombre et lumières de Brann, des torches et des runes.</summary>
+    public bool IsDark { get; private set; }
+
+    /// <summary>Teinte « normale » de la salle (blanc, ou la teinte de pénombre) : celle de la cinématique « teinte normal ».</summary>
+    public Color BaseTint { get; private set; } = Colors.White;
+
+    /// <summary>Vrai si la salle qui contient ce nœud est en pénombre (faux hors d'une salle).</summary>
+    public static bool IsDarkRoom(Node node)
+    {
+        for (var n = node; n != null; n = n.GetParent())
+            if (n is Room room) return room.IsDark;
+        return false;
+    }
+
     /// <summary>Teinte actuelle de la salle (multiplicateur de couleur ; blanc = aucune).</summary>
     public Color Tint => _tint != null ? _tint.Color : Colors.White;
 
@@ -294,7 +308,10 @@ public partial class Room : Node2D
     private void SetupCinematics(Player player)
     {
         var state = GetNode<GameState>("/root/GameState");
-        if (CinematicColors.TryParse(OpeningRules.AmbientTint(state.IsCollected), out float r, out float g, out float b))
+        string ambient = OpeningRules.AmbientTint(state.IsCollected);
+        if (ambient == "normal")
+            SetTint(BaseTint); // blanc, ou la pénombre de la salle
+        else if (CinematicColors.TryParse(ambient, out float r, out float g, out float b))
             SetTint(new Color(r, g, b));
         if (player == null) return;
 
@@ -1119,11 +1136,11 @@ public partial class Room : Node2D
         string typeValue = GetString(marker, "type");
         string appearanceValue = GetString(marker, "apparence");
         if (!DoorRules.TryParseAppearance(appearanceValue, out string appearance))
-            WarnOnce("porte-apparence:" + appearanceValue, $"Porte « {id} » : apparence inconnue « {appearanceValue} » (porte, pont_levis, tronc, rocher, rocher_eau ou eboulis) dans {Name}, traitée comme « porte ».");
-        var kind = DoorKind.Interrupteur; // sans « type », un tronc ou un rocher ne s'ouvre que par le code (interrupteur) ou disparaît avec etape_max
+            WarnOnce("porte-apparence:" + appearanceValue, $"Porte « {id} » : apparence inconnue « {appearanceValue} » (porte, pont_levis, tronc, rocher, rocher_eau, eboulis ou mur_rune) dans {Name}, traitée comme « porte ».");
+        var kind = appearance == "mur_rune" ? DoorKind.Lanterne : DoorKind.Interrupteur; // sans « type », un tronc ou un rocher ne s'ouvre que par le code (interrupteur) ou disparaît avec etape_max
         if (!(string.IsNullOrEmpty(typeValue) && DoorRules.TypeOptional(appearance)) && !DoorRules.TryParseKind(typeValue, out kind))
         {
-            GD.PushError($"Porte « {id} » : type inconnu « {typeValue} » (cle, grande_cle, ennemis ou interrupteur) dans {Name}.");
+            GD.PushError($"Porte « {id} » : type inconnu « {typeValue} » (cle, grande_cle, ennemis, interrupteur ou lanterne) dans {Name}.");
             RemoveMarker(marker);
             return;
         }
@@ -1234,7 +1251,7 @@ public partial class Room : Node2D
     {
         Node source = null;
         foreach (var child in GetChildren())
-            if (child.HasMeta("etage") || child.HasMeta("carte_x") || child.HasMeta("carte_y") || child.HasMeta("camera"))
+            if (child.HasMeta("etage") || child.HasMeta("carte_x") || child.HasMeta("carte_y") || child.HasMeta("camera") || child.HasMeta("obscurite"))
             {
                 source = child;
                 break;
@@ -1246,6 +1263,16 @@ public partial class Room : Node2D
             CameraMode = camera;
         else if (camera != "")
             WarnOnce("camera:" + camera, $"Carte {Name} : camera inconnue « {camera} » (ecran ou suivre), « suivre » utilisé.");
+
+        string darkness = GetString(source, "obscurite");
+        if (!LanternRules.TryParseDarkness(darkness, out bool dark))
+            WarnOnce("obscurite:" + darkness, $"Carte {Name} : obscurite inconnue « {darkness} » (vide, non ou penombre), salle claire.");
+        if (dark)
+        {
+            IsDark = true;
+            BaseTint = new Color(LanternRules.AmbientR, LanternRules.AmbientG, LanternRules.AmbientB);
+            SetTint(BaseTint);
+        }
 
         MapFloor = GetString(source, "etage");
         MapCell = new Vector2I(Mathf.RoundToInt(GetFloat(source, "carte_x")), Mathf.RoundToInt(GetFloat(source, "carte_y")));

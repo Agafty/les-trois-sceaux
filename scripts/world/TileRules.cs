@@ -10,6 +10,11 @@ public static class TileRules
     public const string MountainTileset = "montagne";
     public const string MineTileset = "mine";
     public const string MineBasementTileset = "mine_sous_sol";
+    public const string SanctuaryTileset = "sanctuaire";
+    public const string SanctuaryCryptTileset = "sanctuaire_crypte";
+
+    /// <summary>Tilesets du Sanctuaire Englouti (rez-de-chaussée et cryptes : mêmes numéros).</summary>
+    public static bool IsSanctuary(string tileset) => tileset == SanctuaryTileset || tileset == SanctuaryCryptTileset;
 
     /// <summary>Tilesets de la Mine Effondrée (rez-de-chaussée et sous-sol : mêmes numéros).</summary>
     public static bool IsMine(string tileset) => tileset == MineTileset || tileset == MineBasementTileset;
@@ -46,6 +51,7 @@ public static class TileRules
     {
         VillageTileset => (tileId >= 136 && tileId <= 139) || tileId == 142,
         MineTileset or MineBasementTileset => (tileId >= 144 && tileId <= 147) || tileId == 152 || (tileId >= 72 && tileId <= 75) || tileId == 164 || tileId == 165,
+        SanctuaryTileset or SanctuaryCryptTileset => tileId >= 72 && tileId <= 75,
         MountainTileset => tileId == 156 || tileId == 172 || (tileId >= 176 && tileId <= 179),
         InteriorTileset => tileId == 67,
         _ => false,
@@ -71,6 +77,14 @@ public static class TileRules
                 case 73: case 75: case 165: openId = 77; layer = "Sol"; return true;
                 default: return false;
             }
+        }
+        if (IsSanctuary(tileset))
+        {
+            // Murs fissurés 72 à 75 (haut, bas, gauche, droite) : version ouverte opaque 76 à 79 dans « Decor ».
+            if (closedId < 72 || closedId > 75) return false;
+            openId = closedId + 4;
+            layer = "Decor";
+            return true;
         }
         if (tileset == MountainTileset)
         {
@@ -107,6 +121,12 @@ public static class TileRules
                 case 77: closedId = 73; return true;
                 default: return false;
             }
+        }
+        if (IsSanctuary(tileset))
+        {
+            if (openId < 76 || openId > 79) return false;
+            closedId = openId - 4;
+            return true;
         }
         if (tileset == MountainTileset)
         {

@@ -10,6 +10,7 @@ public static class DoorRules
             case "grande_cle": kind = DoorKind.GrandeCle; return true;
             case "ennemis": kind = DoorKind.Ennemis; return true;
             case "interrupteur": kind = DoorKind.Interrupteur; return true;
+            case "lanterne": kind = DoorKind.Lanterne; return true;
             default: kind = DoorKind.Cle; return false;
         }
     }
@@ -20,6 +21,7 @@ public static class DoorRules
         DoorKind.GrandeCle => "grande_cle",
         DoorKind.Ennemis => "ennemis",
         DoorKind.Interrupteur => "interrupteur",
+        DoorKind.Lanterne => "mur_rune",
         _ => "cle",
     };
 
@@ -30,7 +32,7 @@ public static class DoorRules
     public const string DefaultAppearance = "porte";
 
     /// <summary>Apparences connues (propriété Tiled « apparence » d'une Porte) ; image art/puzzles/porte_&lt;apparence&gt;.png.</summary>
-    public static readonly string[] Appearances = { DefaultAppearance, "pont_levis", "tronc", "rocher", "rocher_eau", "eboulis" };
+    public static readonly string[] Appearances = { DefaultAppearance, "pont_levis", "tronc", "rocher", "rocher_eau", "eboulis", "mur_rune" };
 
     /// <summary>Vrai si <paramref name="value"/> est une apparence connue. Vide = « porte ».</summary>
     public static bool TryParseAppearance(string value, out string appearance)

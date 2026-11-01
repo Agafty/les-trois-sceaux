@@ -9,4 +9,6 @@ public enum DoorKind
     Ennemis,
     /// <summary>Ouverte de l'extérieur par un interrupteur, via <c>Door.Open()</c> (« interrupteur »).</summary>
     Interrupteur,
+    /// <summary>S'ouvre quand Brann, lanterne en poche, reste près du mur à rune (« lanterne »).</summary>
+    Lanterne,
 }

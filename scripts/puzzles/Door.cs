@@ -6,11 +6,13 @@ using Godot;
 /// - GrandeCle : demande la grande clé du donjon, non consommée.
 /// - Ennemis : fermée tant que des ennemis de la salle sont vivants (la salle appelle <see cref="NotifyRoomCleared"/>).
 /// - Interrupteur : ouverte de l'extérieur par <see cref="Open"/> (l'interrupteur viendra à l'étape suivante).
+/// - Lanterne (« mur à rune », apparence mur_rune) : s'ouvre quand Brann, qui possède la lanterne, reste ~0,8 s à moins de 64 px
+///   (<see cref="ILanternReactive"/>) ; dans une salle en pénombre, une lueur bleue la signale. Sans Sortie, état mémorisé par Id.
 /// Une Porte peut aussi être un obstacle d'overworld sans Sortie : voir <see cref="Appearance"/> (pont-levis, tronc, rocher, éboulis), de taille libre.
 /// L'état « ouverte » est mémorisé dans GameState sous l'Id : les deux faces d'une même porte, une par salle,
 /// partagent le même Id et donc le même état.
 /// </summary>
-public partial class Door : StaticBody2D
+public partial class Door : StaticBody2D, ILanternReactive
 {
     /// <summary>La porte vient de s'ouvrir (pas émis quand elle est déjà ouverte au chargement de la salle).</summary>
     [Signal]
@@ -45,6 +47,13 @@ public partial class Door : StaticBody2D
 
     public bool IsOpen => _open;
 
+    // ILanternReactive (type « lanterne » seulement, tant que la porte est fermée).
+    public Vector2 LanternPosition => GlobalPosition;
+    public float LanternReach => LanternRules.RuneReach;
+    public float LanternDwell => LanternRules.RuneDwell;
+    public float LanternTimer { get; set; }
+    public void OnLanternReached() => Open();
+
     /// <summary>Porte ouverte refermée le temps d'un combat de boss (voir <see cref="LockForEncounter"/>).</summary>
     public bool IsLockedForEncounter => _locked;
 
@@ -68,6 +77,7 @@ public partial class Door : StaticBody2D
     private bool _locked;
     private Tween _fadeTween;
     private bool _contactConnected;
+    private PointLight2D _glow;
 
     public override void _Ready()
     {
@@ -92,6 +102,16 @@ public partial class Door : StaticBody2D
             return;
         }
 
+        if (Kind == DoorKind.Lanterne)
+        {
+            LanternRegistry.Register(this);
+            if (Room.IsDarkRoom(this))
+            {
+                _glow = RoomLights.Create(LanternRules.RuneGlowRadius, new Color(0.35f, 0.6f, 1f), 0.9f);
+                AddChild(_glow);
+            }
+        }
+
         if (DoorRules.OpensByPushing(Kind))
         {
             _contact.BodyEntered += OnBodyEntered;
@@ -102,6 +122,7 @@ public partial class Door : StaticBody2D
 
     public override void _ExitTree()
     {
+        LanternRegistry.Unregister(this);
         if (_contactConnected && _contact != null)
         {
             _contact.BodyEntered -= OnBodyEntered;
@@ -125,6 +146,7 @@ public partial class Door : StaticBody2D
         _sprite.Visible = true;
         _sprite.Modulate = Colors.White;
         _sprite.Frame = 0;
+        if (_glow != null) _glow.Visible = true;
     }
 
     /// <summary>Rouvre la porte refermée par <see cref="LockForEncounter"/> (victoire). Sans effet sinon.</summary>
@@ -240,6 +262,8 @@ public partial class Door : StaticBody2D
     {
         if (animate) AudioManager.PlayAt(Sfx.PorteOuvre, GlobalPosition);
         _open = true;
+        LanternRegistry.Unregister(this);
+        if (_glow != null) _glow.Visible = false;
         _player = null;
         SetPhysicsProcess(false);
         _shape.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
@@ -321,6 +345,17 @@ public partial class Door : StaticBody2D
                 for (int y = 6; y < h; y += 8) image.FillRect(new Rect2I(w, y, w, 2), dark);
                 image.FillRect(new Rect2I(w, 0, 3, h), dark);
                 image.FillRect(new Rect2I(w * 2 - 3, 0, 3, h), dark);
+                break;
+            case "mur_rune":
+                // Pierre sombre avec une rune bleue au centre (le graphiste fournira art/puzzles/porte_mur_rune.png).
+                var rock = new Color(0.22f, 0.24f, 0.32f);
+                var rune = new Color(0.45f, 0.7f, 1f);
+                image.Fill(dark);
+                image.FillRect(new Rect2I(1, 1, w - 2, h - 2), rock);
+                int cx = w / 2, cy = h / 2;
+                image.FillRect(new Rect2I(cx - 1, cy - 8, 2, 16), rune);
+                image.FillRect(new Rect2I(cx - 6, cy - 2, 12, 2), rune);
+                image.FillRect(new Rect2I(cx - 4, cy + 4, 8, 2), rune);
                 break;
             case "tronc":
                 image.FillRect(new Rect2I(0, h / 4, w, h / 2), wood);

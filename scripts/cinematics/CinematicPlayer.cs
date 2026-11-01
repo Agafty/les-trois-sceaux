@@ -285,7 +285,8 @@ public partial class CinematicPlayer : Node
                 }
             case "fondu": SetFade(step.Value == "noir" ? 1f : 0f); break;
             case "teinte":
-                if (CinematicColors.TryParse(step.Value, out float r, out float g, out float b)) _room.SetTint(new Color(r, g, b));
+                if (step.Value == "normal") _room.SetTint(_room.BaseTint);
+                else if (CinematicColors.TryParse(step.Value, out float r, out float g, out float b)) _room.SetTint(new Color(r, g, b));
                 break;
             case "musique":
                 if (step.Name == "stop") AudioManager.Instance?.StopMusic(announce ? step.Seconds : 0f);
@@ -645,7 +646,7 @@ public partial class CinematicPlayer : Node
     {
         if (!CinematicColors.TryParse(step.Value, out float r, out float g, out float b)) return;
         var from = _room.Tint;
-        var to = new Color(r, g, b);
+        var to = step.Value == "normal" ? _room.BaseTint : new Color(r, g, b);
         float t = 0f;
         while (t < step.Seconds && !_skip)
         {

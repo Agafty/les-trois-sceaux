@@ -8,11 +8,13 @@ using Godot;
 /// - Permanente (brasero) : toujours allumée, ne s'éteint jamais, n'ouvre rien.
 /// - <see cref="Duration"/> > 0 : une torche allumée s'éteint après ce nombre de secondes (multiplié par
 ///   <see cref="GameState.PuzzleTimeMultiplier"/>) ; sa flamme rétrécit pendant les 3 dernières secondes.
+/// - Lanterne : une torche éteinte non permanente s'allume quand Brann, qui possède la lanterne, reste ~0,5 s à moins de 40 px
+///   (<see cref="ILanternReactive"/>). Dans une salle en pénombre, une torche allumée éclaire (rayon 96 px).
 /// Toutes les torches de même <see cref="Target"/> allumées en même temps ouvrent la porte (<see cref="Door.OpenById"/>,
 /// mémorisée) ; elles restent alors allumées. L'état des torches n'est pas sauvegardé.
 /// Image : art/puzzles/torche.png (7 images : éteinte, 4 de flamme, 2 de flamme qui rétrécit) ou brasero.png (4 images).
 /// </summary>
-public partial class Torch : StaticBody2D, IArrowInteractor
+public partial class Torch : StaticBody2D, IArrowInteractor, ILanternReactive
 {
     /// <summary>La torche vient de s'allumer ou de s'éteindre.</summary>
     [Signal]
@@ -34,6 +36,13 @@ public partial class Torch : StaticBody2D, IArrowInteractor
 
     public bool IsLit => _lit;
 
+    // ILanternReactive : inscrite au registre tant qu'elle est éteinte et peut être allumée.
+    public Vector2 LanternPosition => GlobalPosition;
+    public float LanternReach => LanternRules.TorchReach;
+    public float LanternDwell => LanternRules.TorchDwell;
+    public float LanternTimer { get; set; }
+    public void OnLanternReached() => Light();
+
     public static readonly StringName GroupName = "torches";
 
     private const int FrameSize = 32;
@@ -45,6 +54,7 @@ public partial class Torch : StaticBody2D, IArrowInteractor
     private float _remaining; // > 0 : compte à rebours en cours
     private float _animTime;
     private bool _hasFlame;
+    private PointLight2D _light;
     private ulong _lastArrowId;
     private bool _lastArrowResult;
 
@@ -78,8 +88,14 @@ public partial class Torch : StaticBody2D, IArrowInteractor
         }
         else
         {
+            UpdateLanternState(); // éteinte : la lanterne pourra l'allumer
             ApplyFrame();
         }
+    }
+
+    public override void _ExitTree()
+    {
+        LanternRegistry.Unregister(this);
     }
 
     // Le corps et la zone élargie (TorchArrowZone) peuvent tous deux toucher la même flèche : on ne traite qu'une fois par flèche.
@@ -140,10 +156,29 @@ public partial class Torch : StaticBody2D, IArrowInteractor
         _remaining = 0f;
         if (lit && startTimer && !_frozen && !Permanent)
             _remaining = TorchRules.EffectiveDuration(Duration, _state.PuzzleTimeMultiplier);
+        UpdateLanternState();
         SetProcess(lit); // pas d'animation ni de compte à rebours sur une torche éteinte
         _animTime = 0f;
         ApplyFrame();
         if (changed) EmitSignal(SignalName.LitChanged, lit);
+    }
+
+    // Registre de la lanterne (éteinte et non figée = peut être allumée) et lumière de la salle sombre (allumée).
+    private void UpdateLanternState()
+    {
+        // La lanterne n'allume les torches que dans une salle sombre : les énigmes de torches du Temple et de la Mine restent inchangées.
+        if (_lit || Permanent || _frozen || !Room.IsDarkRoom(this))
+            LanternRegistry.Unregister(this);
+        else
+            LanternRegistry.Register(this);
+
+        if (_lit && _light == null && Room.IsDarkRoom(this))
+        {
+            _light = RoomLights.Create(LanternRules.TorchLightRadius, new Color(1f, 0.7f, 0.35f), 0.9f);
+            _light.Position = new Vector2(0f, -8f);
+            AddChild(_light);
+        }
+        if (_light != null) _light.Visible = _lit;
     }
 
     // Toutes les torches de même cible allumées ensemble : la porte s'ouvre, les torches restent allumées.
@@ -175,6 +210,7 @@ public partial class Torch : StaticBody2D, IArrowInteractor
     {
         _frozen = true;
         _remaining = 0f;
+        UpdateLanternState();
         ApplyFrame();
     }
 
