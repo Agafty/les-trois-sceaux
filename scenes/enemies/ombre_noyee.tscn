@@ -1,0 +1,54 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/OmbreNoyeeEnemy.cs" id="script_errant"]
+[ext_resource type="SpriteFrames" path="res://art/enemies/ombre_noyee_frames.tres" id="ombre_frames"]
+[ext_resource type="Script" path="res://scripts/components/Health.cs" id="script_health"]
+[ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="script_hurtbox"]
+[ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="script_hitbox"]
+
+[ext_resource type="Script" path="res://scripts/components/LootDropper.cs" id="script_loot"]
+[ext_resource type="Resource" path="res://resources/loot/foret_commun.tres" id="loot_table"]
+
+[sub_resource type="CircleShape2D" id="ombre_shape"]
+radius = 10.0
+
+[sub_resource type="CircleShape2D" id="ombre_hitbox_shape"]
+radius = 14.0
+
+[node name="OmbreNoyee" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("script_errant")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("ombre_frames")
+animation = &"float"
+autoplay = "float"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("ombre_shape")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("script_health")
+MaxHealth = 2
+
+[node name="HurtBox" type="Area2D" parent="."]
+script = ExtResource("script_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(0, 4)
+shape = SubResource("ombre_shape")
+
+[node name="HitBox" type="Area2D" parent="."]
+script = ExtResource("script_hitbox")
+Team = 1
+Damage = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+position = Vector2(0, 4)
+shape = SubResource("ombre_hitbox_shape")
+
+[node name="LootDropper" type="Node" parent="."]
+script = ExtResource("script_loot")
+Table = ExtResource("loot_table")

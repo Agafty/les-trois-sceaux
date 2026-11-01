@@ -27,6 +27,16 @@ public partial class LanternLight : Node2D
         Callable.From(SetupLights).CallDeferred();
     }
 
+    /// <summary>
+    /// Vrai si la lumière de la lanterne (et non le simple halo) couvre ce point du monde : la lanterne est allumée
+    /// (possédée, salle sombre) et le point est dans son cercle. Sans allocation ; sert à l'Ombre noyée.
+    /// </summary>
+    public bool LanternCovers(Vector2 worldPosition)
+    {
+        if (_lantern == null || !_lantern.Visible) return false;
+        return LanternRules.IsNear(_lantern.GlobalPosition.X, _lantern.GlobalPosition.Y, worldPosition.X, worldPosition.Y, LanternRules.LightRadius * 0.9f);
+    }
+
     private void SetupLights()
     {
         if (!IsInsideTree() || !Room.IsDarkRoom(this)) return;
