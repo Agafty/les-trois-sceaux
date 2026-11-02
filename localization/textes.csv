@@ -296,3 +296,10 @@ DLG_D3_REVELE_2,"Tu es doué, Brann. Je t'ai bien formé.","You are gifted, Bran
 DLG_D3_REVELE_3,"Mes yeux me trahissent, mes mains tremblent. Morvath me rendra ma jeunesse.","My eyes betray me, my hands tremble. Morvath will give me back my youth."
 DLG_D3_REVELE_4,Pourquoi ? Les sceaux protègent tout le monde !,Why? The seals protect everyone!
 DLG_D3_REVELE_5,"Libère Ondine, petit. Il ne manque plus qu'un sceau.","Free Ondine, boy. Only one seal is missing now."
+BOSS_ONDINE_NOM,"Ondine, la Gardienne du Lac","Ondine, Guardian of the Lake"
+BOSS_ONDINE_REPLIQUE,"Merci, forgeron... Prends mon sceau, vite !","Thank you, smith... Take my seal, quickly!"
+BOSS_ONDINE_CONSEIL_1,"Un anneau d'ondes montre où elle va surgir : la lumière de la lanterne le révèle. Écarte-toi, puis frappe son armure !","A ring of ripples shows where she will surface: the lantern light reveals it. Step aside, then strike her armor!"
+BOSS_ONDINE_CONSEIL_2,"L'armure éclate en morceaux ! Dans le noir ils te cherchent : tourne la lanterne vers eux pour les figer, puis frappe.","The armor shatters into pieces! In the dark they hunt you: turn the lantern on them to freeze them, then strike."
+DLG_D3_FINAL_1,"Merci, petit. Le dernier sceau est le plus doux.","Thank you, boy. The last seal is the sweetest."
+DLG_D3_FINAL_2,"Maître, arrêtez !","Master, stop!"
+DLG_D3_FINAL_3,"Le château t'attend, Brann. Viens... si tu l'oses.","The castle awaits you, Brann. Come... if you dare."

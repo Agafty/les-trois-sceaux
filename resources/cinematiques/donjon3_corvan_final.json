@@ -1,0 +1,25 @@
+{
+  "id": "donjon3_corvan_final",
+  "drapeau_fin": "corvan_final",
+  "passable": true,
+  "etapes": [
+    { "action": "teinte", "couleur": "eclipse", "duree": 1.2 },
+    { "action": "secousse", "force": 3, "duree": 1.0 },
+    { "action": "son", "nom": "eboulement" },
+    { "action": "apparaitre", "cible": "pnj", "id": "corvan", "sprite": "corvan", "a": "corvan_final", "direction": "down" },
+    { "action": "regarder", "acteur": "brann", "vers": "corvan_final" },
+    { "action": "attendre", "secondes": 0.6 },
+    { "action": "dialogue", "orateur": "PNJ_CORVAN", "lignes": [ "DLG_D3_FINAL_1" ] },
+    { "action": "son", "nom": "sceau" },
+    { "action": "secousse", "force": 2, "duree": 1.2 },
+    { "action": "attendre", "secondes": 1.2 },
+    { "action": "dialogue", "orateur": "PNJ_BRANN", "lignes": [ "DLG_D3_FINAL_2" ] },
+    { "action": "dialogue", "orateur": "PNJ_CORVAN", "lignes": [ "DLG_D3_FINAL_3" ] },
+    { "action": "disparaitre", "acteur": "corvan" },
+    { "action": "attendre", "secondes": 0.6 },
+    { "action": "teinte", "couleur": "normal", "duree": 1.2 },
+    { "action": "drapeau", "nom": "corvan_absorbe_sceau" },
+    { "action": "drapeau", "nom": "corvan_final" },
+    { "action": "sauvegarder" }
+  ]
+}

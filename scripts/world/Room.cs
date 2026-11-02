@@ -784,6 +784,8 @@ public partial class Room : Node2D
         }
         // Conditions de report (pause, cinématique, mort, transition en cours) : on réessaie au prochain tick.
         if (GetTree().Paused || CinematicPlayer.Active || (Cinematics?.IsPlaying ?? false)) return;
+        // Une cinématique de point (Corvan qui absorbe le sceau) est sur le point de partir : on l'attend avant de sortir.
+        if (GetNodeOrNull<ScenarioWatcher>("Scenarios")?.HasPendingPointScenario() ?? false) return;
         var player = FindPlayer(this);
         if (player == null || player.IsDead) return;
         if (_rewardScenes.IsTransitioning) return;

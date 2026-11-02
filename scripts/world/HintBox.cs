@@ -44,6 +44,8 @@ public partial class HintBox : Node
         int token = _timedToken;
         GetTree().CreateTimer(seconds).Timeout += () =>
         {
+            // La salle a pu être libérée (mort, changement de salle) avant la fin du minuteur.
+            if (!IsInstanceValid(this)) return;
             if (token == _timedToken && _occupied.Count == 0 && _layer != null && IsInsideTree())
             {
                 _layer.Visible = false;

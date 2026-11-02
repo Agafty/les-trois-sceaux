@@ -43,6 +43,7 @@ public static class Sfx
     public static readonly StringName Buisson = "buisson";
     public static readonly StringName Eboulement = "eboulement";
     public static readonly StringName Poule = "poule";
+    public static readonly StringName Glou = "glou";
 
     /// <summary>Tous les noms, chargés au démarrage par l'AudioManager.</summary>
     public static readonly StringName[] All =
@@ -50,6 +51,6 @@ public static class Sfx
         Epee, CoupEnnemi, EnnemiMort, BrannTouche, BrannMort, Rubis, Coeur, Cle, ObjetObtenu, CoffreOuvre,
         PorteOuvre, PorteVerrouillee, FlecheTir, FlecheImpact, FlecheEnflammee, BombeMeche, BombeExplosion,
         Interrupteur, MauvaisOrdre, Plaque, BlocPousse, TorcheAllume, Chute, Escalier, Sauvegarde,
-        MenuDeplace, MenuValide, MenuRetour, BossRugit, BossCharge, BossAssomme, BossVaincu, Sceau, Texte, Buisson, Eboulement, Poule,
+        MenuDeplace, MenuValide, MenuRetour, BossRugit, BossCharge, BossAssomme, BossVaincu, Sceau, Texte, Buisson, Eboulement, Poule, Glou,
     };
 }

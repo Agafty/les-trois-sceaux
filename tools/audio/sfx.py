@@ -342,6 +342,12 @@ def s_poule(r):
                tone("square", 900, 600, 0.12, 0.5, duty=0.3, lowpass=0.5, release=0.06, vibrato=0.04, vib_hz=30))
 
 
+def s_glou(r):
+    # Un « glou » d'eau : une bulle grave qui monte, puis une plus aiguë (annonce du surgissement d'Ondine).
+    return seq(tone("sine", 180, 420, 0.12, 0.9, attack=0.01, release=0.05, lowpass=0.3, vibrato=0.05, vib_hz=18), silence(0.04),
+               tone("sine", 260, 560, 0.1, 0.8, attack=0.01, release=0.05, lowpass=0.3, vibrato=0.05, vib_hz=22))
+
+
 def s_texte(r):
     # Petit « bip » de voix pour le texte qui défile (très court : il est joué une lettre sur deux).
     return tone("square", 520, 470, 0.03, 0.35, duty=0.25, lowpass=0.6, attack=0.002, release=0.015)
@@ -360,7 +366,7 @@ SOUNDS = {
     "menu_deplace": s_menu_deplace, "menu_valide": s_menu_valide, "menu_retour": s_menu_retour,
     "boss_rugit": s_boss_rugit, "boss_charge": s_boss_charge, "boss_assomme": s_boss_assomme,
     "boss_vaincu": s_boss_vaincu, "sceau": s_sceau, "texte": s_texte, "buisson": s_buisson,
-    "eboulement": s_eboulement, "poule": s_poule,
+    "eboulement": s_eboulement, "poule": s_poule, "glou": s_glou,
 }
 
 

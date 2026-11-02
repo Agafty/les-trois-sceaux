@@ -38,6 +38,25 @@ public partial class ScenarioWatcher : Node
         return _state.IsCollected(flag);
     }
 
+    /// <summary>
+    /// Vrai si un déclencheur sans zone (point Tiled) a ses conditions remplies mais n'a pas encore démarré (le contrôle se fait 10 fois par seconde,
+    /// et seulement quand Brann est libre). La Room s'en sert pour ne pas renvoyer Brann dehors juste avant une cinématique qui va partir
+    /// (ex. Corvan qui absorbe le sceau). Sans allocation.
+    /// </summary>
+    public bool HasPendingPointScenario()
+    {
+        if (_defs == null || _state == null || _player == null || !IsInstanceValid(_player) || !IsInsideTree()) return false;
+        if (!IsInstanceValid(_brann) || _sceneManager.IsTransitioning) return false; // le watcher ne pourrait pas tirer : ne jamais bloquer la sortie
+        for (int i = 0; i < _defs.Count; i++)
+        {
+            var def = _defs[i];
+            if (def.HasZone || _fired.Contains(def.Cinematic)) continue;
+            var data = CinematicLibrary.Get(def.Cinematic);
+            if (data != null && ScenarioRules.Matches(def, data.EndFlag, _isSet)) return true;
+        }
+        return false;
+    }
+
     public override void _PhysicsProcess(double delta)
     {
         _timer -= (float)delta;
