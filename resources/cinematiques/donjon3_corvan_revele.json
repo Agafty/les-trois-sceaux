@@ -17,6 +17,11 @@
       "direction": "down"
     },
     {
+      "action": "regarder",
+      "acteur": "brann",
+      "vers": "corvan_balcon"
+    },
+    {
       "action": "attendre",
       "secondes": 0.6
     },

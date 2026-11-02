@@ -59,7 +59,7 @@ public partial class Npc : CharacterBody2D
         else if (RoomObjectCatalog.IsSafeName(name) && ResourceLoader.Exists(fallbackPath))
             _sprite.SpriteFrames = GD.Load<SpriteFrames>(fallbackPath);
         else
-            GD.PushWarning($"PNJ « {Id} » : planche {path} introuvable, le sprite reste vide.");
+            GD.PushWarning($"PNJ « {Id} » : planche {path} ni {fallbackPath} introuvable, le sprite reste vide.");
         PlayIdle();
 
         if (string.IsNullOrEmpty(Id))

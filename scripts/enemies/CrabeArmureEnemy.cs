@@ -164,7 +164,7 @@ public partial class CrabeArmureEnemy : CharacterBody2D, IBombDestructible
         _sprite.Position = new Vector2(_rng.RandfRange(-WindupShake, WindupShake), 0f); // tremblement : la charge est annoncée
         if (_timer <= 0f)
         {
-            // Direction verrouillée au départ : jamais corrigée ensuite.
+            // Direction prise à la fin de l'annonce, puis jamais corrigée pendant la charge.
             if (!TryGetPlayer(out var p))
             {
                 // Brann n'est plus là (mort, parti) : pas de charge dans le vide, retour à l'errance.

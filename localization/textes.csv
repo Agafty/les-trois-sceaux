@@ -289,7 +289,7 @@ SALLE_DONJON3_12,Reliquaire,Reliquary
 SALLE_DONJON3_BOSS,Bassin d'Ondine,Ondine's basin
 INDICE_RUNE_MUR,Une rune bleue brille faiblement dans le mur. Une lumière pourrait la réveiller.,A blue rune glows faintly in the wall. A light might awaken it.
 INDICE_LANTERNE_GRAVEE,Une lanterne est gravée sur le piédestal. Elle éclairera les salles sombres.,A lantern is carved on the pedestal. It will light up the dark rooms.
-INDICE_SALLE_SOMBRE,Il fait sombre ici... Ta lanterne éclaire devant toi. Approche-la des torches pour les allumer !,It is dark in here... Your lantern lights the way ahead. Bring it close to the torches to light them!
+INDICE_SALLE_SOMBRE,Il fait sombre ici... Une lanterne éclairerait le chemin et pourrait allumer ces torches.,It is dark in here... A lantern would light the way and could light these torches.
 INDICE_OMBRE,"Des ombres rôdent dans le noir. Quand ta lumière les touche, elles s'immobilisent : c'est le moment de frapper !",Shadows lurk in the dark. When your light touches them they freeze: that is the moment to strike!
 DLG_D3_REVELE_1,Maître Corvan ? Vous êtes vivant !,Master Corvan? You're alive!
 DLG_D3_REVELE_2,"Tu es doué, Brann. Je t'ai bien formé.","You are gifted, Brann. I trained you well."
