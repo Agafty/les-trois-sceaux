@@ -24,11 +24,27 @@ region = Rect2(0, 64, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6"]
 atlas = ExtResource("1_oeil_morvath")
-region = Rect2(0, 96, 32, 32)
+region = Rect2(32, 64, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7"]
 atlas = ExtResource("1_oeil_morvath")
+region = Rect2(0, 96, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8"]
+atlas = ExtResource("1_oeil_morvath")
 region = Rect2(32, 96, 32, 32)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_9"]
+atlas = ExtResource("1_oeil_morvath")
+region = Rect2(0, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_10"]
+atlas = ExtResource("1_oeil_morvath")
+region = Rect2(32, 128, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_11"]
+atlas = ExtResource("1_oeil_morvath")
+region = Rect2(64, 128, 32, 32)
+
 [resource]
-animations = [{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_1")}], "loop": true, "name": &"closed", "speed": 4.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_2")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_3")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_4")}], "loop": false, "name": &"open", "speed": 8.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_5")}], "loop": true, "name": &"idle_open", "speed": 4.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_6")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_7")}], "loop": false, "name": &"shoot", "speed": 8.0}]
+animations = [{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_1")}], "loop": true, "name": &"closed", "speed": 4.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_2")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_3")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_4")}], "loop": false, "name": &"open", "speed": 8.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_5")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_6")}], "loop": true, "name": &"idle_open", "speed": 3.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_7")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_8")}], "loop": false, "name": &"shoot", "speed": 8.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_9")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_10")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_11")}], "loop": false, "name": &"flash", "speed": 12.0}]

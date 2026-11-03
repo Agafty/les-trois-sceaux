@@ -42,6 +42,24 @@
    ],
    "fps": 1.0,
    "loop": true
+  },
+  "morvath_orb_burst": {
+   "cells": [
+    [
+     0,
+     3
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   "fps": 14.0,
+   "loop": false
   }
  }
 }

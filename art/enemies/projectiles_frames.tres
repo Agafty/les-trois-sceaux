@@ -22,5 +22,17 @@ region = Rect2(32, 32, 32, 32)
 atlas = ExtResource("1_projectiles")
 region = Rect2(0, 64, 32, 32)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_6"]
+atlas = ExtResource("1_projectiles")
+region = Rect2(0, 96, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7"]
+atlas = ExtResource("1_projectiles")
+region = Rect2(32, 96, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8"]
+atlas = ExtResource("1_projectiles")
+region = Rect2(64, 96, 32, 32)
+
 [resource]
-animations = [{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_1")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_2")}], "loop": true, "name": &"acorn", "speed": 10.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_3")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_4")}], "loop": true, "name": &"morvath_orb", "speed": 10.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_5")}], "loop": true, "name": &"pebble", "speed": 1.0}]
+animations = [{"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_1")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_2")}], "loop": true, "name": &"acorn", "speed": 10.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_3")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_4")}], "loop": true, "name": &"morvath_orb", "speed": 10.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_5")}], "loop": true, "name": &"pebble", "speed": 1.0}, {"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_6")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_7")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_8")}], "loop": false, "name": &"morvath_orb_burst", "speed": 14.0}]
