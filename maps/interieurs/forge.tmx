@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="9">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="10">
  <properties>
   <property name="camera" value="ecran"/>
  </properties>
@@ -100,6 +100,12 @@
   <object id="8" type="Marqueur" x="304" y="240">
    <properties>
     <property name="id" value="traces_forge"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="9" type="Spawn" x="208" y="176">
+   <properties>
+    <property name="id" value="depuis_chateau"/>
    </properties>
    <point/>
   </object>

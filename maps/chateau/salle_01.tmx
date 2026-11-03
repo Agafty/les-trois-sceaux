@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="8">
+ <properties>
+  <property name="camera" value="ecran"/>
+ </properties>
+ <tileset firstgid="1" source="../tilesets/chateau.tsx"/>
+ <layer id="1" name="Sol" width="20" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,
+0,81,81,81,81,81,2,2,1,1,1,4,2,1,81,81,81,81,81,0,
+0,81,81,81,81,81,1,4,2,4,1,1,1,4,81,81,81,81,81,0,
+0,81,81,81,81,81,2,4,1,1,2,1,3,1,81,81,81,81,81,0,
+0,81,81,81,81,81,4,3,2,1,3,1,4,3,81,81,81,81,81,0,
+0,1,1,4,4,2,1,1,3,3,1,4,1,3,1,3,3,4,1,0,
+0,2,1,3,1,1,1,3,1,1,3,4,1,2,4,1,4,2,4,0,
+0,2,1,3,1,1,1,1,4,1,3,1,2,2,4,1,1,1,3,0,
+0,1,1,2,1,1,2,1,1,1,1,1,2,1,2,1,1,1,2,0,
+0,4,1,1,3,1,1,1,3,2,1,1,4,1,1,3,2,1,2,0,
+0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="2" name="Decor" width="20" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,12,12,12,12,12,12,12,12,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="3" name="Murs" width="20" height="11">
+  <data encoding="csv">
+21,17,17,100,17,17,17,17,17,41,17,17,17,17,17,17,100,17,17,22,
+19,96,96,96,96,96,0,0,0,0,0,0,0,0,96,96,96,96,96,20,
+19,96,96,96,96,96,0,0,0,0,0,0,0,0,96,96,96,96,96,20,
+19,96,96,96,96,96,0,0,0,0,0,0,0,0,96,96,96,96,96,20,
+19,96,96,96,96,96,0,0,0,0,0,0,0,0,96,96,96,96,96,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,114,0,0,0,0,0,0,114,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+23,18,18,18,18,18,18,18,18,42,18,18,18,18,18,18,18,18,18,24
+</data>
+ </layer>
+ <objectgroup id="4" name="Objets">
+  <object id="1" type="Sortie" x="288" y="0" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/chateau_salle_02_room.tscn"/>
+    <property name="cible_spawn" value="depuis_sud"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="2" type="Porte" x="288" y="0" width="32" height="32">
+   <properties>
+    <property name="id" value="chateau_porte_01"/>
+    <property name="type" value="ennemis"/>
+   </properties>
+  </object>
+  <object id="3" type="Sortie" x="288" y="320" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/chateau_room.tscn"/>
+    <property name="cible_spawn" value="depuis_salle_01"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="4" type="Spawn" x="304" y="272">
+   <properties>
+    <property name="id" value="depuis_cour"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="5" type="Spawn" x="304" y="80">
+   <properties>
+    <property name="id" value="depuis_nord"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="6" type="Ennemi" x="112" y="16">
+   <properties>
+    <property name="type" value="oeil_morvath"/>
+    <property name="variante" value="normal"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="7" type="Ennemi" x="528" y="16">
+   <properties>
+    <property name="type" value="oeil_morvath"/>
+    <property name="variante" value="normal"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <layer id="5" name="Dessus" width="20" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,45,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,113,0,0,0,0,0,0,113,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,46,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>

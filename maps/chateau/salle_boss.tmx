@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="20" height="22" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="25">
+ <tileset firstgid="1" source="../tilesets/chateau.tsx"/>
+ <layer id="1" name="Sol" width="20" height="22">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,49,49,50,50,50,49,50,51,51,50,51,49,50,50,51,49,49,51,0,
+0,49,51,49,49,50,51,50,51,49,49,49,49,50,50,51,49,50,51,0,
+0,49,51,50,49,49,50,50,49,50,50,49,50,51,50,50,51,49,50,0,
+0,50,50,49,49,49,49,51,51,49,49,49,49,50,49,50,50,51,51,0,
+0,51,49,50,50,49,49,49,51,49,51,49,51,50,49,50,49,49,50,0,
+0,49,51,49,49,49,49,49,50,51,51,49,49,51,51,50,49,49,49,0,
+0,50,51,49,50,50,51,49,49,49,49,49,50,49,49,49,49,51,51,0,
+0,50,51,49,49,51,49,49,50,49,51,49,49,50,50,51,49,49,51,0,
+0,50,50,49,49,49,49,50,129,130,131,132,50,49,49,49,50,50,49,0,
+0,49,50,50,50,50,49,49,133,134,135,136,50,50,49,50,50,50,49,0,
+0,50,50,49,51,50,50,51,137,138,139,140,49,50,50,49,49,50,49,0,
+0,50,50,49,50,49,49,51,141,142,143,144,51,50,50,49,51,49,49,0,
+0,50,49,49,50,49,49,50,50,49,49,49,49,51,49,51,51,49,49,0,
+0,50,49,49,49,49,50,51,49,49,51,50,50,51,50,51,49,50,49,0,
+0,51,50,51,49,49,51,50,50,51,50,50,49,51,51,51,50,49,50,0,
+0,51,49,50,49,49,51,49,50,49,50,50,50,49,51,50,51,49,49,0,
+0,50,50,49,50,50,50,49,49,51,51,50,50,49,49,49,50,50,49,0,
+0,51,51,49,49,51,49,49,50,50,49,50,51,50,49,50,50,49,50,0,
+0,51,49,50,49,50,50,49,51,50,51,50,49,51,50,49,49,49,50,0,
+0,49,50,49,51,50,50,51,49,50,49,49,49,51,51,50,50,50,50,0,
+0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="2" name="Decor" width="20" height="22">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,14,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,0,
+0,13,0,72,0,0,0,0,0,0,0,0,0,0,0,0,72,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,13,0,0,0,0,72,0,0,0,0,0,0,72,0,0,0,0,0,0,
+0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="3" name="Murs" width="20" height="22">
+  <data encoding="csv">
+21,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,22,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,121,122,0,0,0,0,0,0,0,0,121,122,0,0,0,20,
+19,0,0,0,123,124,0,0,0,0,0,0,0,0,123,124,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,121,122,0,0,0,0,0,0,0,0,121,122,0,0,0,20,
+19,0,0,0,123,124,0,0,0,0,0,0,0,0,123,124,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,
+23,18,18,18,18,18,18,18,18,42,18,18,18,18,18,18,18,18,18,24
+</data>
+ </layer>
+ <objectgroup id="4" name="Objets">
+  <object id="1" type="Sortie" x="288" y="672" width="32" height="32">
+   <properties>
+    <property name="cible_carte" value="res://scenes/rooms/chateau_salle_04_room.tscn"/>
+    <property name="cible_spawn" value="depuis_nord"/>
+    <property name="godot_node_type" value="area"/>
+   </properties>
+  </object>
+  <object id="2" type="Porte" x="288" y="672" width="32" height="32">
+   <properties>
+    <property name="id" value="chateau_porte_05"/>
+    <property name="type" value="grande_cle"/>
+   </properties>
+  </object>
+  <object id="3" type="Spawn" x="304" y="624">
+   <properties>
+    <property name="id" value="depuis_sud"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="4" name="boss_corvan" x="304" y="144">
+   <point/>
+  </object>
+  <object id="5" name="pilier" x="128" y="256" width="64" height="64">
+  </object>
+  <object id="6" name="pilier" x="448" y="256" width="64" height="64">
+  </object>
+  <object id="7" name="pilier" x="128" y="416" width="64" height="64">
+  </object>
+  <object id="8" name="pilier" x="448" y="416" width="64" height="64">
+  </object>
+  <object id="9" type="Marqueur" x="80" y="368">
+   <properties>
+    <property name="id" value="corvan_fleches_1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="10" type="Marqueur" x="560" y="368">
+   <properties>
+    <property name="id" value="corvan_fleches_2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="11" type="Marqueur" x="80" y="528">
+   <properties>
+    <property name="id" value="corvan_bombes_1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="12" type="Marqueur" x="560" y="528">
+   <properties>
+    <property name="id" value="corvan_bombes_2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="13" type="Marqueur" x="304" y="368">
+   <properties>
+    <property name="id" value="corvan_coeur_1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="14" type="Marqueur" x="304" y="528">
+   <properties>
+    <property name="id" value="corvan_coeur_2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="15" type="Marqueur" x="112" y="144">
+   <properties>
+    <property name="id" value="morvath_oeil_1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="16" type="Marqueur" x="528" y="144">
+   <properties>
+    <property name="id" value="morvath_oeil_2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="17" type="Marqueur" x="304" y="80">
+   <properties>
+    <property name="id" value="morvath_oeil_3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="18" type="Marqueur" x="304" y="144">
+   <properties>
+    <property name="id" value="corvan_defi"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="19" type="Marqueur" x="304" y="656">
+   <properties>
+    <property name="id" value="corvan_exil"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="20" type="Torche" x="112" y="80">
+   <properties>
+    <property name="id" value="chateau_brasero_07"/>
+    <property name="etat" value="allumee"/>
+    <property name="permanente" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="21" type="Torche" x="528" y="80">
+   <properties>
+    <property name="id" value="chateau_brasero_08"/>
+    <property name="etat" value="allumee"/>
+    <property name="permanente" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="22" type="Torche" x="208" y="624">
+   <properties>
+    <property name="id" value="chateau_brasero_09"/>
+    <property name="etat" value="allumee"/>
+    <property name="permanente" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="23" type="Torche" x="432" y="624">
+   <properties>
+    <property name="id" value="chateau_brasero_10"/>
+    <property name="etat" value="allumee"/>
+    <property name="permanente" type="bool" value="true"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="24" type="Scenario" x="304" y="560">
+   <properties>
+    <property name="cinematique" value="chateau_corvan_defi"/>
+    <property name="si" value="corvan_absorbe_sceau"/>
+    <property name="sauf" value="corvan_defie"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <layer id="5" name="Dessus" width="20" height="22">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,46,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>
