@@ -1,0 +1,66 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/ChevalierEnemy.cs" id="script_chevalier"]
+[ext_resource type="SpriteFrames" path="res://art/enemies/chevalier_corrompu_frames.tres" id="chevalier_frames"]
+[ext_resource type="Script" path="res://scripts/components/Health.cs" id="script_health"]
+[ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="script_hurtbox"]
+[ext_resource type="Script" path="res://scripts/components/HitBox.cs" id="script_hitbox"]
+[ext_resource type="Script" path="res://scripts/components/LootDropper.cs" id="script_loot"]
+[ext_resource type="Resource" path="res://resources/loot/foret_commun.tres" id="loot_table"]
+
+[sub_resource type="CircleShape2D" id="chevalier_shape"]
+radius = 11.0
+
+[sub_resource type="CircleShape2D" id="chevalier_hitbox_shape"]
+radius = 15.0
+
+[sub_resource type="RectangleShape2D" id="chevalier_coup_shape"]
+resource_local_to_scene = true
+size = Vector2(24, 30)
+
+[node name="ChevalierCorrompu" type="CharacterBody2D" groups=["destructible_bombe"]]
+motion_mode = 1
+script = ExtResource("script_chevalier")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("chevalier_frames")
+animation = &"walk_down"
+autoplay = "walk_down"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("chevalier_shape")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("script_health")
+MaxHealth = 4
+
+[node name="HurtBox" type="Area2D" parent="."]
+script = ExtResource("script_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(0, 4)
+shape = SubResource("chevalier_shape")
+
+[node name="HitBox" type="Area2D" parent="."]
+script = ExtResource("script_hitbox")
+Team = 1
+Damage = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+position = Vector2(0, 4)
+shape = SubResource("chevalier_hitbox_shape")
+
+[node name="CoupHitBox" type="Area2D" parent="."]
+script = ExtResource("script_hitbox")
+Team = 1
+Damage = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CoupHitBox"]
+position = Vector2(0, 30)
+shape = SubResource("chevalier_coup_shape")
+
+[node name="LootDropper" type="Node" parent="."]
+script = ExtResource("script_loot")
+Table = ExtResource("loot_table")

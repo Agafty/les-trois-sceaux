@@ -1,0 +1,27 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://maps/donjon_test/arene.tmx" id="map"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="player"]
+[ext_resource type="Script" path="res://scripts/world/Room.cs" id="room_script"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/chevalier_corrompu.tscn" id="chevalier"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/oeil_morvath.tscn" id="oeil"]
+
+[node name="EssaiChateau" type="Node2D"]
+script = ExtResource("room_script")
+Zone = "test"
+
+[node name="Map" parent="." instance=ExtResource("map")]
+
+[node name="Entites" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Player" parent="Entites" instance=ExtResource("player")]
+
+[node name="Chevalier" parent="Entites" instance=ExtResource("chevalier")]
+position = Vector2(230, 176)
+
+[node name="Oeil1" parent="Entites" instance=ExtResource("oeil")]
+position = Vector2(112, 16)
+
+[node name="Oeil2" parent="Entites" instance=ExtResource("oeil")]
+position = Vector2(528, 16)

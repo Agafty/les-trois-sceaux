@@ -1,0 +1,33 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/EyeSentryEnemy.cs" id="script_eye"]
+[ext_resource type="SpriteFrames" path="res://art/enemies/oeil_morvath_frames.tres" id="eye_frames"]
+[ext_resource type="Script" path="res://scripts/components/Health.cs" id="script_health"]
+[ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="script_hurtbox"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/projectile_orbe.tscn" id="orbe"]
+
+[sub_resource type="RectangleShape2D" id="eye_hurt_shape"]
+size = Vector2(48, 48)
+
+[node name="OeilMorvath" type="CharacterBody2D" groups=["vol"]]
+collision_layer = 0
+collision_mask = 0
+motion_mode = 1
+script = ExtResource("script_eye")
+ProjectileScene = ExtResource("orbe")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("eye_frames")
+animation = &"closed"
+autoplay = "closed"
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("script_health")
+MaxHealth = 1
+
+[node name="HurtBox" type="Area2D" parent="."]
+script = ExtResource("script_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+shape = SubResource("eye_hurt_shape")

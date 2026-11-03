@@ -260,6 +260,7 @@ public partial class Room : Node2D
         }
 
         ReadMapProperties();
+        ApplyStageTint();
         if (HasMapPosition && !string.IsNullOrEmpty(SceneFilePath))
             GetNode<GameState>("/root/GameState").MarkRoomVisited(Zone, System.IO.Path.GetFileNameWithoutExtension(SceneFilePath));
         ConfigureLayers();
@@ -1246,6 +1247,16 @@ public partial class Room : Node2D
         torch.Position = _entities.ToLocal(ObjectCenter(marker));
         _entities.AddChild(torch);
         RemoveMarker(marker);
+    }
+
+    // Éclipse imposée par l'étape (3 sceaux, Morvath vivant) : devient la BaseTint, sauf pénombre (salle sombre) ; la teinte d'ouverture (SetupCinematics) passe par-dessus.
+    private void ApplyStageTint()
+    {
+        var gameState = GetNode<GameState>("/root/GameState");
+        if (!StageTintRules.UseEclipse(gameState.StoryStage, Zone ?? "", CameraMode, RoomStem, IsDark, gameState.IsCollected("lac_eclipse_vu"))) return;
+        if (!CinematicColors.TryParse("eclipse", out float r, out float g, out float b)) return;
+        BaseTint = new Color(r, g, b);
+        SetTint(BaseTint);
     }
 
     // Propriétés de carte Tiled (etage, carte_x, carte_y) : YATI les met en metadata sur la racine de la carte importée.

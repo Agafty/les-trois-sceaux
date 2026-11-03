@@ -8,6 +8,6 @@
     { "action": "attendre", "secondes": 0.8 },
     { "action": "dialogue", "orateur": "PNJ_BRANN", "lignes": [ "DLG_LAC_ECLIPSE_1" ] },
     { "action": "camera", "vers": "brann", "duree": 1.5 },
-    { "action": "teinte", "couleur": "normal", "duree": 1.2 }
+    { "action": "teinte", "couleur": "eclipse", "duree": 1.2 }
   ]
 }
