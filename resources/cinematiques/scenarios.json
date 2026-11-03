@@ -124,7 +124,19 @@
       "sauf": [
         "epee_trempee"
       ]
+    },
+    {
+      "salle": "lac_room",
+      "cinematique": "lac_retour_eclipse",
+      "si": [
+        "corvan_absorbe_sceau"
+      ],
+      "sauf": [
+        "lac_eclipse_vu"
+      ]
     }
   ],
-  "reperes": []
+  "reperes": [
+    { "salle": "lac_room", "id": "chateau_vue", "x": 2528, "y": 176 }
+  ]
 }
