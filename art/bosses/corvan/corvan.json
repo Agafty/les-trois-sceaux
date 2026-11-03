@@ -1,0 +1,577 @@
+{
+ "corvan.png": {
+  "cellule": [
+   64,
+   64
+  ],
+  "colonnes": 5,
+  "lignes": 6,
+  "origine": [
+   32,
+   62
+  ],
+  "ordre_des_lignes": [
+   "bas (idle, marche x4)",
+   "haut",
+   "gauche",
+   "droite (= miroir de gauche)",
+   "leve x3, coup x2",
+   "coince x2, touche, genoux x2"
+  ],
+  "animations": {
+   "idle_down": {
+    "cases": [
+     0
+    ],
+    "fps": 5.0,
+    "boucle": true
+   },
+   "idle_up": {
+    "cases": [
+     5
+    ],
+    "fps": 5.0,
+    "boucle": true
+   },
+   "idle_left": {
+    "cases": [
+     10
+    ],
+    "fps": 5.0,
+    "boucle": true
+   },
+   "idle_right": {
+    "cases": [
+     15
+    ],
+    "fps": 5.0,
+    "boucle": true
+   },
+   "walk_down": {
+    "cases": [
+     1,
+     2,
+     3,
+     4
+    ],
+    "fps": 6.0,
+    "boucle": true
+   },
+   "walk_up": {
+    "cases": [
+     6,
+     7,
+     8,
+     9
+    ],
+    "fps": 6.0,
+    "boucle": true
+   },
+   "walk_left": {
+    "cases": [
+     11,
+     12,
+     13,
+     14
+    ],
+    "fps": 6.0,
+    "boucle": true
+   },
+   "walk_right": {
+    "cases": [
+     16,
+     17,
+     18,
+     19
+    ],
+    "fps": 6.0,
+    "boucle": true
+   },
+   "leve": {
+    "cases": [
+     20,
+     21,
+     22
+    ],
+    "fps": 5.0,
+    "boucle": false
+   },
+   "leve_tenu": {
+    "cases": [
+     22
+    ],
+    "fps": 1.0,
+    "boucle": true
+   },
+   "coup": {
+    "cases": [
+     23,
+     24
+    ],
+    "fps": 8.0,
+    "boucle": false
+   },
+   "coince": {
+    "cases": [
+     25,
+     26
+    ],
+    "fps": 3.0,
+    "boucle": true
+   },
+   "touche": {
+    "cases": [
+     27
+    ],
+    "fps": 1.0,
+    "boucle": false
+   },
+   "genoux": {
+    "cases": [
+     28,
+     29
+    ],
+    "fps": 2.0,
+    "boucle": true
+   }
+  },
+  "note": "case = ligne*5+colonne ; le marteau est a droite de l'ecran (vue de face) ; sous les pieds : corvan_ombre.png"
+ },
+ "corvan_corrompu.png": {
+  "cellule": [
+   96,
+   96
+  ],
+  "colonnes": 11,
+  "lignes": 1,
+  "origine": [
+   48,
+   93
+  ],
+  "noms_des_cases": [
+   "idle_a",
+   "idle_b",
+   "coup_leve",
+   "coup_frappe",
+   "coup_fin",
+   "touche",
+   "transition_0",
+   "transition_1",
+   "transition_2",
+   "etourdi_a",
+   "etourdi_b"
+  ],
+  "animations": {
+   "idle": {
+    "cases": [
+     0,
+     1
+    ],
+    "fps": 3.0,
+    "boucle": true
+   },
+   "coup": {
+    "cases": [
+     2,
+     3,
+     4
+    ],
+    "fps": 5.0,
+    "boucle": false
+   },
+   "touche": {
+    "cases": [
+     5
+    ],
+    "fps": 1.0,
+    "boucle": false
+   },
+   "transition": {
+    "cases": [
+     6,
+     7,
+     8
+    ],
+    "fps": 3.0,
+    "boucle": false
+   },
+   "etourdi": {
+    "cases": [
+     9,
+     10
+    ],
+    "fps": 3.0,
+    "boucle": true
+   }
+  },
+  "note": "sans marteau, face au joueur ; 'transition' = Morvath se releve (genoux, penche, bras ecartes) ; 'etourdi' = courbe, tete basse ; l'effondrement apres l'Oeil = animation 'genoux' de corvan.png (Corvan normal)"
+ },
+ "calques": {
+  "cellule": [
+   96,
+   96
+  ],
+  "colonnes": 10,
+  "cases": [
+   "idle_a",
+   "idle_b",
+   "coup_leve",
+   "coup_frappe",
+   "coup_fin",
+   "touche",
+   "brise_1",
+   "brise_2",
+   "brise_3",
+   "flash"
+  ],
+  "animations": {
+   "idle": {
+    "cases": [
+     0,
+     1
+    ],
+    "fps": 3.0,
+    "boucle": true
+   },
+   "coup": {
+    "cases": [
+     2,
+     3,
+     4
+    ],
+    "fps": 5.0,
+    "boucle": false
+   },
+   "touche": {
+    "cases": [
+     5
+    ],
+    "fps": 1.0,
+    "boucle": false
+   },
+   "brise": {
+    "cases": [
+     6,
+     7,
+     8
+    ],
+    "fps": 8.0,
+    "boucle": false
+   },
+   "flash": {
+    "cases": [
+     9
+    ],
+    "fps": 1.0,
+    "boucle": false
+   }
+  },
+  "note": "memes cases que corvan_corrompu.png pour les 6 premieres ; 'brise' = eclats qui s'ecartent puis disparaissent (a jouer sur le calque touche, puis le cacher) ; 'flash' = silhouette claire (alternative a modulate pour clignoter)"
+ },
+ "bulbes_ronces_centres_px": {
+  "idle_a": [
+   [
+    17,
+    58
+   ],
+   [
+    79,
+    58
+   ],
+   [
+    48,
+    48
+   ]
+  ],
+  "idle_b": [
+   [
+    16,
+    55
+   ],
+   [
+    80,
+    55
+   ],
+   [
+    48,
+    46
+   ]
+  ],
+  "coup_leve": [
+   [
+    19,
+    29
+   ],
+   [
+    77,
+    29
+   ],
+   [
+    48,
+    45
+   ]
+  ],
+  "coup_frappe": [
+   [
+    26,
+    73
+   ],
+   [
+    70,
+    73
+   ],
+   [
+    48,
+    54
+   ]
+  ],
+  "coup_fin": [
+   [
+    23,
+    71
+   ],
+   [
+    73,
+    71
+   ],
+   [
+    48,
+    52
+   ]
+  ],
+  "touche": [
+   [
+    19,
+    52
+   ],
+   [
+    78,
+    53
+   ],
+   [
+    48,
+    51
+   ]
+  ],
+  "note": "3 centres (bras gauche ecran, bras droit, haut de la poitrine) par case, en px de la case 96x96 ; rayon visuel ~8 px ; une fleche sur un bulbe = toucher dans un cercle de 10 px"
+ },
+ "bulbe_ronces.png": {
+  "cellule": [
+   32,
+   32
+  ],
+  "centre": [
+   16,
+   16
+  ],
+  "animations": {
+   "idle": {
+    "cases": [
+     0,
+     1
+    ],
+    "fps": 3.0,
+    "boucle": true
+   },
+   "touche": {
+    "cases": [
+     2
+    ],
+    "fps": 1.0,
+    "boucle": false
+   },
+   "eclate": {
+    "cases": [
+     3
+    ],
+    "fps": 1.0,
+    "boucle": false
+   }
+  }
+ },
+ "ombre_marteau.png": {
+  "cellule": [
+   128,
+   128
+  ],
+  "centre": [
+   64,
+   64
+  ],
+  "rayon_px": 56,
+  "cases": [
+   "contour_pointille",
+   "plein_14",
+   "plein_28",
+   "plein_42",
+   "plein_56_alerte"
+  ],
+  "note": "5 cases : a caler sur la duree de l'annonce (1,2 s x multiplicateur) ; tramé (damier) : la transparence se regle avec modulate"
+ },
+ "poussiere.png": {
+  "cellule": [
+   64,
+   48
+  ],
+  "origine": [
+   32,
+   42
+  ],
+  "animations": {
+   "impact": {
+    "cases": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "fps": 10.0,
+    "boucle": false
+   }
+  }
+ },
+ "pointes_ronces.png": {
+  "cellule": [
+   32,
+   48
+  ],
+  "origine": [
+   16,
+   44
+  ],
+  "une_case_de_largeur": 32,
+  "animations": {
+   "monticule": {
+    "cases": [
+     0,
+     1
+    ],
+    "fps": 4.0,
+    "boucle": true
+   },
+   "pointes": {
+    "cases": [
+     2,
+     3,
+     4
+    ],
+    "fps": 8.0,
+    "boucle": false
+   }
+  },
+  "note": "monticule 1,5 s (boucle), pointes 1 s : pointes_0 sort, pointes_1 plein, pointes_2 retombe ; une instance par case"
+ },
+ "bulle_eau.png": {
+  "cellule": [
+   32,
+   32
+  ],
+  "centre": [
+   16,
+   16
+  ],
+  "animations": {
+   "flotte": {
+    "cases": [
+     0,
+     1
+    ],
+    "fps": 3.0,
+    "boucle": true
+   },
+   "revelee": {
+    "cases": [
+     2
+    ],
+    "fps": 1.0,
+    "boucle": true
+   },
+   "eclate": {
+    "cases": [
+     3
+    ],
+    "fps": 1.0,
+    "boucle": false
+   }
+  }
+ },
+ "oeil.png": {
+  "cellule": [
+   32,
+   32
+  ],
+  "centre": [
+   16,
+   16
+  ],
+  "animations": {
+   "idle": {
+    "cases": [
+     0,
+     1
+    ],
+    "fps": 2.0,
+    "boucle": true
+   },
+   "deplace": {
+    "cases": [
+     2,
+     3
+    ],
+    "fps": 8.0,
+    "boucle": true
+   },
+   "tir": {
+    "cases": [
+     4,
+     5,
+     6
+    ],
+    "fps": 6.0,
+    "boucle": false
+   },
+   "touche": {
+    "cases": [
+     7
+    ],
+    "fps": 1.0,
+    "boucle": false
+   }
+  }
+ },
+ "oeil_anneau.png": {
+  "cellule": [
+   48,
+   48
+  ],
+  "centre": [
+   24,
+   24
+  ],
+  "animations": {
+   "arrivee": {
+    "cases": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "fps": 4.0,
+    "boucle": false
+   }
+  },
+  "note": "anneau dore a l'arrivee de l'Oeil : 4 images sur 1 s"
+ },
+ "conseils": {
+  "cellule": [
+   32,
+   32
+  ],
+  "fichiers": [
+   "conseil_fleche.png",
+   "conseil_bombe.png",
+   "conseil_lanterne.png"
+  ],
+  "note": "icone d'objet a flotter au-dessus du boss (centre-haut de la case, ~16 px au-dessus de la tete)"
+ }
+}
