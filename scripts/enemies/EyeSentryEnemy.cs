@@ -35,6 +35,7 @@ public partial class EyeSentryEnemy : CharacterBody2D, IBombDestructible
     private static readonly StringName AnimOpen = "open";
     private static readonly StringName AnimIdleOpen = "idle_open";
     private static readonly StringName AnimShoot = "shoot";
+    private static readonly StringName AnimFlash = "flash";
     private static readonly Vector2[] Sides = { Vector2.Down, Vector2.Up, Vector2.Left, Vector2.Right };
     private static PackedScene _deathScene;
 
@@ -213,6 +214,7 @@ public partial class EyeSentryEnemy : CharacterBody2D, IBombDestructible
 
     private void OnAnimationFinished()
     {
+        if (_dead) { QueueFree(); return; } // fin de l'éclat doré
         // Le tir est une animation courte non bouclée : l'œil reste ensuite ouvert.
         if (!_dead && _state == State.Eveille && _sprite.Animation == AnimShoot) _sprite.Play(AnimIdleOpen);
     }
@@ -228,6 +230,13 @@ public partial class EyeSentryEnemy : CharacterBody2D, IBombDestructible
     private void OnDied()
     {
         _dead = true;
+        // Éclat doré (animation « flash ») puis disparition ; sans cette animation, le nuage de mort habituel.
+        if (_sprite.SpriteFrames != null && _sprite.SpriteFrames.HasAnimation(AnimFlash))
+        {
+            GetNode<Area2D>("HurtBox").SetDeferred(Area2D.PropertyName.Monitorable, false); // plus de coup sur un œil qui s'éteint
+            _sprite.Play(AnimFlash);
+            return; // OnAnimationFinished libère le nœud
+        }
         var poof = (_deathScene ??= GD.Load<PackedScene>("res://scenes/enemies/death_effect.tscn")).Instantiate<Node2D>();
         GetParent().AddChild(poof);
         poof.GlobalPosition = GlobalPosition;

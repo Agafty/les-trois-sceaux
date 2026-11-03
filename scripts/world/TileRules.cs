@@ -12,6 +12,11 @@ public static class TileRules
     public const string MineBasementTileset = "mine_sous_sol";
     public const string SanctuaryTileset = "sanctuaire";
     public const string SanctuaryCryptTileset = "sanctuaire_crypte";
+    public const string RoadCastleTileset = "route_chateau";
+    public const string CastleTileset = "chateau";
+
+    /// <summary>Tilesets de la fin du jeu (route, grotte, cour : « route_chateau » ; salles et arène : « chateau »). Ni trou ni escalier.</summary>
+    public static bool IsCastle(string tileset) => tileset == RoadCastleTileset || tileset == CastleTileset;
 
     /// <summary>Tilesets du Sanctuaire Englouti (rez-de-chaussée et cryptes : mêmes numéros).</summary>
     public static bool IsSanctuary(string tileset) => tileset == SanctuaryTileset || tileset == SanctuaryCryptTileset;
@@ -39,8 +44,8 @@ public static class TileRules
         _ => false,
     };
 
-    /// <summary>Ravin du tileset village (terrain « Ravin », 80 à 95) : solide pour Brann et les ennemis, mais les flèches passent au-dessus.</summary>
-    public static bool IsRavine(string tileset, int tileId) => (tileset == VillageTileset || tileset == MountainTileset) && tileId >= 80 && tileId <= 95;
+    /// <summary>Ravin des tilesets village, montagne et chateau (fosse de ronces) (terrain « Ravin », 80 à 95) : solide pour Brann et les ennemis, mais les flèches passent au-dessus.</summary>
+    public static bool IsRavine(string tileset, int tileId) => (tileset == VillageTileset || tileset == MountainTileset || tileset == CastleTileset) && tileId >= 80 && tileId <= 95;
 
     public const string InteriorTileset = "interieurs";
 
@@ -51,7 +56,7 @@ public static class TileRules
     {
         VillageTileset => (tileId >= 136 && tileId <= 139) || tileId == 142,
         MineTileset or MineBasementTileset => (tileId >= 144 && tileId <= 147) || tileId == 152 || (tileId >= 72 && tileId <= 75) || tileId == 164 || tileId == 165,
-        SanctuaryTileset or SanctuaryCryptTileset => tileId >= 72 && tileId <= 75,
+        SanctuaryTileset or SanctuaryCryptTileset or RoadCastleTileset or CastleTileset => tileId >= 72 && tileId <= 75,
         MountainTileset => tileId == 156 || tileId == 172 || (tileId >= 176 && tileId <= 179),
         InteriorTileset => tileId == 67,
         _ => false,
@@ -78,7 +83,7 @@ public static class TileRules
                 default: return false;
             }
         }
-        if (IsSanctuary(tileset))
+        if (IsSanctuary(tileset) || IsCastle(tileset))
         {
             // Murs fissurés 72 à 75 (haut, bas, gauche, droite) : version ouverte opaque 76 à 79 dans « Decor ».
             if (closedId < 72 || closedId > 75) return false;
@@ -122,7 +127,7 @@ public static class TileRules
                 default: return false;
             }
         }
-        if (IsSanctuary(tileset))
+        if (IsSanctuary(tileset) || IsCastle(tileset))
         {
             if (openId < 76 || openId > 79) return false;
             closedId = openId - 4;

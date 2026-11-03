@@ -8,6 +8,8 @@ public partial class Projectile : Area2D
 {
     [Export] public float Speed { get; set; } = 110f;
     [Export] public float Lifetime { get; set; } = 3f;
+    /// <summary>Animation jouée quand le projectile heurte un mur (ex. « morvath_orb_burst ») ; vide = disparition immédiate.</summary>
+    [Export] public StringName WallBurstAnimation { get; set; } = "";
 
     private Vector2 _direction = Vector2.Right;
     private float _age;
@@ -52,6 +54,17 @@ public partial class Projectile : Area2D
     private void OnBodyEntered(Node2D body)
     {
         if (body is CharacterBody2D) return;
+        if (!_dying && !string.IsNullOrEmpty(WallBurstAnimation)
+            && GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D") is { SpriteFrames: not null } sprite
+            && sprite.SpriteFrames.HasAnimation(WallBurstAnimation))
+        {
+            // Éclatement contre le mur : on fige l'orbe, on coupe ses coups, puis on le retire à la fin de l'animation.
+            _dying = true;
+            _hitBox.SetDeferred(Area2D.PropertyName.Monitoring, false);
+            sprite.Play(WallBurstAnimation);
+            sprite.AnimationFinished += QueueFree;
+            return;
+        }
         Die();
     }
 }

@@ -212,7 +212,7 @@
    <properties>
     <property name="cinematique" value="chateau_corvan_defi"/>
     <property name="si" value="corvan_absorbe_sceau"/>
-    <property name="sauf" value="corvan_defie"/>
+    <property name="sauf" value="corvan_defie,morvath_vaincu"/>
    </properties>
    <point/>
   </object>

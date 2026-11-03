@@ -1,0 +1,11 @@
+{
+  "id": "chateau_cour_voix",
+  "drapeau_fin": "chateau_cour_vu",
+  "passable": true,
+  "etapes": [
+    { "action": "camera", "vers": "chateau_portail", "duree": 1.5 },
+    { "action": "attendre", "secondes": 0.5 },
+    { "action": "dialogue", "orateur": "PNJ_CORVAN", "lignes": [ "DLG_CH_COUR_1", "DLG_CH_COUR_2" ] },
+    { "action": "camera", "vers": "brann", "duree": 1.2 }
+  ]
+}

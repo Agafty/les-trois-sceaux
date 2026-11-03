@@ -54,7 +54,7 @@ public partial class TileFeatures : Node2D
             string name = TileRules.TilesetNameFromTexturePath(atlas.Texture.ResourcePath);
             if (name == "")
                 GD.PushWarning($"Carte {GetParent()?.Name} : tileset « {atlas.Texture.ResourcePath} » non reconnu (pas un PNG nommé) : ses buissons et ravins éventuels sont ignorés.");
-            if (name == TileRules.ForestTileset || name == TileRules.VillageTileset || name == TileRules.MountainTileset)
+            if (name == TileRules.ForestTileset || name == TileRules.VillageTileset || name == TileRules.MountainTileset || name == TileRules.CastleTileset)
                 sources[id] = (name, atlas.GetAtlasGridSize().X);
         }
         if (sources.Count == 0) return;

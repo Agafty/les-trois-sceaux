@@ -158,6 +158,7 @@ public partial class CinematicPlayer : Node
         if (!IsInstanceValid(this) || !IsInsideTree()) { Active = false; return; }
         bool skipped = WasSkipped = _skip;
         if (!string.IsNullOrEmpty(data.EndFlag)) _state.MarkCollected(data.EndFlag);
+        _room.RefreshStageBaseTint(); // le drapeau posé peut changer la teinte de base (éclipse du lac)
         SetProcess(false);
         HideHint();
         SetFade(0f); // jamais d'écran noir oublié

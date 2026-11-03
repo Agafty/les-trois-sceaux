@@ -1252,11 +1252,25 @@ public partial class Room : Node2D
     // Éclipse imposée par l'étape (3 sceaux, Morvath vivant) : devient la BaseTint, sauf pénombre (salle sombre) ; la teinte d'ouverture (SetupCinematics) passe par-dessus.
     private void ApplyStageTint()
     {
+        if (RefreshStageBaseTint()) SetTint(BaseTint);
+    }
+
+    /// <summary>
+    /// Recalcule la teinte de base d'après l'étape et les drapeaux (appelé aussi à la fin d'une cinématique : après lac_retour_eclipse,
+    /// la teinte « normale » du lac devient l'éclipse). Ne change pas la teinte affichée. Renvoie vrai si la salle est en éclipse.
+    /// </summary>
+    public bool RefreshStageBaseTint()
+    {
         var gameState = GetNode<GameState>("/root/GameState");
-        if (!StageTintRules.UseEclipse(gameState.StoryStage, Zone ?? "", CameraMode, RoomStem, IsDark, gameState.IsCollected("lac_eclipse_vu"))) return;
-        if (!CinematicColors.TryParse("eclipse", out float r, out float g, out float b)) return;
-        BaseTint = new Color(r, g, b);
-        SetTint(BaseTint);
+        if (StageTintRules.UseEclipse(gameState.StoryStage, Zone ?? "", CameraMode, RoomStem, IsDark, gameState.IsCollected("lac_eclipse_vu"))
+            && CinematicColors.TryParse("eclipse", out float r, out float g, out float b))
+        {
+            BaseTint = new Color(r, g, b);
+            return true;
+        }
+        // Pas (ou plus) d'éclipse, par exemple après morvath_vaincu : revenir à la teinte de la carte (pénombre ou blanc).
+        BaseTint = IsDark ? new Color(LanternRules.AmbientR, LanternRules.AmbientG, LanternRules.AmbientB) : Colors.White;
+        return false;
     }
 
     // Propriétés de carte Tiled (etage, carte_x, carte_y) : YATI les met en metadata sur la racine de la carte importée.

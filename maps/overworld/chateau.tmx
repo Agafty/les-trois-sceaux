@@ -147,7 +147,7 @@
    <properties>
     <property name="cinematique" value="chateau_cour_voix"/>
     <property name="si" value="corvan_absorbe_sceau"/>
-    <property name="sauf" value="chateau_cour_vu"/>
+    <property name="sauf" value="chateau_cour_vu,morvath_vaincu"/>
    </properties>
    <point/>
   </object>

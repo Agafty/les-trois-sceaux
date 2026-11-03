@@ -14,6 +14,7 @@ radius = 5.0
 script = ExtResource("script_projectile")
 Speed = 90.0
 Lifetime = 4.0
+WallBurstAnimation = &"morvath_orb_burst"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = ExtResource("proj_frames")
