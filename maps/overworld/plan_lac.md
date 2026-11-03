@@ -156,7 +156,7 @@ Buissons coupables : 2 sur la niche de la plume ((2,2) et (1,3)), 2 devant la pl
 | Brume (lac) | 0,15 / 0,25 / 0,5 / 0,2 / 0 | Le plus dense à l'étape 2 (la menace est au Sanctuaire), puis se lève |
 | Tout le reste | toutes | Éboulis, rocher, cible, secrets, statue et portail ne dépendent pas de l'étape |
 
-Pas de PNJ sur le lac dans ce plan (le pêcheur du village est évoqué en décision hors plan, §6). Le ciel d'éclipse de l'étape 3 est une **teinte de salle** (`Room.SetTint`), à lancer depuis la cinématique de sortie du Sanctuaire : ce n'est pas du ressort de la carte.
+Pas de PNJ sur le lac dans ce plan (le pêcheur du village est évoqué en décision hors plan, §6). Le ciel d'éclipse de l'étape 3 est une **teinte de salle**, imposée par le code à cette étape (`Room.BaseTint`, voir `maps/chateau/plan.md` §10.3) ; la cinématique `lac_retour_eclipse` la prolonge. Ce n'est pas du ressort de la carte.
 
 ### 2.6 Les deux quarts de cœur du lac
 

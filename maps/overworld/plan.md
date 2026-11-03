@@ -1,6 +1,6 @@
 # Plan de l'overworld et du village de Brumeval (phase 6, étape 1)
 
-Document de conception. **Aucun `.tmx` de ce plan n'existe encore** : on attend la validation (section 8). Seul `foret_temple.tmx` existe ; il serait modifié à l'étape 2 (section 1.3). Les aperçus ASCII ont été vérifiés par un parcours (BFS) : toutes les portes, sorties, PNJ et poules du village sont atteignables depuis l'arrivée ouest, et les poches secrètes de la forêt le sont une fois le rocher ouvert ou les buissons coupés.
+Document de conception, **mis à jour le 2026-11-03** pour suivre le code (`CLAUDE.md`) et `maps/chateau/plan.md`. Les cartes `foret_temple`, `foret_sud`, `village`, `montagne`, `lac`, `grotte_sw` et les cinq intérieurs de `maps/interieurs/` existent ; restent à créer `route_falaise`, `passage_falaise` et `chateau` (voir `maps/chateau/plan.md`). **Numérotation des étapes : celle du code, `GameState.StoryStage` de 0 à 4** (0 aucun sceau, 1 après le Temple, 2 après la Mine, 3 après le Sanctuaire, 4 = `morvath_vaincu`, épilogue ; `etape_min` / `etape_max` suivent ces bornes). La section 5 est **remplacée par `CLAUDE.md`**, qui fait foi pour les classes et propriétés Tiled. Les aperçus ASCII ont été vérifiés par un parcours (BFS) : toutes les portes, sorties, PNJ et poules du village sont atteignables depuis l'arrivée ouest, et les poches secrètes de la forêt le sont une fois le rocher ouvert ou les buissons coupés.
 
 Conventions de tous les aperçus : une lettre par case de 32 px. Légende commune : `#` solide (arbre, falaise, mur), `.` sol libre, `X` Sortie, `P` Spawn, `D` porte de maison enterrable (Sortie), `d` porte de maison fermée (décor), `H` maison (toit et mur), `W` puits, `E` ennemi, `R` statue du corbeau, `F` mur fissuré, `L` tronc en travers, `b` buisson coupable, `o` poule, `t` Tobias, `i` Pip, `u` villageois, `s` cachette de Pip, `Q` quart de cœur, `Y` cible à l'arc, `r` rocher, `f` plume de corbeau, `x` vide noir (intérieurs).
 
@@ -16,12 +16,12 @@ L'overworld fait 5×4 écrans (100×44 cases). Chaque carte `.tmx` occupe un rec
 | `foret_sud.tmx` | 20×11 | (0,2) | (0,22) | Sentier entre le village et la forêt, statue, plume, cible cachée |
 | `village.tmx` | 40×11 | (1,2) (2,2) | (20,22) | Brumeval |
 | `montagne.tmx` | 40×22 | (2,0) (3,0) (2,1) (3,1) | (40,0) | Ravin et pont-levis (écran sud-ouest), montagne, col et entrée de la Mine (écran sud-est) |
-| `route_falaise.tmx` | 40×11 | (3,2) (4,2) | (60,22) | Route de l'est, falaise, grotte noire |
-| `chateau.tmx` | 20×22 | (4,0) (4,1) | (80,0) | Cour et façade du château |
+| `route_falaise.tmx` | 40×11 | (3,2) (4,2) | (60,22) | Route de l'est, falaise, bouche de grotte barrée par un mur à rune |
+| `chateau.tmx` | 20×22 | (4,0) (4,1) | (80,0) | Cour et façade du château (les salles sont dans `maps/chateau/`) |
 | `grotte_sw.tmx` | 20×11 | (0,3) | (0,33) | Cul-de-sac rocheux du sud-ouest, mur fissuré visible |
 | `lac.tmx` | 80×11 | (1,3) (2,3) (3,3) (4,3) | (20,33) | Rive (éboulis), lac, ponton, Sanctuaire Englouti |
 
-Total : 4+1+2+4+2+2+1+4 = **20 écrans**, soit forêt 5, village 2, montagne 4, lac et rives 5 (lac 4 + grotte du sud-ouest 1), route-falaise-château 4. Une zone du jeu (`Zone` de la `Room`) = un préfixe d'id : `foret`, `village`, `montagne`, `route`, `chateau`, `lac`. Chaque `.tmx` aura sa scène `scenes/rooms/<nom>_room.tscn`.
+Total : 4+1+2+4+2+2+1+4 = **20 écrans**, soit forêt 5, village 2, montagne 4, lac et rives 5 (lac 4 + grotte du sud-ouest 1), route-falaise-château 4. Une zone du jeu (`Zone` de la `Room`) = un préfixe d'id : `foret`, `village`, `montagne`, `route` (route et grotte), `chateau`, `lac`. Chaque `.tmx` aura sa scène `scenes/rooms/<nom>_room.tscn`.
 
 Propriétés de carte proposées (pour une future carte du monde, sans effet sur le jeu) : `monde_x`, `monde_y` (origine en écrans, ex. 1 et 2 pour le village).
 
@@ -48,7 +48,7 @@ Les Sorties sont des rectangles `area` de 1 case d'épaisseur sur le bord, les S
 | Village vers forêt (raccourci de Tobias) | `village` 224, 0, 64, 32 (cases 7-8, ligne 0) | `foret_temple` `depuis_village_raccourci` (896, 624) |
 | Forêt (raccourci) vers village | `foret_temple` 864, 672, 64, 32 (cases 27-28, ligne 21) | `village` `depuis_foret_raccourci` (256, 80) |
 
-Passages **volontairement fermés** (falaise ou eau, pas de Sortie) : forêt est vers montagne, montagne sud vers route, montagne est vers château, grotte SO vers lac, route/falaise vers lac. Le château (`chateau.tmx`) s'atteint seulement par la grotte noire de la falaise : `route_falaise` > intérieur `passage_falaise` > `chateau` `depuis_passage_falaise`.
+Passages **volontairement fermés** (falaise ou eau, pas de Sortie) : forêt est vers montagne, montagne sud vers route, montagne est vers château, grotte SO vers lac, route/falaise vers lac. Le château (`chateau.tmx`) s'atteint seulement par la grotte de la falaise : `route_falaise` > mur à rune (lanterne) > intérieur `passage_falaise` (20×22, zone `route`, deux écrans) > `chateau` `depuis_passage_falaise`. Raccords exacts de la route, de la grotte et du château : `maps/chateau/plan.md` §2.2 (qui fait foi).
 
 ### 1.3 `foret_temple.tmx` : à garder tel quel, avec 4 retouches (étape 2)
 
@@ -93,11 +93,11 @@ X..i...............WW.........u......P.X
 | Hutte de Tobias | 1-5 x 1-3 | (3,3) `d` | Fermée ; tas de bois devant |
 | Maison de Hulda | 10-14 x 1-3 | (12,3) `D` | Intérieur `maison_hulda` |
 | Archives d'Isolde | 25-30 x 1-3 | (27,3) `D` | Intérieur `archives_isolde` |
-| Maison des mineurs | 35-38 x 1-3 | (36,3) `d` | Fermée, volets clos ; s'ouvre visuellement à l'étape 3 (mineurs de retour) |
+| Maison des mineurs | 35-38 x 1-3 | (36,3) `d` | Fermée, volets clos ; s'ouvre visuellement à l'étape 2 (mineurs de retour) |
 | Maison de Pip | 1-6 x 6-8 | (3,8) `d` | Fermée (parents) |
 | **Forge de Corvan** | 8-14 x 6-8 | (11,8) `D` | Intérieur `forge`, point central |
 | Boutique de Garrick | 25-30 x 6-8 | (27,8) `D` | Intérieur `boutique_garrick` |
-| Maison du pêcheur | 32-36 x 6-8 | (34,8) `d` | Fermée ; ses volets s'ouvrent à l'étape 4 ou 5 (décor) |
+| Maison du pêcheur | 32-36 x 6-8 | (34,8) `d` | Fermée ; ses volets s'ouvrent à l'étape 4 (décor) |
 | Rocher fissuré | 37-38 x 6-8 | mur fissuré (37,8) `F` | Cave secrète de Garrick (bombes) |
 | Poulailler et grange | décor, entre les maisons | — | 2 petits annexes décoratifs, cachent des poules |
 
@@ -108,13 +108,13 @@ Les portes des bâtiments fermés sont une tuile `porte fermée` sans Sortie (la
 | Sortie | Cases | Mène à | État au début | Comment il s'ouvre |
 | --- | --- | --- | --- | --- |
 | Ouest | col. 0, lignes 4-5 | `foret_sud` (puis le temple) | **Ouverte** | — |
-| Nord-ouest | cases 7-8, ligne 0 | raccourci vers la forêt (`foret_temple`) | **Fermée** : un tronc en travers (`LL`, ligne 1) avec la hache de Tobias plantée dedans | Disparaît à l'étape 2 (Tobias retourne au bois) |
-| Nord-est | cases 32-33, ligne 0 | `montagne` (écran sud-ouest) | Ouverte jusqu'à un **ravin** : pont-levis relevé et cible à l'arc visibles, brume épaisse | Flèche dans la cible (arc, étape 1) |
-| Est | col. 39, lignes 4-5 | `route_falaise` | **Ouverte, en cul-de-sac** : la route finit au pied d'une falaise percée d'une grotte noire (indice : « Il fait trop sombre ») | Lanterne (étape 3) |
+| Nord-ouest | cases 7-8, ligne 0 | raccourci vers la forêt (`foret_temple`) | **Fermée** : un tronc en travers (`LL`, ligne 1) avec la hache de Tobias plantée dedans | Disparaît à l'étape 1 (Tobias retourne au bois ; `etape_max` 0) |
+| Nord-est | cases 32-33, ligne 0 | `montagne` (écran sud-ouest) | Ouverte jusqu'à un **ravin** : pont-levis relevé et cible à l'arc visibles, brume épaisse | Flèche dans la cible (arc, obtenu au Temple) |
+| Est | col. 39, lignes 4-5 | `route_falaise` | **Ouverte, en cul-de-sac** : la route finit au pied d'une falaise percée d'une grotte fermée par un **mur à rune** qui brille (`Porte` `mur_rune`, voir `maps/chateau/plan.md` §4.1) | Lanterne (obtenue au Sanctuaire) |
 | Sud | cases 19-20, ligne 10 | `lac` (rive) | Ouverte jusqu'à un **éboulis** de rochers qui barre la rive | Bombe (étape 2) |
 | Cave de Garrick | case (37,8) | intérieur `cave_garrick` | Mur fissuré visible | Bombe (étape 2) |
 
-« Brume au nord » : une zone de brume épaisse (classe `Brume`, voir 5) couvre le village et le ravin. Elle ne bloque pas le passage (on peut aller voir le ravin, le pont relevé et la cible dès le début, « montrer avant d'exiger ») ; elle s'éclaircit aux étapes 2 à 5 (liste de densités par étape).
+« Brume au nord » : une zone de brume épaisse (classe `Brume`, voir 5) couvre le village et le ravin. Elle ne bloque pas le passage (on peut aller voir le ravin, le pont relevé et la cible dès le début, « montrer avant d'exiger ») ; sa densité varie avec l'étape (5 valeurs, étapes 0 à 4, voir 2.7).
 
 ### 2.5 Le ravin et le pont-levis (écran sud-ouest de `montagne.tmx`, lignes 11 à 21)
 
@@ -137,21 +137,21 @@ Le pont-levis est dans `montagne.tmx`, pas dans le village : on y arrive par la 
 
 ### 2.6 PNJ du village et étapes de l'histoire
 
-Étapes (à stocker dans `GameState.StoryStage`, voir 5) : **0** prologue et matin (cinématiques) ; **1** libre, brume épaisse (début de la forêt) ; **2** après le Temple, brume en partie levée ; **3** après la Mine ; **4** après le Sanctuaire, village vide pendant l'éclipse ; **5** épilogue, soleil et fête.
+Étapes (`GameState.StoryStage`, dérivée : nombre de sceaux, ou 4 si `morvath_vaincu`) : **0** aucun sceau (prologue, matin, brume épaisse, début de la forêt) ; **1** après le Temple, brume en partie levée ; **2** après la Mine (mineurs de retour, bombes en boutique, le lac s'ouvre) ; **3** après le Sanctuaire, village vide pendant l'éclipse ; **4** épilogue (`morvath_vaincu`), soleil et fête. (Ancienne numérotation 0 à 5 : les anciennes étapes 0 et 1 sont fusionnées, les suivantes décalées de 1.)
 
-| PNJ (`id`) | Étapes | Emplacement (colonne, ligne) | Comportement |
+| PNJ (`id`) | Étapes | Emplacement (colonne, ligne) | Rôle (`errance` 0 = immobile) |
 | --- | --- | --- | --- |
-| `pip` | 0 à 1 | (3,5) au départ ; cachette derrière le puits (20,6) dans la scène du Sanglier | Suit Brann dans le village et la forêt sud (pas dans les donjons) ; conseils de gameplay ; donne le quart de cœur des poules |
-| `pip` | 2 à 4 | (21,7) près du puits | Immobile ; parle des poules |
-| `pip` | 5 | (18,6) à la fête | Immobile |
-| `tobias` | 0 à 1 | (5,4) devant sa hutte | Immobile ; indice : Corvan allait souvent en forêt |
-| `tobias` | 2 à 3 | dans `foret_sud`, (12,5) | Immobile ; a dégagé le raccourci |
-| `tobias` | 5 | (23,4) à la fête | Immobile |
-| `hulda` | 0 à 5 | dans `maison_hulda`, derrière le comptoir | Boutique (potion, cœur) ; à l'étape 5 elle est sur la place |
-| `garrick` | 0 à 5 | dans `boutique_garrick`, derrière le comptoir | Boutique ; l'étal des bombes apparaît à l'étape 3 |
-| `isolde` | 0 à 5 | dans `archives_isolde` ; en scène à la forge (étape 0) | Raconte l'histoire des sceaux ; retrouve le nom de Corvan à l'étape 4 |
-| `villageois_apeure` | 0 à 1 | (17,7) | Dialogue court (brume) |
-| `villageois_mineur` | 3 | (30,5) | Le mineur revenu ; parle de la Mine |
+| `pip` | 0 | (3,5) au départ ; cachette derrière le puits (20,6) dans la scène du Sanglier | Conseils de gameplay par dialogue (le suivi de Brann n'existe pas dans le code : PNJ fixe) ; donne le quart de cœur des poules |
+| `pip` | 1 à 3 | (21,7) près du puits | Immobile ; parle des poules |
+| `pip` | 4 | (18,6) à la fête | Immobile ; garde le bloc des poules |
+| `tobias` | 0 | (5,4) devant sa hutte | Immobile ; indice : Corvan allait souvent en forêt |
+| `tobias` | 1 à 2 | dans `foret_sud`, (12,5) | Immobile ; a dégagé le raccourci |
+| `tobias` | 4 | (23,4) à la fête | Immobile |
+| `hulda` | 0 à 4 | dans l'herboristerie (`herboristerie.tmx`), derrière le comptoir | Boutique (potion, cœur) ; à l'étape 4 elle est aussi sur la place (second objet `PNJ`) |
+| `garrick` | 0 à 4 | dans la boutique (`boutique.tmx`), derrière le comptoir | Boutique ; flèches dès l'étape 1, bombes dès l'étape 2 |
+| `isolde` | 0 à 4 | dans les archives (`archives.tmx`) ; en scène à la forge (étape 0) | Raconte l'histoire des sceaux ; retrouve le nom de Corvan à l'étape 3 |
+| `villageois_apeure` | 0 | (17,7) | Dialogue court (brume) |
+| `villageois_mineur` | 2 | (30,5) | Le mineur revenu ; parle de la Mine |
 | `corvan` | 0 | dans la forge | Scènes du prologue (disparaît après la scène) |
 
 Il n'y a pas d'autres habitants : les 2 villageois sont facultatifs (décision 9).
@@ -162,12 +162,13 @@ Une seule carte `village.tmx`. Chaque objet porte `etape_min` / `etape_max` (voi
 
 | Étape | Brume (densité) | Ce qui change |
 | --- | --- | --- |
-| 0 | 0,5 | Matin ; l'éclipse (ciel violet) en fin de prologue ; Ronceaux et Sanglier sur la place (scénarisés) |
-| 1 | 0,8 | Brume épaisse, volets clos, villageois apeurés ; tronc au nord-ouest |
-| 2 | 0,45 | Tobias parti, tronc retiré ; flèches en boutique |
-| 3 | 0,3 | Mineurs de retour (maison des mineurs ouverte) ; bombes en boutique |
-| 4 | 0,7 | Village vide : seuls Hulda et Isolde restent ; ciel d'éclipse ; huile de lanterne en boutique |
-| 5 | 0 | Soleil, guirlandes, tous les PNJ sur la place ; le feu de la forge est rallumé |
+| 0 | 0,8 | Matin, puis éclipse (ciel violet) en fin de prologue ; brume épaisse, volets clos, villageois apeurés ; Ronceaux et Sanglier sur la place (scénarisés) ; tronc au nord-ouest |
+| 1 | 0,45 | Tobias parti, tronc retiré ; flèches en boutique |
+| 2 | 0,3 | Mineurs de retour (maison des mineurs ouverte) ; bombes en boutique |
+| 3 | 0,7 | Village vide : seuls Hulda et Isolde restent ; ciel d'éclipse (teinte imposée par le code à l'étape 3, pas par une propriété de carte) |
+| 4 | 0 | Soleil, guirlandes, tous les PNJ sur la place ; le feu de la forge est rallumé |
+
+La brume du village est celle de `village.tmx` : `0.8,0.45,0.3,0.7,0`. Il n'y a plus d'huile de lanterne (retirée le 2026-11-01 : la lanterne est passive).
 
 ### 2.8 Collectibles et secrets du village
 
@@ -179,7 +180,7 @@ Une seule carte `village.tmx`. Chaque objet porte `etape_min` / `etape_max` (voi
 
 ## 3. Les intérieurs
 
-Principe : **tous les intérieurs sont des cartes de 20×11 cases en `camera` = `ecran`**. La pièce est dessinée au centre sur fond noir (`x`), plus petite qu'un écran comme prévu par la roadmap, **sans rien demander au code** (pas de caméra à centrer). Calques habituels ; le tileset `interieurs` est à créer (section 6). Spawn d'entrée `depuis_village` toujours en (9,8), devant la porte (Sortie en (9,9)). Légende ajoutée : `T` comptoir ou table, `e` étal (`Etal`), `B` étagère de livres, `h` Hulda, `g` Garrick, `a` Isolde, `N` Corvan, `F` fourneau, `b` lit, `A` enclume, `c` charbon, `%` roche, `.` sol.
+Principe : **tous les intérieurs sont des cartes de 20×11 cases en `camera` = `ecran`**. La pièce est dessinée au centre sur fond noir (`x`), plus petite qu'un écran comme prévu par la roadmap, **sans rien demander au code** (pas de caméra à centrer). Calques habituels ; le tileset `interieurs` est à créer (section 6). Spawn d'entrée `depuis_village` toujours en (9,8), devant la porte (Sortie en (9,9)). Légende ajoutée : `T` comptoir ou table, `e` étal (`Article`), `B` étagère de livres, `h` Hulda, `g` Garrick, `a` Isolde, `N` Corvan, `F` fourneau, `b` lit, `A` enclume, `c` charbon, `%` roche, `.` sol.
 
 ### 3.1 La forge de Corvan (`maps/interieurs/forge.tmx`)
 
@@ -196,7 +197,7 @@ xxx#.....P......#xxx
 xxx######D#######xxx
 xxxxxxxxxxxxxxxxxxxx
 ```
-La statue du corbeau `R` est posée sur l'enclume (1 case solide, 1 objet `StatueCorbeau` id `village_statue_forge`) ; `N` = Corvan (étape 0 seulement). `F` : fourneau 3×2 froid (tuile-objet avec `etape_max` 4) puis fourneau allumé (`etape_min` 5). `TTT` : établi et outils ; `bb` : lit de Brann. `cc` : deux `Ramassable` de charbon (`village_charbon_01/02`, étape 0, quête du matin). Sortie : (9,9) vers `village`, spawn `depuis_forge`. Spawn d'arrivée : `depuis_village` (9,8). Plus tard : établi d'amélioration de l'épée (épée trempée après le 2ᵉ sceau, Lame du Corbeau avec les 10 plumes), objet `Forge` à spécifier à ce moment-là.
+La statue du corbeau `R` est posée sur l'enclume (1 case solide, 1 objet `StatueCorbeau` id `village_statue_forge`) ; `N` = Corvan (étape 0 seulement). `F` : fourneau 3×2 froid (tuile-objet avec `etape_max` 3) puis fourneau allumé (`etape_min` 4). `TTT` : établi et outils ; `bb` : lit de Brann. `cc` : deux `Ramassable` de charbon (`village_charbon_01/02`, étape 0, quête du matin). Sortie : (9,9) vers `village`, spawn `depuis_forge`. Spawn d'arrivée : `depuis_village` (9,8). Plus tard : établi d'amélioration de l'épée (épée trempée après le 2ᵉ sceau, Lame du Corbeau avec les 10 plumes), objet `Forge` à spécifier à ce moment-là.
 
 ### 3.2 Maison de Hulda (`maps/interieurs/maison_hulda.tmx`)
 
@@ -213,7 +214,7 @@ xxx#.....P......#xxx
 xxx######D#######xxx
 xxxxxxxxxxxxxxxxxxxx
 ```
-Deux `Etal` sur le comptoir : potion rouge (40 rubis, 2 maximum dans l'inventaire) et petit cœur de soin (10 rubis, prix à valider, décision 7). `H` : étagères d'herbes. Hulda (`h`) est derrière le comptoir ; on lui parle de dos au comptoir, les étals s'achètent en face.
+Deux `Article` sur le comptoir : potion rouge (40 rubis, 2 maximum dans l'inventaire) et petit cœur de soin (10 rubis, prix à valider, décision 7). `H` : étagères d'herbes. Hulda (`h`) est derrière le comptoir ; on lui parle de dos au comptoir, les étals s'achètent en face.
 
 ### 3.3 Boutique de Garrick (`maps/interieurs/boutique_garrick.tmx`)
 
@@ -230,7 +231,7 @@ xxx#.....P......#xxx
 xxx######D#######xxx
 xxxxxxxxxxxxxxxxxxxx
 ```
-Étals du comptoir (de gauche à droite) : 10 flèches (20 rubis, dès l'étape 2), 5 bombes (30, dès l'étape 3), huile de lanterne (10, dès l'étape 4). Étal seul contre le mur : quart de cœur (150 rubis, `stock` 1, mémorisé). Garrick radin : un dialogue de marchandage au premier achat.
+Articles du comptoir (de gauche à droite) : 10 flèches (20 rubis, `etape` 1), 5 bombes (30, `etape` 2). Il n'y a **pas** d'huile de lanterne (retirée le 2026-11-01, lanterne passive). Article seul contre le mur : quart de cœur (150 rubis, `unique`, mémorisé par son `id`). Garrick radin : un dialogue de marchandage au premier achat.
 
 ### 3.4 Archives de Dame Isolde (`maps/interieurs/archives_isolde.tmx`)
 
@@ -264,15 +265,15 @@ xxxxxx%%.P..%%xxxxxx
 xxxxxxxx%X%%xxxxxxxx
 xxxxxxxxxxxxxxxxxxxx
 ```
-Deux `Etal` : grand carquois (100 rubis) et grand sac de bombes (100 rubis), chacun `stock` 1. Garrick (`g`, id `garrick_cave`) y marmonne : « Comment as-tu trouvé ça ? ». Sortie (9,9) vers `village`, spawn `depuis_cave_garrick` (37,9). Le Spawn d'arrivée de la cave est `depuis_village` (9,8).
+Deux `Article` : grand carquois (100 rubis) et grand sac de bombes (100 rubis), chacun `unique`, `etape` 2. Garrick (`g`, id `garrick_cave`) y marmonne : « Comment as-tu trouvé ça ? ». Sortie (9,9) vers `village`, spawn `depuis_cave_garrick` (37,9). Le Spawn d'arrivée de la cave est `depuis_village` (9,8).
 
 ### 3.6 Autres intérieurs (plus tard)
 
-`grotte_sw` (réceptacle de cœur, derrière le mur fissuré de l'écran (0,3)), `grotte_sombre_montagne` (lanterne, quart de cœur), `passage_falaise` (couloir noir vers le château). Ces 3 pièces s'ajoutent aux 5 ci-dessus : **8 intérieurs au total** (la roadmap en annonce 5 à 6 plus 1 ou 2 grottes ; l'écart vient de la montagne et de la falaise).
+`grotte_sw` (réceptacle de cœur, derrière le mur fissuré de l'écran (0,3)), `passage_falaise` (grotte noire vers le château, **20×22**, deux écrans, zone `route`, mur à rune sur la route, voir `maps/chateau/plan.md` §4.2). La lanterne n'est plus dans une grotte de la montagne : elle est dans le Sanctuaire (donjon 3), donc `grotte_sombre_montagne` n'existe pas. Intérieurs réels : forge, herboristerie, boutique, archives, cave de Garrick ; plus `grotte_sw` (zone `foret`) et `passage_falaise`.
 
 ## 4. La forêt complète (5 écrans)
 
-Forêt = `foret_temple.tmx` (4 écrans, existe) + `foret_sud.tmx` (1 écran). Le fond du Temple reste au nord-centre ; l'accès normal depuis le village est : village (entrée ouest) > forêt sud > sortie nord (cases 6-7) > moitié basse de `foret_temple` > pont (cases 11-12) > moitié haute > temple. Le raccourci du village (étape 2) débouche dans la moitié basse est, près de la souche creuse.
+Forêt = `foret_temple.tmx` (4 écrans, existe) + `foret_sud.tmx` (1 écran). Le fond du Temple reste au nord-centre ; l'accès normal depuis le village est : village (entrée ouest) > forêt sud > sortie nord (cases 6-7) > moitié basse de `foret_temple` > pont (cases 11-12) > moitié haute > temple. Le raccourci du village (ouvert dès l'étape 1) débouche dans la moitié basse est, près de la souche creuse.
 
 ### 4.1 `foret_sud.tmx` (20×11)
 
@@ -291,7 +292,7 @@ Forêt = `foret_temple.tmx` (4 écrans, existe) + `foret_sud.tmx` (1 écran). Le
 ```
 - Ennemis : 2 Ronceaux et 1 Sanglier noirci (faciles, au-dessus du niveau de départ ; le Sanglier à gauche du sentier).
 - `R` : statue du corbeau (`foret_statue_clairiere`), point de sauvegarde avant le gros de la forêt.
-- `t` : Tobias aux étapes 2 et 3.
+- `t` : Tobias aux étapes 1 et 2.
 - **Quart de cœur n°1 (cible cachée à l'arc)** : une cible `Y` camouflée dans un buisson (`Interrupteur` mode `fleche`, `symbole` `feuille`) au bout de la ligne 9 ; elle ouvre un rocher `r` (une `Porte` d'apparence `rocher`) qui ferme une poche en bas à gauche contenant le quart de cœur `Q` (`foret_quart_coeur_cible`). Indice visible dès le début : le rocher isolé au bout d'un couloir dégagé, avec des fleurs qui guident le regard ; accessible seulement après l'arc (donc après le temple) ; rien n'est obligatoire.
 - **Plume n°1** : `f`, dans une niche du coin nord-est, fermée par 2 buissons coupables `b` (`foret_plume_01`).
 - Raccords : nord (cases 6-7), est (colonne 19, lignes 4-5), sud (cases 9-10).
@@ -304,24 +305,17 @@ Voir 1.3. En plus : **quart de cœur n°2** = souche creuse (34,17), déjà derr
 
 Temple des Racines 2 (déjà prévues dans les salles 03 et 12), forêt 2, village 1, montagne 1 et Mine 1, lac 1 et Sanctuaire 1, route/falaise 1. Id : `<zone>_plume_NN`.
 
-## 5. Nouveautés Tiled et code à faire valider (à ajouter au `CLAUDE.md` après accord)
+## 5. Nouveautés Tiled et code : section REMPLACÉE par `CLAUDE.md`
 
-Le principe : **réutiliser au maximum les classes existantes** (`Porte`, `Interrupteur`, `MurFissure`, `Ramassable`, `StatueCorbeau`, `PNJ`, rectangles `indice_`) et ajouter peu de choses.
+Toutes ces propositions ont été réalisées et documentées dans `CLAUDE.md` (section « Overworld et village »), qui fait foi : ne pas se servir de l'ancienne liste. Correspondances utiles :
 
-1. **Propriétés communes à tous les objets du calque `Objets`** : `etape_min` (entier, défaut 0) et `etape_max` (entier, défaut 99). La `Room` n'instancie l'objet que si `GameState.StoryStage` est dans l'intervalle. Sert aux PNJ, ennemis, ramassables, étals, portes (tronc), brumes, et aux **objets tuiles** (feu de forge éteint/allumé, guirlandes).
-2. **`PNJ`** : `id` (clé des dialogues et de l'état), `sprite` (nom de `art/npcs/<sprite>_frames.tres`), `direction` (`bas` par défaut), `comportement` (`immobile` par défaut, `errant`, `suit`). Dialogue : clés `PNJ_<ID>_E<étape>_<n>` dans `textes.csv` (ou JSON indexé par flags, selon le développeur). Convention : plusieurs objets `PNJ` de même `id` à des étapes disjointes.
-3. **`Etal`** (boutique, achat à la manière de A Link to the Past, sans menu) : `id`, `contenu` (nom d'un `.tres` de `resources/pickups/`), `prix` (rubis), `stock` (0 = illimité, 1 = unique, mémorisé par `id`), plus `etape_min` / `etape_max`. Point posé sur la case du comptoir ; le prix s'affiche au-dessus.
-4. **`Porte` généralisée** : propriété `apparence` (`porte` par défaut, `pont_levis`, `tronc`, `rocher`, `eboulis`) ; rectangle de taille libre (pont 2×2, tronc 2×1, rocher 1×1) et **sans `Sortie`** quand elle bloque un passage d'overworld. Type `interrupteur` pour le pont et le rocher (ouverts par un `Interrupteur`), et le tronc n'a pas besoin de type : il porte `etape_max` 1 (l'objet n'existe plus à l'étape 2). Image : `art/puzzles/porte_<apparence>.png`.
-5. **`MurFissure`** : propriété `apparence` (`mur` par défaut, `eboulis` pour la rive) ; peut recouvrir une `Sortie` de même rectangle (comme une `Porte`), la `Sortie` s'activant une fois le mur détruit. Utilise `IBombDestructible`.
-6. **`Brume`** : rectangle ; propriété `densite` = liste de 6 valeurs (une par étape de 0 à 5, ex. `0.5,0.8,0.45,0.3,0.7,0`) ; ne bloque pas le passage. Calque `Dessus` ou superposition de brume avec la teinte de couleur de la zone.
-7. **`Poule`** : point, `id` (`village_poule_01` à `05`) ; marcher dessus ou la frapper l'attrape ; compteur `GameState.Chickens` ; `pip` donne le quart de cœur à 5 (récompense mémorisée par `village_quart_coeur_poules`).
-8. **`Marqueur`** : point, `id`, pour les cinématiques (où se place Pip, où marche Corvan) sans coordonnées en dur dans le code.
-9. **`Ennemi`** : propriété `apparition` (`chargement` par défaut, `scenario` : n'existe que lancé par une cinématique, pour la scène du Sanglier sur la place).
-10. **`Interrupteur`** : `symbole` `feuille` + mode `fleche` sert de cible camouflée ; aucune nouveauté, mais l'art doit la rendre discrète.
-11. **Propriétés de carte** `monde_x`, `monde_y` (facultatives). Les intérieurs sont en `camera` = `ecran`.
-12. **Sorties de bord à plusieurs cases** : le `.tmx` actuel n'en a que de 1 case ; les rectangles de 2 cases de large (et 64×32) sont à confirmer côté code. Un seul Spawn par passage.
-13. **Pour le développeur, en code** : `GameState.StoryStage` (sauvegardé, `SaveData` version +1), boîte de dialogue PNJ avec défilement des lettres (une `DialogueBox` existe pour les boss), `Etal`, `Poule`, système de cinématiques, `TitleScreen` : nouvelle partie dans la forge (`maps/interieurs/forge.tmx`, spawn `depuis_village`), pause de jeu pendant les achats, ressources `.tres` des objets : `quart_de_coeur` (4 = un cœur), `plume_corbeau`, `potion_rouge`, `petit_coeur`, `fleches_10`, `bombes_5`, `huile_lanterne`, `grand_carquois`, `grand_sac_bombes`.
-14. **Pour le développeur, à vérifier** : la flèche passe-t-elle au-dessus d'un ravin (comme au-dessus d'un trou) ? Une `Porte` peut-elle être posée hors d'une `Sortie` ? Pip suiveur d'une carte à l'autre (village + forêt sud) ?
+- `etape_min` / `etape_max` sur tout objet du calque `Objets` ; étapes 0 à 4 (`GameState.StoryStage`).
+- `PNJ` : `id`, `sprite`, `direction` (`down` par défaut, `up`, `left`, `right`), `errance` (rayon en px, 0 = immobile). Plus de `comportement`. Dialogues en JSON (`resources/dialogues/<id>.json`, blocs par `stage` et drapeaux), clés `DLG_<PNJ>_<étape>_<n>`.
+- `Article` (et non `Etal`) : `id`, `contenu`, `prix`, `unique`, `etape` (étape minimale), `drapeau`, `vendeur`.
+- `Porte` généralisée (`apparence` : `porte`, `pont_levis`, `tronc`, `rocher`, `rocher_eau`, `eboulis`, et `mur_rune` pour la lanterne), possible sans `Sortie`. `MurFissure` (`apparence` `mur` / `eboulis`). `Brume` : `densite` = **5 valeurs** (étapes 0 à 4). `Poule` gérée (`errance`, flag `poules_toutes`). `Marqueur`, `Ennemi.apparition`, `Scenario` et cinématiques JSON, propriétés de carte `monde_x` / `monde_y`.
+- Ravin (village et montagne 80-95) : les flèches le survolent ; `TileFeatures` s'en charge.
+- Teinte d'éclipse : à l'étape 3, imposée par le code pour les zones concernées (proposition de `maps/chateau/plan.md` §10.3, point 6) ; plus de propriété de carte.
+- Ressources d'objets dans `resources/pickups/` (quart de cœur, plume de corbeau, grand carquois, grand sac de bombes…) ; pas d'`huile_lanterne`.
 
 ### À demander au graphiste
 
@@ -330,8 +324,8 @@ Dans l'ordre d'utilité (le plan d'un tileset se livre avant son dessin, comme d
 2. **`interieurs`** (nouveau `.tsx`) : sols (bois, pierre), murs, étagères d'herbes et de livres, comptoir, étal, lit, établi, fourneau 3×2 (froid et allumé), enclume avec corbeau, table, registres, roche de cave.
 3. **Sprites PNJ** : Pip, Tobias, Hulda, Isolde, Garrick, Corvan, 2 villageois, poule (marche, picore).
 4. **`montagne`**, **`lac`** (rive, ponton, éboulis), **`route_chateau`** (route pavée, falaise sombre, grotte noire, façade du château) : dans l'ordre des étapes de production.
-5. **Images de `Porte`** : `pont_levis` (relevé et abaissé, 64×64), `tronc`, `rocher`, `eboulis` ; cible camouflée (feuillage) ; texture de brume.
-6. Objets : quart de cœur, plume de corbeau, grand carquois, grand sac de bombes, potion rouge, huile, icône de prix.
+5. **Images de `Porte`** : `pont_levis` (relevé et abaissé, 64×64), `tronc`, `rocher`, `eboulis`, `mur_rune` (existe) ; cible camouflée (feuillage) ; texture de brume.
+6. Objets : quart de cœur, plume de corbeau, grand carquois, grand sac de bombes, potion rouge, icône de prix.
 
 ## 6. Ordre de production conseillé (phase 6)
 
@@ -340,17 +334,17 @@ Objectif : une **boucle jouable village > forêt > temple > retour au village** 
 1. **Valider ce plan**, puis demander au graphiste le plan des tilesets `village` et `interieurs` ; au développeur : `StoryStage`, `PNJ` + dialogues, `etape_min/max`.
 2. **`foret_sud.tmx` et retouches de `foret_temple.tmx`** : n'utilisent que le tileset `foret` existant, donc faisables tout de suite. On peut déjà tester le chemin forêt sud > temple.
 3. **`village.tmx` (blockout)**, puis **`forge.tmx`** avec la statue : nouvelle partie dans la forge, sortie sur la place, sortie ouest vers la forêt. La boucle est jouable ; Pip, Tobias et Corvan sont des placeholders.
-4. **Retour au village** après le boss : Pip, Tobias et Hulda parlent (étape 2), flèches en boutique : `maison_hulda.tmx`, `boutique_garrick.tmx` avec les `Etal`.
+4. **Retour au village** après le boss : Pip, Tobias et Hulda parlent (étape 1), flèches en boutique : `herboristerie.tmx`, `boutique.tmx` avec les `Article`.
 5. **Montagne, écran sud-ouest** (`montagne.tmx` réduit à un palier, le ravin, la cible, le pont-levis et la fermeture du reste par la falaise) : boucle « arc obtenu > pont abaissé ».
 6. Secrets de la forêt (cible cachée, souche creuse, plume), poules de Pip, `archives_isolde.tmx`.
 7. Scènes d'ouverture (cinématiques) et teintes jour/brume/éclipse.
 8. Donjon 2 : reste de `montagne.tmx` et Mine ; éboulis du lac et `lac.tmx` partiel (rive), `grotte_sw`, `cave_garrick` (bombes).
 9. Donjon 3 : reste de `lac.tmx`, `route_falaise.tmx`, grotte noire, `chateau.tmx`.
-10. Évolution du village (étapes 3 à 5), épilogue.
+10. Évolution du village (étapes 2 à 4), épilogue.
 
 ## 7. Cohérence avec les contraintes de progression
 
-- Chaque blocage est visible avant d'être franchissable : ravin et cible (nord), éboulis (sud), fissure (est du village et grotte SO), grotte noire (route), tronc (raccourci).
+- Chaque blocage est visible avant d'être franchissable : ravin et cible (nord), éboulis (sud), fissure (est du village et grotte SO), mur à rune de la grotte (route), tronc (raccourci).
 - Rien n'exige un objet avant l'endroit où on l'obtient : l'arc est dans le Temple (forêt, ouvert), la cible est ensuite au ravin ; les bombes sont dans la Mine, derrière le pont ; la lanterne est dans le Sanctuaire, derrière l'éboulis. Les secrets de la forêt demandent l'arc et sont facultatifs. Aucune soft-lock : le tronc, la cible et le rocher sont des états sauvegardés ou dépendants de l'étape.
 - Les blocs poussables ne sont pas utilisés dans l'overworld.
 
@@ -360,11 +354,11 @@ Objectif : une **boucle jouable village > forêt > temple > retour au village** 
 2. Une carte par zone, 8 cartes extérieures, avec passages de 2 cases (section 1).
 3. Le village sur 40×11 (hauteur imposée par la grille) avec 10 bâtiments dont 4 enterables, plus la cave.
 4. Le ravin et le pont-levis sont dans `montagne.tmx` et non dans le village ; la brume ne bloque pas (on voit les obstacles avant d'avoir l'arc).
-5. Route de l'est ouverte dès le début mais en cul-de-sac (grotte noire visible) ; sinon fermer la sortie est par une barrière jusqu'à l'étape 3.
+5. Route de l'est ouverte dès le début mais en cul-de-sac : **tranché** (2026-11-03), la grotte est barrée par un mur à rune visible, ouvert par la lanterne.
 6. Raccourci Tobias (village vers la moitié basse du temple, ouvert à l'étape 2) : à garder ou à retirer ?
 7. Prix : petit cœur chez Hulda à 10 rubis ? Quart de cœur de Garrick à 150 comme dans la roadmap.
 8. Intérieurs en 20×11 avec fond noir (aucune caméra spéciale) plutôt que des cartes réellement plus petites.
 9. Habitants supplémentaires (2 villageois anonymes) ; Pip suiveur limité au village et à la forêt sud.
 10. Les 2 buissons du passage sud de `foret_temple` : ils n'existent pas dans le fichier actuel. À ajouter (si l'épée coupe) ou à oublier ?
-11. Nouvelles classes et propriétés de la section 5 (`etape_min/max`, `Etal`, `Poule`, `Brume`, `Marqueur`, `apparence` sur `Porte` et `MurFissure`, `apparition`), à inscrire au `CLAUDE.md`.
+11. Nouvelles classes et propriétés : **faites**, inscrites au `CLAUDE.md` (section 5 remplacée).
 12. Huit intérieurs au lieu des 5 ou 6 annoncés, et l'ordre de production de la section 6.
