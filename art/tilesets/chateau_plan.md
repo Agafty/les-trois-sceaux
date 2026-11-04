@@ -1,12 +1,12 @@
 # Plan du tileset `chateau` — Le château de Morvath, intérieur (pierre sombre, tapis, armures, fosse de ronces, arène de Corvan)
 
-> Fichier généré par `tools/sprites/chateau.py` : modifier le script, pas ce fichier. **État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro).
+> Fichier généré par `tools/sprites/chateau.py` : modifier le script, pas ce fichier. **État : FINAL** (dessin final de toutes les tuiles ; les numéros sont ceux du plan, aucune tuile n'a bougé).
 
 - Image : `art/tilesets/chateau.png`, 256×704 px, 8 colonnes × 22 lignes de tuiles 32×32, sans marge ni espacement (176 cases). Tileset Tiled : `maps/tilesets/chateau.tsx` (collisions et terrains définis). `art/tilesets/chateau_numeros.png` = la planche ×2 avec les numéros.
 - **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 19 à 22 (ids 144 à 175) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
 - Collisions en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche). Les terrains (Wang par coins) sont dans le panneau Terrains de Tiled.
-- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px. Palette finale : pierre violette sombre (comme la façade de `route_chateau`), tapis rouge sombre, ronces noires, symboles dorés.
-- En PLAN, **la couleur indique la famille** (pierre sombre violette / tapis (rouge sombre) / mur (violet foncé) / porte (orange) / sol d'arène (violet clair) / symboles (or) / socle / escalier (beige) / armure / colonne / fissuré à la bombe (violet vif) / ronces (noir-violet) / rune (cyan) / niche d'Œil (or) / tenture (magenta) / blason / cercle des sceaux (mauve)) ; une zone plus sombre dans une tuile = zone solide.
+- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px sur les objets (pas sur les dalles de sol). Palette : pierre violette sombre (dalles, murs presque noirs, faces violet clair), tapis rouge sombre à bordure d'or, ronces noires et violettes, runes cyan, symboles dorés. Dessin : `tools/sprites/chateau_art.py` (+ `chateau_objets.py`, `chateau_pierre.py`) ; les bords de la fosse (81 à 94) sont fondus par `tools/sprites/fondus.py chateau`.
+- Les collisions sont dans le tileset (colonne Collision de chaque tableau).
 - **Pas de trou mortel** (ids 58-66 vides) ; la **fosse de ronces** (80-95) est un ravin : on ne la franchit pas, les flèches passent.
 - Salles : `salle_01` à `salle_04` (20×11) et `salle_boss` (20×22) de `maps/chateau/plan.md` ; la cour et la façade sont dans `route_chateau`.
 
@@ -17,7 +17,7 @@ Tileset `chateau` : 8 colonnes, id local Tiled = ligne × 8 + colonne. Salles 01
 | Famille | Ids | Calque | À savoir |
 | --- | --- | --- | --- |
 | **FOSSE DE RONCES = RAVIN** (`TileFeatures`, `TileRules.IsRavine`) | **80 à 95** (80 = sol de base, 81 à 94 bords, 95 = ronces pleines) | `Murs` (bords, 81 à 95) ; `Sol` (80) | **Mêmes ids que le ravin de `village` et `montagne` : ajouter le tileset `chateau` à `TileRules.IsRavine`** (aujourd'hui limité à `village` / `montagne`). Collision par quarts de case dans le `.tsx`, déplacée par le code dans la couche physique « ravin » : Brann et les ennemis ne passent pas, **les flèches passent** (salle 01 : les Œils sont derrière deux fosses). Aucun trou mortel : `HoleRules` ne doit pas reconnaître `chateau`. |
-| **MURS FISSURÉS** fermé -> ouvert (`TileRules`, salle 03) | **72 -> 76** (haut), **73 -> 77** (bas), **74 -> 78** (gauche), **75 -> 79** (droite) | fermés `Murs`, ouverts `Decor` | Comme `sanctuaire` : la bombe retire la tuile fermée de `Murs`, le code pose la version ouverte sur `Decor` (ou elle est déjà posée dessous). Ouverts opaques (trou noir). La salle 03 n'utilise qu'une orientation : le mur de la cellule est vertical (74 ou 75). |
+| **MURS FISSURÉS** fermé -> ouvert (`TileRules`, salle 03) | **72 -> 76** (haut), **73 -> 77** (bas), **74 -> 78** (gauche), **75 -> 79** (droite) | fermés `Murs`, ouverts `Decor` | Comme `sanctuaire` : la bombe retire la tuile fermée de `Murs`, le code pose la version ouverte sur `Decor` (ou elle est déjà posée dessous). Ouverts entièrement opaques (brèche noire irrégulière, gravats devant). La salle 03 n'utilise qu'une orientation : le mur de la cellule est vertical (74 ou 75). |
 | **Escaliers** | 56 (montant), 57 (descendant) | `Sol` | Réservés par cohérence : le château n'a pas d'escalier dans le plan (pas de `Sortie` `transition=escalier`). |
 | **Ids VIDES** | 31 à 39 et 58 à 66 | — | Réservés (trous de passage / trous mortels). **Aucun trou : `HoleRules` / `HoleWatcher` n'ont rien à reconnaître ici.** |
 | **Mur à rune** (`Porte` `apparence=mur_rune`, type `lanterne`) | tuile dessous : 102 `alcove_sol_rune` | `Sol` | Salle 03 : la `Porte` `chateau_porte_04` (64×32, image `porte_mur_rune.png`) couvre 2 cases de 102 dans la ligne du mur. Mur autour : 103 `mur_rune_grave`. |
@@ -257,4 +257,4 @@ Dans Tiled : panneau **Terrains**, choisir le terrain puis le pinceau de terrain
 - Porte : remplacer la tuile de mur par `porte_<côté>`, poser `porte_<côté>_dessus` dans la même case de `Dessus`, puis l'objet `Porte`.
 - Grille de la salle 03 (`chateau_porte_03`) : c'est une `Porte` dont l'image `art/puzzles/porte_*_chateau.png` est à dessiner ; sous elle, du sol (`pierre_*`).
 - Lumière : braseros et torches sont des objets (`Torche`) ; teinte d'éclipse appliquée par le code.
-- Aperçu : `art/tilesets/chateau_apercu.png` reconstitue `salle_01`, `salle_03` et `salle_boss` (carrés colorés = objets Tiled).
+- Aperçu : `art/tilesets/chateau_apercu.png` reconstitue les vraies cartes (`salle_01` à `salle_04` et `salle_boss`) avec les tuiles finales (`tools/sprites/chateau_apercu_cartes.py`) ; les objets Tiled ne sont pas dessinés.

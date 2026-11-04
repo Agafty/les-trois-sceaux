@@ -274,10 +274,53 @@ def apercu():
     return maps
 
 
+def final_md(md):
+    md = md.replace('**État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro)',
+                    '**État : FINAL** (dessin final de toutes les tuiles ; les numéros sont ceux du plan, aucune tuile n\'a bougé)')
+    md = md.replace('**État : PLAN**', '**État : FINAL**')
+    a = md.index('- Vue de dessus 3/4')
+    b = md.index(chr(10), a)
+    b2 = md.index(chr(10), b + 1)
+    md = md[:a] + ('- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d\'1 px sur les objets (pas sur les dalles de sol). Palette : pierre violette '
+                   'sombre (dalles, murs presque noirs, faces violet clair), tapis rouge sombre à bordure d\'or, ronces noires et violettes, '
+                   'runes cyan, symboles dorés. Dessin : `tools/sprites/chateau_art.py` (+ `chateau_objets.py`, `chateau_pierre.py`) ; '
+                   'les bords de la fosse (81 à 94) sont fondus par `tools/sprites/fondus.py chateau`.') + md[b:]
+    a = md.index('- En PLAN, **la couleur')
+    b = md.index(chr(10), a)
+    md = md[:a] + '- Les collisions sont dans le tileset (colonne Collision de chaque tableau).' + md[b:]
+    md = md.replace('Ouverts opaques (trou noir).', 'Ouverts entièrement opaques (brèche noire irrégulière, gravats devant).')
+    md = md.replace('aplats colorés', 'dessin final')
+    md = md.replace('Aperçu : `art/tilesets/chateau_apercu.png` reconstitue `salle_01`, `salle_03` et `salle_boss` (carrés colorés = objets Tiled).',
+                    'Aperçu : `art/tilesets/chateau_apercu.png` reconstitue les vraies cartes (`salle_01` à `salle_04` et `salle_boss`) avec les tuiles finales (`tools/sprites/chateau_apercu_cartes.py`) ; les objets Tiled ne sont pas dessinés.')
+    return md
+
+
+def main_final():
+    import final_lib
+    import chateau_art
+    import fondus
+    import fondus_lib
+    S.finish()
+    px = final_lib.render(S, chateau_art.REG)
+    out_t = os.path.join(ROOT, 'art', 'tilesets')
+    save_png(os.path.join(out_t, 'chateau.png'), px)
+    fondus.STYLES['chateau'] = {'Fosse': fondus.ravin}
+    fondus.patch('chateau')
+    px2 = fondus_lib.read_png(os.path.join(out_t, 'chateau.png'))
+    px2 = [[None if p[3] == 0 else tuple(p) for p in row] for row in px2]
+    save_png(os.path.join(out_t, 'chateau_numeros.png'), final_lib.numbered(S, px2))
+    with open(os.path.join(out_t, 'chateau_plan.md'), 'w', encoding='utf-8', newline=chr(10)) as f:
+        f.write(final_md(S.md('chateau.py')))
+    print('chateau : dessin final,', len(S.tiles), 'tuiles.')
+
+
 def main():
     S.save_all('chateau.py')
     apercu()
 
 
 if __name__ == '__main__':
-    main()
+    if '--plan' in sys.argv:
+        main()
+    else:
+        main_final()

@@ -291,10 +291,45 @@ def apercu():
     return maps
 
 
+def final_md(md):
+    md = md.replace('**État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro)',
+                    '**État : FINAL** (dessin final de toutes les tuiles ; les numéros sont ceux du plan, aucune tuile n\'a bougé)')
+    md = md.replace('**État : PLAN**', '**État : FINAL**')
+    a = md.index('- Vue de dessus 3/4')
+    b = md.index(chr(10), a)
+    md = md[:a] + ('- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d\'1 px sur les objets (pas sur les sols). Palette : pavés gris-violet, '
+                   'herbe d\'éclipse vert froid éteint, falaise brun clair, grotte brun très sombre, façade et cour pierre violette, runes cyan, ronces noires ; '
+                   'les mêmes tuiles servent le jour (route, étapes 0 à 2) et sous la teinte d\'éclipse (code). '
+                   'Dessin : `tools/sprites/route_chateau_art.py` (+ `chateau_art.py`, `chateau_objets.py`, `chateau_pierre.py`).') + md[b:]
+    a = md.index('- En PLAN, **la couleur')
+    b = md.index(chr(10), a)
+    md = md[:a] + '- Les collisions sont dans le tileset (colonne Collision de chaque tableau).' + md[b:]
+    md = md.replace('Les versions ouvertes sont opaques (arche noire).', 'Les versions ouvertes sont entièrement opaques (brèche noire irrégulière, gravats devant).')
+    md = md.replace('Aperçu : `art/tilesets/route_chateau_apercu.png` reconstitue les trois cartes ASCII de `maps/chateau/plan.md` avec les aplats (carrés colorés = objets Tiled).',
+                    'Aperçu : `art/tilesets/route_chateau_apercu.png` reconstitue les vraies cartes (`route_falaise`, `passage_falaise`, `chateau`) avec les tuiles finales (`tools/sprites/chateau_apercu_cartes.py`) ; les objets Tiled ne sont pas dessinés.')
+    return md
+
+
+def main_final():
+    import final_lib
+    import route_chateau_art
+    S.finish()
+    px = final_lib.render(S, route_chateau_art.REG)
+    out_t = os.path.join(ROOT, 'art', 'tilesets')
+    save_png(os.path.join(out_t, 'route_chateau.png'), px)
+    save_png(os.path.join(out_t, 'route_chateau_numeros.png'), final_lib.numbered(S, px))
+    with open(os.path.join(out_t, 'route_chateau_plan.md'), 'w', encoding='utf-8', newline=chr(10)) as f:
+        f.write(final_md(S.md('route_chateau.py')))
+    print('route_chateau : dessin final,', len(S.tiles), 'tuiles.')
+
+
 def main():
     S.save_all('route_chateau.py')
     apercu()
 
 
 if __name__ == '__main__':
-    main()
+    if '--plan' in sys.argv:
+        main()
+    else:
+        main_final()

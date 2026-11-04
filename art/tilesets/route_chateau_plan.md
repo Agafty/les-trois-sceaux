@@ -1,12 +1,12 @@
 # Plan du tileset `route_chateau` — La route de la falaise, la grotte noire et la cour du château (fin du jeu)
 
-> Fichier généré par `tools/sprites/route_chateau.py` : modifier le script, pas ce fichier. **État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro).
+> Fichier généré par `tools/sprites/route_chateau.py` : modifier le script, pas ce fichier. **État : FINAL** (dessin final de toutes les tuiles ; les numéros sont ceux du plan, aucune tuile n'a bougé).
 
 - Image : `art/tilesets/route_chateau.png`, 256×768 px, 8 colonnes × 24 lignes de tuiles 32×32, sans marge ni espacement (192 cases). Tileset Tiled : `maps/tilesets/route_chateau.tsx` (collisions et terrains définis). `art/tilesets/route_chateau_numeros.png` = la planche ×2 avec les numéros.
 - **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 21 à 24 (ids 160 à 191) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
 - Collisions en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche). Les terrains (Wang par coins) sont dans le panneau Terrains de Tiled.
-- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px. Palette finale : extérieur sous éclipse (violets froids, verts éteints), grotte brun sombre, château pierre violette ; les mêmes tuiles servent le jour (route, étapes 0 à 2) et sous la teinte d'éclipse (code).
-- En PLAN, **la couleur indique la famille** (pavés de la route (gris) / herbe d'éclipse (vert froid) / dalles de la cour (violet-gris) / sol de grotte (brun) / falaise (brun clair) / roche de grotte (brun sombre) / façade (violet) / portail (mauve) / créneaux / rempart / niche de l'Œil (or) / poterne (orange-brun) / fissuré à la bombe (violet vif) / rocher / statue / brasero (orange) / rune (cyan)) ; une zone plus sombre dans une tuile = zone solide.
+- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px sur les objets (pas sur les sols). Palette : pavés gris-violet, herbe d'éclipse vert froid éteint, falaise brun clair, grotte brun très sombre, façade et cour pierre violette, runes cyan, ronces noires ; les mêmes tuiles servent le jour (route, étapes 0 à 2) et sous la teinte d'éclipse (code). Dessin : `tools/sprites/route_chateau_art.py` (+ `chateau_art.py`, `chateau_objets.py`, `chateau_pierre.py`).
+- Les collisions sont dans le tileset (colonne Collision de chaque tableau).
 - Cartes : `route_falaise`, `passage_falaise`, `chateau` (cour) de `maps/chateau/plan.md`. Les salles intérieures du château utilisent le tileset `chateau`.
 - **Pas de trou ni de ravin** dans ce tileset (ids 58-66 et 80-95 vides).
 
@@ -16,7 +16,7 @@ Tileset `route_chateau` : 8 colonnes, id local Tiled = ligne × 8 + colonne. Un 
 
 | Famille | Ids | Calque | À savoir |
 | --- | --- | --- | --- |
-| **MURS FISSURÉS** fermé -> ouvert (`TileRules`) | **72 -> 76** (haut, **utilisé : la poterne de la cour**), 73 -> 77 (bas), 74 -> 78 (gauche), 75 -> 79 (droite) | fermés `Murs`, ouverts `Decor` | Comme `sanctuaire` 72 -> 76 : la bombe retire la tuile fermée de `Murs`, le code pose la version ouverte sur `Decor` (ou elle est déjà posée dessous). Les versions ouvertes sont opaques (arche noire). Seule l'orientation `haut` sert dans le plan ; les trois autres sont réservées et peuvent rester en aplat. La poterne se peint en 72 (fissurée) sur la dernière rangée de la façade, case (4,4) de `chateau`. |
+| **MURS FISSURÉS** fermé -> ouvert (`TileRules`) | **72 -> 76** (haut, **utilisé : la poterne de la cour**), 73 -> 77 (bas), 74 -> 78 (gauche), 75 -> 79 (droite) | fermés `Murs`, ouverts `Decor` | Comme `sanctuaire` 72 -> 76 : la bombe retire la tuile fermée de `Murs`, le code pose la version ouverte sur `Decor` (ou elle est déjà posée dessous). Les versions ouvertes sont entièrement opaques (brèche noire irrégulière, gravats devant). Seule l'orientation `haut` sert dans le plan ; les trois autres sont réservées et peuvent rester en aplat. La poterne se peint en 72 (fissurée) sur la dernière rangée de la façade, case (4,4) de `chateau`. |
 | **Poterne** (famille) | 128 `poterne_fermee` (murée sans fissure), 72 `poterne_fissuree`, 76 `poterne_ouverte`, 129 arche (Dessus), 130 seuil (Sol) | voir tableau | `poterne_fermee` n'est pas dans le plan (la fissure se voit dès l'arrivée) : variante de repli. |
 | **Escaliers** | 56 `perron_montant`, 57 `perron_descendant` | `Sol` | Marches du perron devant le portail. **Aucune `Sortie` `transition=escalier` prévue dans ce tileset** (réservés pour la cohérence avec les autres donjons). |
 | **Ids VIDES** | 31 à 39, 58 à 66, **80 à 95** | — | Réservés (trous de passage / trous mortels / **ravin**). Ce tileset n'a ni trou ni ravin : **ne PAS ajouter `route_chateau` à `HoleRules`, `HoleWatcher` ni `TileRules.IsRavine`** (le fossé de ronces est dans `chateau`). |
@@ -270,4 +270,4 @@ Dans Tiled : panneau **Terrains**, choisir le terrain puis le pinceau de terrain
 - Porte `mur_rune` : l'image `art/puzzles/porte_mur_rune.png` existe déjà (64×32 : fermée, ouverte).
 - Lumière : braseros et lueurs sont des objets (`Torche`) ou gérés par le code (grotte en `penombre`), pas des tuiles.
 - Teinte d'éclipse (étape 3) : appliquée par le code sur toute la salle, il n'y a pas de variante de couleur dans le PNG.
-- Aperçu : `art/tilesets/route_chateau_apercu.png` reconstitue les trois cartes ASCII de `maps/chateau/plan.md` avec les aplats (carrés colorés = objets Tiled).
+- Aperçu : `art/tilesets/route_chateau_apercu.png` reconstitue les vraies cartes (`route_falaise`, `passage_falaise`, `chateau`) avec les tuiles finales (`tools/sprites/chateau_apercu_cartes.py`) ; les objets Tiled ne sont pas dessinés.
