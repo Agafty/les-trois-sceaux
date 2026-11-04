@@ -44,6 +44,17 @@ public partial class Room : Node2D
     [Export(PropertyHint.Range, "0.5,6,0.1")]
     public float VictoryExitDelay { get; set; } = 2.2f;
 
+    /// <summary>
+    /// Reprise après la mort de Brann dans cette salle : scène où il repart (ex. la statue de l'antichambre avant le boss final)
+    /// avec toute sa vie. Vide = comportement habituel (la salle est rechargée à son point d'entrée, avec 3 cœurs).
+    /// </summary>
+    [Export(PropertyHint.File, "*.tscn")]
+    public string DeathRespawnScene { get; set; } = "";
+
+    /// <summary>Id du Spawn d'arrivée dans <see cref="DeathRespawnScene"/>.</summary>
+    [Export]
+    public string DeathRespawnSpawn { get; set; } = "";
+
     [ExportGroup("Variante rouge")]
     /// <summary>Multiplicateur de points de vie d'un ennemi de variante « rouge ».</summary>
     [Export(PropertyHint.Range, "1,5,0.5")]
@@ -240,6 +251,8 @@ public partial class Room : Node2D
 
     public override void _Ready()
     {
+        if (!string.IsNullOrEmpty(DeathRespawnScene) && string.IsNullOrEmpty(DeathRespawnSpawn))
+            GD.PushWarning($"{Name} : DeathRespawnScene est renseigné sans DeathRespawnSpawn, Brann arrivera sans point d'entrée.");
         SetPhysicsProcess(false); // activé seulement par le mode caméra « ecran »
         // Le HUD vit avec la salle (pas d'autoload supplémentaire) ; il ne dépend que de GameState.
         var hudScene = GD.Load<PackedScene>("res://scenes/ui/hud.tscn"); // mis en cache par Godot
@@ -647,6 +660,8 @@ public partial class Room : Node2D
         if (state.IsCollected(bossId))
         {
             SpawnBossRewards(bossId, boss.DropsHeartContainer, boss.SealPickupName, center, false);
+            string pending = boss.PendingCinematicWhenDefeated(state);
+            if (!string.IsNullOrEmpty(pending)) ReplayCinematicWhenFree(pending);
             boss.Free(); // jamais ajouté à l'arbre
             RemoveMarker(marker);
             return;
@@ -674,6 +689,23 @@ public partial class Room : Node2D
         };
         boss.Defeated += () => OnBossDefeated(boss, center);
         RemoveMarker(marker);
+    }
+
+    // Boss vaincu mais scène de fin jamais terminée (jeu quitté pendant la cinématique) : on la relance dès que Brann est libre.
+    private void ReplayCinematicWhenFree(string cinematicId)
+    {
+        var timer = new Timer { Name = "RelanceCinematique", WaitTime = 0.4, OneShot = false, Autostart = true };
+        timer.Timeout += () =>
+        {
+            if (Cinematics == null || Cinematics.IsPlaying || GetTree().Paused) return;
+            var player = FindPlayer(this);
+            if (player == null || player.IsDead || !player.CanInteract) return;
+            if (GetNodeOrNull<SceneManager>("/root/SceneManager")?.IsTransitioning == true) return;
+            var data = CinematicLibrary.Get(cinematicId);
+            timer.QueueFree();
+            if (data != null) _ = Cinematics.Play(data);
+        };
+        AddChild(timer);
     }
 
     // Limites où le centre du boss peut aller : la carte entière moins l'épaisseur des murs et son rayon.

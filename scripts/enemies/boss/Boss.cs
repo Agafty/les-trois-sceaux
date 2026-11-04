@@ -54,4 +54,10 @@ public abstract partial class Boss : CharacterBody2D
 
     /// <summary>Limites de l'arène (monde), réglées par la Room d'après la carte ; vide = valeur par défaut du boss.</summary>
     public Rect2 ArenaBounds { get; set; }
+
+    /// <summary>
+    /// Appelé par la Room quand le boss est déjà vaincu à l'entrée dans la salle : id d'une cinématique à relancer (jeu quitté pendant
+    /// la scène de fin), ou vide. Le boss n'est pas dans l'arbre à ce moment.
+    /// </summary>
+    public virtual string PendingCinematicWhenDefeated(GameState state) => "";
 }

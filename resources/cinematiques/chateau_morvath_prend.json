@@ -1,0 +1,16 @@
+{
+  "id": "chateau_morvath_prend",
+  "drapeau_fin": "morvath_eveille",
+  "passable": true,
+  "etapes": [
+    { "action": "regarder", "acteur": "brann", "vers": "corvan_defi" },
+    { "action": "secousse", "force": 4, "duree": 1.2 },
+    { "action": "son", "nom": "boss_rugit" },
+    { "action": "teinte", "couleur": "#7a4a9a", "duree": 2.0 },
+    { "action": "attendre", "secondes": 0.4 },
+    { "action": "dialogue", "orateur": "PNJ_MORVATH", "lignes": [ "DLG_CH_MORVATH_1" ] },
+    { "action": "dialogue", "orateur": "PNJ_CORVAN", "lignes": [ "DLG_CH_MORVATH_2" ] },
+    { "action": "dialogue", "orateur": "PNJ_MORVATH", "lignes": [ "DLG_CH_MORVATH_3" ] },
+    { "action": "drapeau", "nom": "morvath_eveille" }
+  ]
+}

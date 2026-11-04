@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/boss/BossBubble.cs" id="1_bubble"]
+[ext_resource type="Script" path="res://scripts/components/Health.cs" id="2_health"]
+[ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="3_hurtbox"]
+
+[sub_resource type="CircleShape2D" id="hurt_shape"]
+radius = 14.0
+
+[node name="BulleEau" type="Node2D"]
+script = ExtResource("1_bubble")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")
+MaxHealth = 1
+
+[node name="HurtBox" type="Area2D" parent="."]
+script = ExtResource("3_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+shape = SubResource("hurt_shape")

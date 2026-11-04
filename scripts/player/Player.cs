@@ -71,6 +71,7 @@ public partial class Player : CharacterBody2D
     private float _blinkTimer;
     private Vector2 _knockbackVelocity;
     private float _respawnTimer = -1f;
+    private Room _deathRoom; // salle où Brann est mort (reprise ailleurs si elle le demande)
     private Camera2D _camera;
     private float _fallTimer;
     private Vector2 _fallRespawn;
@@ -156,7 +157,8 @@ public partial class Player : CharacterBody2D
     {
         _state = State.Mort;
         // HealthChanged(0) vient d'être recopié dans GameState ; on y remet la vie de reprise sans signal.
-        _gameState.PrepareRespawn();
+        _deathRoom = FindRoom();
+        _gameState.PrepareRespawn(_deathRoom != null && !string.IsNullOrEmpty(_deathRoom.DeathRespawnScene));
         Velocity = Vector2.Zero;
         _knockbackVelocity = Vector2.Zero;
         _invincibleTimer = 0f;
@@ -171,6 +173,13 @@ public partial class Player : CharacterBody2D
         // Filet de sécurité si AnimationFinished n'arrive jamais (animation absente).
         _respawnTimer = RespawnDelay + 2f;
         GD.Print("Brann est mort");
+    }
+
+    private Room FindRoom()
+    {
+        for (Node n = GetParent(); n != null; n = n.GetParent())
+            if (n is Room room) return room;
+        return null;
     }
 
     private void OnAnimationFinished()
@@ -597,7 +606,10 @@ public partial class Player : CharacterBody2D
         if (_respawnTimer > 0f) return;
 
         // Si refusé (fondu en cours), on réessaie à la frame suivante.
-        if (_sceneManager.ReloadCurrentRoom())
+        bool started = _deathRoom != null && IsInstanceValid(_deathRoom) && !string.IsNullOrEmpty(_deathRoom.DeathRespawnScene)
+            ? _sceneManager.GoToScene(_deathRoom.DeathRespawnScene, _deathRoom.DeathRespawnSpawn)
+            : _sceneManager.ReloadCurrentRoom();
+        if (started)
             _respawnTimer = -1f;
     }
 

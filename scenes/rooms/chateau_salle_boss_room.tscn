@@ -7,6 +7,8 @@
 [node name="ChateauSalleBoss" type="Node2D"]
 script = ExtResource("room_script")
 Zone = "chateau"
+DeathRespawnScene = "res://scenes/rooms/chateau_salle_04_room.tscn"
+DeathRespawnSpawn = "depuis_sud"
 
 [node name="Map" parent="." instance=ExtResource("map")]
 

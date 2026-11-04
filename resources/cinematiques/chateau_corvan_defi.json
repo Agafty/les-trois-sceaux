@@ -1,0 +1,12 @@
+{
+  "id": "chateau_corvan_defi",
+  "drapeau_fin": "corvan_defie",
+  "passable": true,
+  "etapes": [
+    { "action": "regarder", "acteur": "brann", "vers": "corvan_defi" },
+    { "action": "attendre", "secondes": 0.5 },
+    { "action": "dialogue", "orateur": "PNJ_CORVAN", "lignes": [ "DLG_CH_DEFI_1" ] },
+    { "action": "dialogue", "orateur": "PNJ_BRANN", "lignes": [ "DLG_CH_DEFI_2" ] },
+    { "action": "dialogue", "orateur": "PNJ_CORVAN", "lignes": [ "DLG_CH_DEFI_3", "DLG_CH_DEFI_4" ] }
+  ]
+}

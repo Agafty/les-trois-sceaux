@@ -310,8 +310,18 @@ public partial class Door : StaticBody2D, ILanternReactive
         int frameH = Mathf.Max(1, Mathf.RoundToInt(CellSize.Y));
         string textureName = DoorRules.TextureName(Kind, Appearance);
         string path = $"res://art/puzzles/porte_{textureName}.png";
+        // Rectangle vertical (plus haut que large) : porte_<nom>_v.png si le graphiste l'a livrée (ex. mur à rune de 32x64).
+        // Ordre : porte_<nom>_<zone>_v.png, puis porte_<nom>_v.png, puis (rectangle horizontal) la variante de zone.
+        bool verticalFound = false;
+        if (frameH > frameW)
+        {
+            string zoneVertical = string.IsNullOrEmpty(Zone) ? "" : $"res://art/puzzles/porte_{textureName}_{Zone}_v.png";
+            string verticalPath = $"res://art/puzzles/porte_{textureName}_v.png";
+            if (zoneVertical.Length > 0 && ResourceLoader.Exists(zoneVertical)) { path = zoneVertical; verticalFound = true; }
+            else if (ResourceLoader.Exists(verticalPath)) { path = verticalPath; verticalFound = true; }
+        }
         // Variante propre à la zone (ex. porte_interrupteur_donjon2.png : grille rouillée de la Mine) si le fichier existe.
-        if (!string.IsNullOrEmpty(Zone))
+        if (!verticalFound && !string.IsNullOrEmpty(Zone))
         {
             string zonePath = $"res://art/puzzles/porte_{textureName}_{Zone}.png";
             if (ResourceLoader.Exists(zonePath)) path = zonePath;

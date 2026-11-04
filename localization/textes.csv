@@ -311,3 +311,25 @@ INDICE_PASSAGE,Il fait sombre. Suis la lumière des braseros.,It is dark. Follow
 INDICE_PORTAIL,Le portail est scellé par l'Œil de Morvath.,The gate is sealed by the Eye of Morvath.
 INDICE_TROIS_SCEAUX,"Une flèche, une fissure, une rune. Trois sceaux, trois dons.","An arrow, a crack, a rune. Three seals, three gifts."
 INDICE_ANTICHAMBRE,La porte du fond attend la grande clé.,The far door awaits the great key.
+PNJ_MORVATH,Morvath,Morvath
+DLG_CH_DEFI_1,"Tu as rapporté les trois sceaux, Brann. Ils sont tous ouverts, maintenant.","You brought back the three seals, Brann. They are all open now."
+DLG_CH_DEFI_2,"Maître... revenez à la forge. Je vous en prie.","Master... come back to the forge. Please."
+DLG_CH_DEFI_3,"La forge est froide, petit. Mes mains ne savent plus rien faire.","The forge is cold, lad. My hands no longer know how to do anything."
+DLG_CH_DEFI_4,Alors je vais te montrer ce qu'elles savent encore.,Then I will show you what they still know.
+DLG_CH_MORVATH_1,"Assez joué, vieil homme. Ce corps est à moi.","Enough games, old man. This body is mine."
+DLG_CH_MORVATH_2,"Non... Brann... Je ne voulais pas...","No... Brann... I did not want to..."
+DLG_CH_MORVATH_3,"Mille ans dans le noir. Tu vas m'amuser, petit forgeron.","A thousand years in the dark. You will amuse me, little smith."
+DLG_CH_EXIL_1,"Brann... c'est toi ? Mes yeux n'y voient plus rien.","Brann... is that you? My eyes can no longer see."
+DLG_CH_EXIL_2,"Oui, Maître. C'est fini.","Yes, Master. It is over."
+DLG_CH_EXIL_3,J'avais si peur de vieillir. Et regarde ce que j'ai fait.,I was so afraid of growing old. And look at what I have done.
+DLG_CH_EXIL_4,"Vous m'avez appris à forger. Ça, vous ne l'avez pas gâché.","You taught me to forge. That, you did not spoil."
+DLG_CH_EXIL_5,"Les sceaux sont à toi, maintenant. Forge-les en un seul. Un qui ne s'ouvrira plus.","The seals are yours now. Forge them into one. One that will never open again."
+DLG_CH_EXIL_6,"Je ne peux plus rester à Brumeval. Je partirai loin, là où personne ne me connaît.","I cannot stay in Brumeval any more. I will go far away, where no one knows me."
+DLG_CH_EXIL_7,"Prends soin de la forge, Maître Brann.","Take care of the forge, Master Brann."
+DLG_CH_EXIL_8,Je garderai le feu allumé.,I will keep the fire lit.
+BOSS_CORVAN_NOM,"Corvan, le Forgeron","Corvan, the Smith"
+BOSS_CORVAN_CONSEIL_1,"Son marteau est lent. Écarte-toi du cercle d'ombre, puis frappe !","His hammer is slow. Step out of the shadow circle, then strike!"
+BOSS_CORVAN_CONSEIL_2,Les ronces craignent les flèches. Vise les bulbes !,Brambles fear arrows. Aim at the bulbs!
+BOSS_CORVAN_CONSEIL_3,La pierre éclate sous les bombes !,Stone shatters under bombs!
+BOSS_CORVAN_CONSEIL_4,"Dans l'eau noire, la lanterne montre où frapper.","In the black water, the lantern shows where to strike."
+BOSS_CORVAN_CONSEIL_5,"L'Œil de Morvath ! Une flèche, vite !","The Eye of Morvath! An arrow, quick!"

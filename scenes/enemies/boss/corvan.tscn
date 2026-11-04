@@ -1,0 +1,100 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/boss/CorvanBoss.cs" id="1_corvan"]
+[ext_resource type="Script" path="res://scripts/components/Health.cs" id="2_health"]
+[ext_resource type="Script" path="res://scripts/components/HurtBox.cs" id="3_hurtbox"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/boss/bulbe_sylve.tscn" id="4_bulb"]
+
+[sub_resource type="CircleShape2D" id="body_shape"]
+radius = 12.0
+
+[sub_resource type="RectangleShape2D" id="layer_shape"]
+size = Vector2(60, 84)
+
+[sub_resource type="RectangleShape2D" id="body_hurt_shape"]
+size = Vector2(56, 84)
+
+[sub_resource type="CircleShape2D" id="eye_hurt_shape"]
+radius = 16.0
+
+[node name="Corvan" type="CharacterBody2D"]
+collision_layer = 4
+motion_mode = 1
+script = ExtResource("1_corvan")
+NameKey = "BOSS_CORVAN_NOM"
+DropsHeartContainer = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -12)
+shape = SubResource("body_shape")
+
+[node name="Visuel" type="Node2D" parent="."]
+
+[node name="Ombre" type="Sprite2D" parent="Visuel"]
+
+[node name="Sprite" type="AnimatedSprite2D" parent="Visuel"]
+centered = false
+
+[node name="Calque" type="AnimatedSprite2D" parent="Visuel"]
+centered = false
+
+[node name="Icone" type="Sprite2D" parent="Visuel"]
+visible = false
+position = Vector2(0, -82)
+
+[node name="Bulbes" type="Node2D" parent="."]
+visible = false
+
+[node name="Bulbe1" parent="Bulbes" instance=ExtResource("4_bulb")]
+position = Vector2(-31, -35)
+TexturePath = "res://art/bosses/corvan/bulbe_ronces.png"
+FrameSize = 32
+BurstFirstFrame = 2
+
+[node name="Bulbe2" parent="Bulbes" instance=ExtResource("4_bulb")]
+position = Vector2(31, -35)
+TexturePath = "res://art/bosses/corvan/bulbe_ronces.png"
+FrameSize = 32
+BurstFirstFrame = 2
+
+[node name="Bulbe3" parent="Bulbes" instance=ExtResource("4_bulb")]
+position = Vector2(0, -45)
+TexturePath = "res://art/bosses/corvan/bulbe_ronces.png"
+FrameSize = 32
+BurstFirstFrame = 2
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")
+MaxHealth = 8
+
+[node name="Couche" type="Area2D" parent="."]
+script = ExtResource("3_hurtbox")
+Team = 1
+PlaySounds = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Couche"]
+position = Vector2(0, -44)
+shape = SubResource("layer_shape")
+
+[node name="Corps" type="Area2D" parent="."]
+script = ExtResource("3_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Corps"]
+position = Vector2(0, -44)
+shape = SubResource("body_hurt_shape")
+
+[node name="Oeil" type="Node2D" parent="."]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Oeil"]
+
+[node name="Health" type="Node" parent="Oeil"]
+script = ExtResource("2_health")
+MaxHealth = 2
+
+[node name="HurtBox" type="Area2D" parent="Oeil"]
+script = ExtResource("3_hurtbox")
+Team = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Oeil/HurtBox"]
+shape = SubResource("eye_hurt_shape")

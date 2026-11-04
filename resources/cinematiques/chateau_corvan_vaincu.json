@@ -1,0 +1,26 @@
+{
+  "id": "chateau_corvan_vaincu",
+  "drapeau_fin": "morvath_vaincu",
+  "passable": true,
+  "etapes": [
+    { "action": "secousse", "force": 3, "duree": 1.0 },
+    { "action": "apparaitre", "cible": "pnj", "id": "corvan", "sprite": "corvan_vieux", "a": "corvan_defi", "direction": "up" },
+    { "action": "regarder", "acteur": "brann", "vers": "corvan_defi" },
+    { "action": "son", "nom": "sceau" },
+    { "action": "teinte", "couleur": "#ffffff", "duree": 3.0 },
+    { "action": "attendre", "secondes": 0.5 },
+    { "action": "dialogue", "orateur": "PNJ_CORVAN", "lignes": [ "DLG_CH_EXIL_1" ] },
+    { "action": "dialogue", "orateur": "PNJ_BRANN", "lignes": [ "DLG_CH_EXIL_2" ] },
+    { "action": "dialogue", "orateur": "PNJ_CORVAN", "lignes": [ "DLG_CH_EXIL_3" ] },
+    { "action": "dialogue", "orateur": "PNJ_BRANN", "lignes": [ "DLG_CH_EXIL_4" ] },
+    { "action": "dialogue", "orateur": "PNJ_CORVAN", "lignes": [ "DLG_CH_EXIL_5", "DLG_CH_EXIL_6", "DLG_CH_EXIL_7" ] },
+    { "action": "deplacer", "acteur": "corvan", "vers": "corvan_exil", "vitesse": 45 },
+    { "action": "disparaitre", "acteur": "corvan" },
+    { "action": "dialogue", "orateur": "PNJ_BRANN", "lignes": [ "DLG_CH_EXIL_8" ] },
+    { "action": "drapeau", "nom": "corvan_exil" },
+    { "action": "drapeau", "nom": "morvath_vaincu" },
+    { "action": "sauvegarder" },
+    { "action": "fondu", "vers": "noir", "duree": 1.2 },
+    { "action": "aller_a", "carte": "res://scenes/rooms/forge_room.tscn", "spawn": "depuis_chateau" }
+  ]
+}

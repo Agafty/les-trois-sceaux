@@ -468,9 +468,9 @@ public partial class GameState : Node
     /// Prépare la reprise après la mort : stocke la vie de reprise SANS émettre de signal,
     /// pour que l'état ne reste jamais à 0 PV (sauvegarde) et que le HUD garde 0 cœur pendant l'animation de mort.
     /// </summary>
-    public void PrepareRespawn()
+    public void PrepareRespawn(bool fullHealth = false)
     {
-        PlayerHealth = Mathf.Min(RespawnHealth, PlayerMaxHealth);
+        PlayerHealth = fullHealth ? PlayerMaxHealth : Mathf.Min(RespawnHealth, PlayerMaxHealth);
     }
 
     /// <summary>Ajoute (ou retire si négatif) des petites clés, jamais sous 0.</summary>
