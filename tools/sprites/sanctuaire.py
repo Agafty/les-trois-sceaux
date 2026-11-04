@@ -1,4 +1,4 @@
-"""Tilesets du Sanctuaire Englouti (donjon 3) — Les Trois Sceaux. ÉTAT : PLAN (aplats lisibles, numéros définitifs).
+"""Tilesets du Sanctuaire Englouti (donjon 3) — Les Trois Sceaux. ÉTAT : FINAL (dessin dans sanctuaire_art.py ; `--plan` régénère les aplats du plan).
 
 Usage : python tools/sprites/sanctuaire.py
 Produit : art/tilesets/sanctuaire.png, sanctuaire_numeros.png, sanctuaire_crypte.png, sanctuaire_crypte_numeros.png,
@@ -346,6 +346,45 @@ def crypte_px(px_rows):
     return out
 
 
+def final_md(md):
+    md = md.replace('**État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro)',
+                    '**État : FINAL** (dessin final de toutes les tuiles ; les numéros sont ceux du plan, aucune tuile n\'a bougé)')
+    md = md.replace('**État : PLAN**', '**État : FINAL**')
+    a = md.index('- Vue de dessus 3/4')
+    b = md.index(chr(10), a)
+    md = md[:a] + ('- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d\'1 px. Palette : pierre gris-violet et bleus-verts froids (comme la '
+                   'façade du Sanctuaire dans `lac`), algues vertes, algues lumineuses turquoise (cryptes), runes cyan. Les collisions sont dans le tileset '
+                   '(colonne Collision). Dessin : `tools/sprites/sanctuaire_art.py`.') + md[b:]
+    md = md.replace('Dans le dessin final, la crypte aura des algues lumineuses aux murs.',
+                    'La crypte a en plus des algues lumineuses sur les murs. Les ouvertures de mur fissuré (76 à 79) sont entièrement opaques.')
+    md = md.replace('Les versions ouvertes sont opaques (fond noir).', 'Les versions ouvertes sont entièrement opaques (brèche sombre, gravats, bord irrégulier).')
+    return md
+
+
+def main_final():
+    import final_lib
+    import sanctuaire_art
+    S.finish()
+    px = final_lib.render(S, sanctuaire_art.REG)
+    out_t = os.path.join(ROOT, 'art', 'tilesets')
+    save_png(os.path.join(out_t, 'sanctuaire.png'), px)
+    save_png(os.path.join(out_t, 'sanctuaire_numeros.png'), final_lib.numbered(S, px))
+    dark = sanctuaire_art.crypte_px(px, S)
+    save_png(os.path.join(out_t, 'sanctuaire_crypte.png'), dark)
+    save_png(os.path.join(out_t, 'sanctuaire_crypte_numeros.png'), final_lib.numbered(S, dark))
+    for nom in ('sanctuaire', 'sanctuaire_crypte'):
+        old = S.name
+        S.name = nom
+        try:
+            with open(os.path.join(ROOT, 'maps', 'tilesets', nom + '.tsx'), 'w', encoding='utf-8', newline=chr(10)) as f:
+                f.write(S.tsx())
+        finally:
+            S.name = old
+    with open(os.path.join(out_t, 'sanctuaire_plan.md'), 'w', encoding='utf-8', newline=chr(10)) as f:
+        f.write(final_md(S.md('sanctuaire.py')))
+    print('sanctuaire : dessin final,', len(S.tiles), 'tuiles.')
+
+
 def main():
     S.save_all('sanctuaire.py')
     out_t = os.path.join(ROOT, 'art', 'tilesets')
@@ -366,4 +405,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if '--plan' in sys.argv:
+        main()
+    else:
+        main_final()

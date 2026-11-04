@@ -1,12 +1,12 @@
 # Plan du tileset `sanctuaire` — Le Sanctuaire Englouti (donjon 3 : pierre à demi noyée, eau, passerelles, cryptes, arène d'Ondine)
 
-> Fichier généré par `tools/sprites/sanctuaire.py` : modifier le script, pas ce fichier. **État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro).
+> Fichier généré par `tools/sprites/sanctuaire.py` : modifier le script, pas ce fichier. **État : FINAL** (dessin final de toutes les tuiles ; les numéros sont ceux du plan, aucune tuile n'a bougé).
 
 - Image : `art/tilesets/sanctuaire.png`, 256×736 px, 8 colonnes × 23 lignes de tuiles 32×32, sans marge ni espacement (184 cases). Tileset Tiled : `maps/tilesets/sanctuaire.tsx` (collisions et terrains définis). `art/tilesets/sanctuaire_numeros.png` = la planche ×2 avec les numéros.
 - **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 20 à 23 (ids 152 à 183) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
 - Collisions en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche). Les terrains (Wang par coins) sont dans le panneau Terrains de Tiled.
-- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px. Palette finale : pierre gris-violet et bleus-verts froids (comme la façade du Sanctuaire dans `lac`). En PLAN, **la couleur indique la famille** (dalle (bleu-gris) / crypte (bleu sombre) / mur (violet-gris) / eau peu profonde (bleu clair) / eau profonde (bleu foncé) / planches (brun) / chaussée (gris clair) / escalier (beige) / colonne (gris-bleu) / rune (cyan) / fissuré à la bombe (violet) / porte (orange) / algues lumineuses (vert) / balcon (rose) / estrade (or) / bassin (turquoise)) ; une zone plus sombre dans une tuile = zone solide.
-- DEUX planches de même numérotation : `sanctuaire.png` (rez-de-chaussée, clair) et `sanctuaire_crypte.png` (cryptes : recoloration plus sombre ; tileset `sanctuaire_crypte.tsx` identique). Dans le dessin final, la crypte aura des algues lumineuses aux murs.
+- Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px. Palette : pierre gris-violet et bleus-verts froids (comme la façade du Sanctuaire dans `lac`), algues vertes, algues lumineuses turquoise (cryptes), runes cyan. Les collisions sont dans le tileset (colonne Collision). Dessin : `tools/sprites/sanctuaire_art.py`.
+- DEUX planches de même numérotation : `sanctuaire.png` (rez-de-chaussée, clair) et `sanctuaire_crypte.png` (cryptes : recoloration plus sombre ; tileset `sanctuaire_crypte.tsx` identique). La crypte a en plus des algues lumineuses sur les murs. Les ouvertures de mur fissuré (76 à 79) sont entièrement opaques.
 - **Aucune fosse ni trou** dans ce donjon : les ids 31 à 39 et 58 à 66 sont volontairement vides.
 
 ## POUR LE DÉVELOPPEUR ET LE LEVEL-DESIGNER : ids à connaître
@@ -15,7 +15,7 @@ Tilesets `sanctuaire` (rez-de-chaussée) ET `sanctuaire_crypte` (sous-sol) : **m
 
 | Famille | Ids | Calque | À savoir |
 | --- | --- | --- | --- |
-| **MURS FISSURÉS** fermé -> ouvert (`TileRules`, salle 03) | **72 -> 76** (haut), **73 -> 77** (bas), **74 -> 78** (gauche), **75 -> 79** (droite) | fermés `Murs`, ouverts `Decor` | Comme `mine` 144 -> 148 : la bombe retire la tuile fermée de `Murs`, le code pose la version ouverte sur `Decor` (ou elle est déjà posée dessous). Les versions ouvertes sont opaques (fond noir). La salle 03 n'utilise qu'une orientation (le mur de l'alcôve est vertical : 74 ou 75). |
+| **MURS FISSURÉS** fermé -> ouvert (`TileRules`, salle 03) | **72 -> 76** (haut), **73 -> 77** (bas), **74 -> 78** (gauche), **75 -> 79** (droite) | fermés `Murs`, ouverts `Decor` | Comme `mine` 144 -> 148 : la bombe retire la tuile fermée de `Murs`, le code pose la version ouverte sur `Decor` (ou elle est déjà posée dessous). Les versions ouvertes sont entièrement opaques (brèche sombre, gravats, bord irrégulier). La salle 03 n'utilise qu'une orientation (le mur de l'alcôve est vertical : 74 ou 75). |
 | **Escaliers** | 56 (montant), 57 (descendant) | `Sol` | Posent une `Sortie` `transition=escalier`, comme les autres donjons. |
 | **Ids VIDES** | 31 à 39 et 58 à 66 | — | Réservés (trous de passage / trous mortels des autres donjons). Aucun trou dans ce donjon : **`HoleRules` / `HoleWatcher` n'ont rien à reconnaître ici** (ne pas y ajouter les tilesets `sanctuaire*`). |
 | **EAU PROFONDE (solide)** | 96 à 111 | `Murs` | Terrain `Eau profonde` : collision par quarts de case (la moitié « rive » d'un bord reste praticable), flèches arrêtées comme par un mur. Se peint sur `Murs` ; dessous, mettre du sol. |
