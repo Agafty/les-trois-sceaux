@@ -182,7 +182,19 @@ public partial class CrackedWall : StaticBody2D, IBombDestructible
         var layer = layerName == "Sol" ? FloorLayer : DecorLayer;
         if (layer?.TileSet == null || !FindAtlas(layer.TileSet, tileset, out int sourceId, out var atlas)) return;
         int columns = atlas.GetAtlasGridSize().X;
-        layer.SetCell(cell, sourceId, new Vector2I(openId % columns, openId / columns));
+        var coords = new Vector2I(openId % columns, openId / columns);
+        // L'import de la carte ne crée que certaines tuiles du tileset : sans ce test, une tuile absente
+        // (ex. gravats 140/141 du village dans la carte du lac) serait posée invisible et laisserait un trou.
+        if (!atlas.HasTile(coords))
+        {
+            if (coords.Y >= atlas.GetAtlasGridSize().Y)
+            {
+                GD.PushWarning($"Mur fissuré {Id} : tuile ouverte {openId} hors de la planche « {tileset} ».");
+                return;
+            }
+            atlas.CreateTile(coords);
+        }
+        layer.SetCell(cell, sourceId, coords);
     }
 
     // --- Image de secours -------------------------------------------------------------------------
