@@ -1,0 +1,27 @@
+{
+  "id": "village_fete",
+  "drapeau_fin": "fete_vue",
+  "passable": true,
+  "etapes": [
+    { "action": "fondu", "vers": "noir", "duree": 0 },
+    { "action": "teinte", "couleur": "normal", "duree": 0 },
+    { "action": "camera", "vers": "fete_place", "duree": 0 },
+    { "action": "placer", "acteur": "brann", "vers": "depuis_lac" },
+    { "action": "regarder", "acteur": "brann", "direction": "up" },
+    { "action": "apparaitre", "cible": "pnj", "id": "isolde", "sprite": "isolde", "a": "fete_isolde", "direction": "down" },
+    { "action": "fondu", "vers": "clair", "duree": 1.2 },
+    { "action": "attendre", "secondes": 0.4 },
+    { "action": "dialogue", "orateur": "PNJ_HULDA", "lignes": ["DLG_FETE_1"] },
+    { "action": "dialogue", "orateur": "PNJ_PIP", "lignes": ["DLG_FETE_2"] },
+    { "action": "dialogue", "orateur": "PNJ_ISOLDE", "lignes": ["DLG_FETE_3"] },
+    { "action": "regarder", "acteur": "brann", "vers": "depuis_route" },
+    { "action": "camera", "vers": "depuis_route", "duree": 2.0 },
+    { "action": "attendre", "secondes": 0.6 },
+    { "action": "dialogue", "orateur": "PNJ_BRANN", "lignes": ["DLG_FETE_4"] },
+    { "action": "fondu", "vers": "noir", "duree": 1.5 },
+    { "action": "drapeau", "nom": "fete_vue" },
+    { "action": "drapeau", "nom": "jeu_termine" },
+    { "action": "sauvegarder" },
+    { "action": "aller_a", "carte": "res://scenes/ui/generique.tscn" }
+  ]
+}

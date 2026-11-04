@@ -439,8 +439,8 @@ But : construire le reste du jeu avec les briques déjà validées. Ici on code 
 **Histoire et fin**
 
 - [x] Ouverture scriptée (voir « L'ouverture du jeu ») et système de cinématiques
-- [ ] Séquence de fin et générique
-- [ ] Option : un donjon final court si le temps le permet, sinon le boss du donjon 3 est le boss final
+- [x] Séquence de fin et générique
+- [x] Option : un donjon final court si le temps le permet, sinon le boss du donjon 3 est le boss final
 
 **Méthode** : un donjon = environ 6 à 8 semaines (conception papier → blockout → énigmes → art → test). Faire tester chaque donjon dès qu'il est jouable.
 

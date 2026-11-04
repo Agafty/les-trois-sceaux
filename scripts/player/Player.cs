@@ -385,14 +385,50 @@ public partial class Player : CharacterBody2D
     public void EndCinematic()
     {
         if (_state != State.Cinematique) return;
+        RestoreBaseFrames();
         _state = State.Deplacement;
         _hurtBox.Invincible = false;
         UpdateAnimation(false);
     }
 
+    // Planche d'images normale de Brann, mémorisée pendant qu'une animation de cinématique d'une autre planche joue.
+    private SpriteFrames _baseFrames;
+
+    /// <summary>
+    /// Cinématique : joue une animation précise. Si la planche de Brann ne la connaît pas, cherche art/characters/brann_&lt;animation&gt;_frames.tres
+    /// (ex. « forge ») et l'utilise jusqu'au prochain CinematicPose ou à la fin de la cinématique. Faux si introuvable.
+    /// </summary>
+    public bool CinematicPlay(string animation)
+    {
+        if (_state != State.Cinematique || string.IsNullOrEmpty(animation)) return false;
+        var current = _baseFrames ?? _sprite.SpriteFrames;
+        if (current.HasAnimation(animation))
+        {
+            RestoreBaseFrames();
+        }
+        else
+        {
+            string path = $"res://art/characters/brann_{animation}_frames.tres";
+            var other = ResourceLoader.Exists(path) ? ResourceLoader.Load<SpriteFrames>(path) : null;
+            if (other == null || !other.HasAnimation(animation)) return false;
+            _baseFrames ??= _sprite.SpriteFrames;
+            _sprite.SpriteFrames = other;
+        }
+        _sprite.Play(animation);
+        return true;
+    }
+
+    private void RestoreBaseFrames()
+    {
+        if (_baseFrames == null) return;
+        _sprite.SpriteFrames = _baseFrames;
+        _baseFrames = null;
+    }
+
     /// <summary>Cinématique : tourne Brann vers une direction et le montre marchant ou immobile.</summary>
     public void CinematicPose(Vector2 direction, bool walking)
     {
+        RestoreBaseFrames();
         UpdateFacing(direction);
         UpdateAnimation(walking);
     }

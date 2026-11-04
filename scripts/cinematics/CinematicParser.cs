@@ -184,8 +184,10 @@ public static class CinematicParser
                 break;
             case "aller_a":
                 string scene = Str(e, "carte");
-                if (!scene.StartsWith("res://scenes/rooms/", StringComparison.Ordinal) || !scene.EndsWith(".tscn", StringComparison.Ordinal) || scene.Contains(".."))
-                    errors.Add($"{where} : « carte » doit être un chemin res://scenes/rooms/....tscn");
+                // Une salle, ou un écran d'interface (le générique de fin) : scenes/rooms/ ou scenes/ui/.
+                bool knownFolder = scene.StartsWith("res://scenes/rooms/", StringComparison.Ordinal) || scene.StartsWith("res://scenes/ui/", StringComparison.Ordinal);
+                if (!knownFolder || !scene.EndsWith(".tscn", StringComparison.Ordinal) || scene.Contains(".."))
+                    errors.Add($"{where} : « carte » doit être un chemin res://scenes/rooms/....tscn ou res://scenes/ui/....tscn");
                 break;
             case "secousse":
                 if (strength <= 0f) errors.Add($"{where} : « force » doit être positive");

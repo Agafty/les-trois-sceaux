@@ -313,6 +313,13 @@ public partial class SaveSystem : Node
         Callable.From(AutoSave).CallDeferred();
     }
 
+    /// <summary>
+    /// Sauvegarde automatique immédiate (étape « sauvegarder » d'une cinématique). Contrairement à <see cref="RequestAutoSave"/>, elle n'attend pas
+    /// l'image suivante : une cinématique passée enchaîne la sauvegarde et le changement de salle dans la même image, et la sauvegarde
+    /// différée serait alors refusée (transition en cours). Sans effet sans emplacement choisi ou pendant une transition.
+    /// </summary>
+    public void AutoSaveNow() => AutoSave();
+
     private void AutoSave()
     {
         _autoSavePending = false;

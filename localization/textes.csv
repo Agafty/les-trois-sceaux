@@ -333,3 +333,33 @@ BOSS_CORVAN_CONSEIL_2,Les ronces craignent les flèches. Vise les bulbes !,Bramb
 BOSS_CORVAN_CONSEIL_3,La pierre éclate sous les bombes !,Stone shatters under bombs!
 BOSS_CORVAN_CONSEIL_4,"Dans l'eau noire, la lanterne montre où frapper.","In the black water, the lantern shows where to strike."
 BOSS_CORVAN_CONSEIL_5,"L'Œil de Morvath ! Une flèche, vite !","The Eye of Morvath! An arrow, quick!"
+OBJ_SCEAU_UNIQUE,le sceau de Brumeval,the Seal of Brumeval
+OBJ_SCEAU_UNIQUE_DESC,"Les trois sceaux ne font plus qu'un. Il ne s'ouvrira plus.","The three seals are now one. It will never open again."
+ITEM_SCEAU_UNIQUE_NOM,Sceau de Brumeval,Seal of Brumeval
+ITEM_SCEAU_UNIQUE_DESC,"Forgé par Brann avec les trois sceaux. Il protège Brumeval pour mille ans.","Forged by Brann from the three seals. It protects Brumeval for a thousand years."
+DLG_FORGE_FIN_1,"Un seul sceau. Solide, cette fois.","One single seal. Sturdy, this time."
+DLG_FORGE_FIN_2,Brann ! Tout le monde t'attend sur la place !,Brann! Everyone is waiting for you in the square!
+DLG_FORGE_FIN_3,J'arrive.,I'm coming.
+DLG_FETE_1,Maître Brann ! À ta santé !,Master Brann! To your health!
+DLG_FETE_2,Je savais que tu gagnerais. J'ai même gardé une poule pour toi !,I knew you would win. I even saved a chicken for you!
+DLG_FETE_3,J'écrirai ton nom dans les registres des gardiens. En lettres d'or.,I will write your name in the guardians' registers. In golden letters.
+DLG_FETE_4,"Prenez soin de vous, Maître.","Take care of yourself, Master."
+GENERIQUE_SKIP,Maintenir une touche : accélérer. Échap (Start) : passer,Hold any key: speed up. Esc (Start): skip
+GENERIQUE_TITRE,Les Trois Sceaux,The Three Seals
+GENERIQUE_UN_JEU_DE,Un jeu de,A game by
+GENERIQUE_NOM_AUTEUR,Agafty,Agafty
+GENERIQUE_PROGRAMMATION,Programmation,Programming
+GENERIQUE_NOM_PROGRAMMATION,Agafty,Agafty
+GENERIQUE_GRAPHISMES,Graphismes,Graphics
+GENERIQUE_NOM_GRAPHISMES,Agafty,Agafty
+GENERIQUE_SONS,Sons,Sound
+GENERIQUE_NOM_SONS,Agafty,Agafty
+GENERIQUE_LEVEL_DESIGN,Level design,Level design
+GENERIQUE_NOM_LEVEL_DESIGN,Agafty,Agafty
+GENERIQUE_TEXTES,Textes,Writing
+GENERIQUE_NOM_TEXTES,Agafty,Agafty
+GENERIQUE_TESTS,Tests,Testing
+GENERIQUE_NOM_TESTS,Agafty,Agafty
+GENERIQUE_REMERCIEMENTS,Remerciements,Special thanks
+GENERIQUE_NOM_REMERCIEMENTS,"Merci d'avoir joué.","Thank you for playing."
+GENERIQUE_FIN,Fin,The End

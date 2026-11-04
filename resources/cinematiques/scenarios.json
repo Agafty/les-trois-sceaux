@@ -134,9 +134,46 @@
       "sauf": [
         "lac_eclipse_vu"
       ]
+    },
+    {
+      "salle": "forge_room",
+      "cinematique": "forge_sceau_unique",
+      "si": [
+        "morvath_vaincu"
+      ],
+      "sauf": [
+        "sceau_unique"
+      ]
+    },
+    {
+      "salle": "village_room",
+      "cinematique": "village_fete",
+      "si": [
+        "sceau_unique"
+      ],
+      "sauf": [
+        "fete_vue"
+      ]
     }
   ],
   "reperes": [
-    { "salle": "lac_room", "id": "chateau_vue", "x": 2528, "y": 176 }
+    {
+      "salle": "lac_room",
+      "id": "chateau_vue",
+      "x": 2528,
+      "y": 176
+    },
+    {
+      "salle": "village_room",
+      "id": "fete_place",
+      "x": 664,
+      "y": 216
+    },
+    {
+      "salle": "village_room",
+      "id": "fete_isolde",
+      "x": 656,
+      "y": 240
+    }
   ]
 }

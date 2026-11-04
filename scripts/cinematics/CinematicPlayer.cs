@@ -277,11 +277,11 @@ public partial class CinematicPlayer : Node
                 {
                     var actor = FindActor(step.Actor);
                     if (actor == null) break;
-                    if (actor.Npc != null)
-                    {
-                        if (!actor.Npc.ScriptedPlay(new StringName(step.Name)))
-                            GD.PushWarning($"Cinématique : « {step.Actor} » n'a pas l'animation « {step.Name} ».");
-                    }
+                    bool played = actor.Npc != null
+                        ? actor.Npc.ScriptedPlay(new StringName(step.Name))
+                        : actor.Brann != null && actor.Brann.CinematicPlay(step.Name); // Brann : « forge » (art/characters/brann_forge_frames.tres)
+                    if (!played)
+                        GD.PushWarning($"Cinématique : « {step.Actor} » n'a pas l'animation « {step.Name} ».");
                     break;
                 }
             case "fondu": SetFade(step.Value == "noir" ? 1f : 0f); break;
@@ -306,7 +306,7 @@ public partial class CinematicPlayer : Node
             case "donner": Give(step, announce); break;
             case "drapeau": _state.MarkCollected(step.Name); break;
             case "aller_a": _ = GoToScene(step); break;
-            case "sauvegarder": GetNode<SaveSystem>("/root/SaveSystem").RequestAutoSave(); break;
+            case "sauvegarder": GetNode<SaveSystem>("/root/SaveSystem").AutoSaveNow(); break; // tout de suite : un « aller_a » juste après (cinématique passée) bloquerait une sauvegarde différée
         }
     }
 
