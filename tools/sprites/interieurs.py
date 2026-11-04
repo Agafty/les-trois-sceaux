@@ -32,7 +32,7 @@ S = Sheet('interieurs', 8, 'intérieurs de Brumeval (forge, herboristerie, bouti
            '`Murs` : murs et meubles (collisions dans le tileset)',
            '`Objets` : Sortie, Spawn, PNJ, Coffre, StatueCorbeau (sur l\'enclume), MurFissure, escaliers…',
            '`Dessus` : rarement utilisé en intérieur (haut des poutres, lustres)'])
-S.reserve = 4
+S.reserve = 2
 
 
 def M(nom, role, coll, cat, **k):
@@ -190,6 +190,12 @@ S.line([D('tapis_bd', 'Tapis, coin bas droite', 'tapis'), D('paillasson', 'Paill
         D('rayon_lumiere', 'Rayon de lumière de fenêtre (semi-transparent)', 'lampe', ghost=True), None])
 S.assemblage('Tapis 3×3', [['tapis_hg', 'tapis_h', 'tapis_hd'], ['tapis_g', 'tapis_centre', 'tapis_d'], ['tapis_bg', 'tapis_b', 'tapis_bd']], 'Decor', 'peut s\'étirer en répétant tapis_h / tapis_centre')
 
+# ---------------------------------------------------------------- foyer froid (ajouté après coup, en fin de planche)
+S.group('Foyer de forge froid (fourneau éteint)', 'Ajouté en fin de planche (ids 200, 201 / 208, 209) : même foyer que le 2×2 allumé (80-83), cendres et bûches noircies. Même collision pleine. À poser à la place du foyer allumé tant que le fourneau est froid.')
+S.line([M('foyer_froid_haut_g', 'FOYER de forge FROID 2×2, haut gauche (hotte)', FULL, 'forge', col='#6a6470'), M('foyer_froid_haut_d', 'FOYER de forge FROID 2×2, haut droite', FULL, 'forge', col='#6a6470')])
+S.line([M('foyer_froid_bas_g', 'FOYER de forge FROID 2×2, bas gauche (cendres)', FULL, 'forge', col='#6a6470'), M('foyer_froid_bas_d', 'FOYER de forge FROID 2×2, bas droite (cendres)', FULL, 'forge', col='#6a6470')])
+S.assemblage('Foyer de forge froid 2×2', [['foyer_froid_haut_g', 'foyer_froid_haut_d'], ['foyer_froid_bas_g', 'foyer_froid_bas_d']], 'Murs', 'même emplacement que le foyer allumé ; le code ou la cinématique échange les tuiles')
+
 S.notes += ['Aucun escalier d\'étage : les maisons sont sur un seul niveau ; l\'escalier de la cave de Garrick est `escalier_cave_haut` / `escalier_cave_bas`.',
             'Les coffres, PNJ, statues du corbeau, mur fissuré (objet), Sortie et Spawn sont des **objets Tiled** (calque `Objets`), pas des tuiles : le tileset ne contient que le décor.']
 
@@ -200,5 +206,6 @@ if __name__ == '__main__':
         import final_lib
         import interieurs_art1
         import interieurs_art2  # noqa: F401
+        import interieurs_art3  # noqa: F401
         px = final_lib.render(S, interieurs_art1.REG)
         final_lib.save_final(S, px, 'interieurs.py')

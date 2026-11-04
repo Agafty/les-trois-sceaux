@@ -1,6 +1,7 @@
 """Tileset de Brumeval, le village — PLAN (aplats + numéros) — Les Trois Sceaux.
 
-Usage : python tools/sprites/village.py          -> DESSIN FINAL (village.png, village_brume.png, _numeros.png, _plan.md, .tsx)
+Usage : python tools/sprites/village.py --patch -> ajoute seulement la ligne de fête (368-375) aux PNG existants
+        python tools/sprites/village.py          -> DESSIN FINAL (village.png, village_brume.png, _numeros.png, _plan.md, .tsx)
         python tools/sprites/village.py --plan   -> PLAN (aplats par famille et numéros)
 Le catalogue (numéros, collisions, terrains) est identique dans les deux cas ; le dessin est dans village_art1/2/3.py.
 Variante « brume » : même planche recolorée (plus froide, désaturée, voilée) : art/tilesets/village_brume.png, mêmes numéros.
@@ -35,7 +36,7 @@ S = Sheet('village', 8, 'Brumeval, le village (overworld : place, maisons, lac, 
            '`Murs` : tout ce qui bloque (façades, toits, falaise, ravin, éboulis, objets). Les collisions sont dans le tileset',
            '`Objets` : Sortie, Spawn, PNJ, Coffre, MurFissure, Ramassable… (objets Tiled, pas des tuiles)',
            '`Dessus` : passe devant Brann (auvents, cime des lampadaires, enseignes, brume)'])
-S.reserve = 4
+S.reserve = 3
 
 
 def M(nom, role, coll, cat, **k):
@@ -324,6 +325,17 @@ S.line([U('brume_legere_a', 'Brume légère, voile A', 'brume', ghost=True), U('
         D('brume_sol_a', 'Brume rasante au sol (Decor, semi-transparente)', 'brume', ghost=True),
         D('brume_sol_b', 'Brume rasante au sol, variante', 'brume', ghost=True)])
 
+# ---------------------------------------------------------------- 24 fête (ajoutée après coup, en fin de planche)
+S.group('24. Décor de fête (épilogue : la fête de Brumeval)',
+        'Ajouté en fin de planche (ids 368 à 375), sans collision, tout sur `Dessus`. Guirlande : g + m (répétable) + d, accrochée entre deux façades ; '
+        'banderole : g + m (répétable) + d ; le fanion se répète à l’horizontale ; le lampion est seul.')
+S.line([U('guirlande_g', 'Guirlande de fanions, bout gauche (accrochée au mur)', 'lampe'), U('guirlande_m', 'Guirlande de fanions, milieu (répétable)', 'lampe'),
+        U('guirlande_d', 'Guirlande de fanions, bout droit', 'lampe'), U('lampion', 'Lampion de papier suspendu', 'lampe'),
+        U('fanion', 'Fanions tendus (se répètent à l’horizontale)', 'lampe'),
+        U('banderole_g', 'Banderole de fête, bout gauche (tige de bois)', 'toit_a'),
+        U('banderole_m', 'Banderole de fête, milieu (losange doré, répétable)', 'toit_a'),
+        U('banderole_d', 'Banderole de fête, bout droit (tige de bois)', 'toit_a')])
+
 S.notes += ['Pas de tuile de porte « escalier » : les maisons n\'ont pas de marches, l\'entrée est de plain-pied (la Sortie est sur la tuile de porte).',
             'À régler dans Tiled après livraison du dessin : propriétés, éventuelles animations (fumée, drapeau, eau).']
 
@@ -336,5 +348,47 @@ if __name__ == '__main__':
         import village_art1
         import village_art2  # noqa: F401
         import village_art3  # noqa: F401
+        import village_art4  # noqa: F401
         px = final_lib.render(S, village_art1.REG)
-        final_lib.save_final(S, px, 'village.py', brume=art_lib.haze(px))
+        if '--patch' in sys.argv:
+            # Ajoute seulement les lignes de fête (ids 368+) à village.png / village_brume.png EXISTANTS : le reste de la planche
+            # (retouches faites depuis) n'est pas redessiné. Régénère aussi _numeros.png, le .tsx et _plan.md.
+            import zlib
+            import struct
+            import tsplan as _t
+
+            def load(path):
+                d = open(path, 'rb').read()
+                i, idat = 8, b''
+                while i < len(d):
+                    n, t = struct.unpack('>I4s', d[i:i + 8])
+                    if t == b'IHDR':
+                        w, h = struct.unpack('>II', d[i + 8:i + 16])
+                    if t == b'IDAT':
+                        idat += d[i + 8:i + 8 + n]
+                    i += 12 + n
+                raw = zlib.decompress(idat)
+                st = w * 4 + 1
+                return [[(None if raw[y * st + 1 + x * 4 + 3] == 0 else tuple(raw[y * st + 1 + x * 4:y * st + 5 + x * 4])) for x in range(w)] for y in range(h)]
+            first = 368 // S.cols * 32
+            out = os.path.join(_t.ROOT, 'art', 'tilesets')
+            hz = art_lib.haze(px)
+            for nom, new_px in (('village.png', px), ('village_brume.png', hz)):
+                old = load(os.path.join(out, nom))
+                assert len(old) == len(new_px), (len(old), len(new_px))
+                for y in range(first, first + 32):
+                    old[y] = new_px[y]
+                _t.save_png(os.path.join(out, nom), old)
+                if nom == 'village.png':
+                    _t.save_png(os.path.join(out, 'village_numeros.png'), final_lib.numbered(S, old))
+            S.finish()
+            with open(os.path.join(_t.ROOT, 'maps', 'tilesets', 'village.tsx'), 'w', encoding='utf-8', newline='\n') as f:
+                f.write(S.tsx())
+            md = S.md('village.py').replace('**État : PLAN** (aplats de couleur par famille, le dessin final remplacera chaque tuile au même numéro)',
+                                            '**État : DESSIN FINAL** (les numéros sont ceux du plan, aucune tuile n\'a bougé)')
+            md = md.replace('Le plan est en aplats : **la couleur indique la famille** (vert herbe, gris-bleu pavés, brun terre, bleu eau, rouge/gris/jaune toits, orange portes et blocages…) ; une zone plus sombre dans une tuile = zone solide.',
+                            'Les collisions sont dans le tileset (voir la colonne Collision).')
+            with open(os.path.join(out, 'village_plan.md'), 'w', encoding='utf-8', newline='\n') as f:
+                f.write(md)
+        else:
+            final_lib.save_final(S, px, 'village.py', brume=art_lib.haze(px))

@@ -3,7 +3,7 @@
 > Fichier généré par `tools/sprites/interieurs.py` : modifier le script, pas ce fichier. **État : DESSIN FINAL** (les numéros sont ceux du plan, aucune tuile n'a bougé).
 
 - Image : `art/tilesets/interieurs.png`, 256×928 px, 8 colonnes × 29 lignes de tuiles 32×32, sans marge ni espacement (232 cases). Tileset Tiled : `maps/tilesets/interieurs.tsx` (collisions et terrains définis). `art/tilesets/interieurs_numeros.png` = la planche ×2 avec les numéros.
-- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 26 à 29 (ids 200 à 231) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
+- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 28 à 29 (ids 216 à 231) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
 - Collisions en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche). Les terrains (Wang par coins) sont dans le panneau Terrains de Tiled.
 - Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px (dessin final). Les collisions sont dans le tileset (voir la colonne Collision).
 - Salle type 20×11 : rangée 0 = plafond, rangée 1 = face du mur du fond (les meubles hauts s'y adossent), colonnes 0 et 19 = bandes latérales, rangée 10 = bandeau du bas avec la porte de sortie (`Sortie` + Spawn d'arrivée juste au-dessus). Un meuble de 2 cases de haut a sa moitié haute au-dessus de sa moitié basse.
@@ -290,6 +290,17 @@ Tapis 3×3 : coins, bords et centre ; sans collision.
 | 197 | `tache_encre` | Tache d'encre / de suie sur le sol | Decor | aucune |
 | 198 | `rayon_lumiere` | Rayon de lumière de fenêtre (semi-transparent) | Decor | aucune |
 
+## 12. Foyer de forge froid (fourneau éteint)
+
+Ajouté en fin de planche (ids 200, 201 / 208, 209) : même foyer que le 2×2 allumé (80-83), cendres et bûches noircies. Même collision pleine. À poser à la place du foyer allumé tant que le fourneau est froid.
+
+| N° | Nom | Rôle | Calque | Collision |
+| --- | --- | --- | --- | --- |
+| 200 | `foyer_froid_haut_g` | FOYER de forge FROID 2×2, haut gauche (hotte) | Murs | pleine |
+| 201 | `foyer_froid_haut_d` | FOYER de forge FROID 2×2, haut droite | Murs | pleine |
+| 208 | `foyer_froid_bas_g` | FOYER de forge FROID 2×2, bas gauche (cendres) | Murs | pleine |
+| 209 | `foyer_froid_bas_d` | FOYER de forge FROID 2×2, bas droite (cendres) | Murs | pleine |
+
 ## Assemblages (pinceau « tampon » dans Tiled)
 
 | Assemblage | Tuiles (ligne par ligne) | Calques / usage |
@@ -301,6 +312,7 @@ Tapis 3×3 : coins, bords et centre ; sans collision.
 | **Lit 1×2** | `152 / 153` | Murs — tête contre le mur du fond ; variante bleue : lit_b |
 | **Cheminée 2×2** | `170 171 / 172 173` | Murs — adossée au mur du fond |
 | **Tapis 3×3** | `184 185 186 / 187 188 189 / 190 191 192` | Decor — peut s'étirer en répétant tapis_h / tapis_centre |
+| **Foyer de forge froid 2×2** | `200 201 / 208 209` | Murs — même emplacement que le foyer allumé ; le code ou la cinématique échange les tuiles |
 
 ## Notes
 

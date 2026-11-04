@@ -3,7 +3,7 @@
 > Fichier généré par `tools/sprites/village.py` : modifier le script, pas ce fichier. **État : DESSIN FINAL** (les numéros sont ceux du plan, aucune tuile n'a bougé).
 
 - Image : `art/tilesets/village.png`, 256×1600 px, 8 colonnes × 50 lignes de tuiles 32×32, sans marge ni espacement (400 cases). Tileset Tiled : `maps/tilesets/village.tsx` (collisions et terrains définis). `art/tilesets/village_numeros.png` = la planche ×2 avec les numéros.
-- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 47 à 50 (ids 368 à 399) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
+- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 48 à 50 (ids 376 à 399) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
 - Collisions en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche). Les terrains (Wang par coins) sont dans le panneau Terrains de Tiled.
 - Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px (dessin final). Les collisions sont dans le tileset (voir la colonne Collision).
 - **Arbres, buissons, rochers, falaises de forêt, fleurs et chemin de forêt** : on réutilise le tileset `foret` dans la même carte (Tiled accepte plusieurs tilesets par carte).
@@ -535,6 +535,21 @@ Tuiles à demi transparentes qui donnent la brume épaisse du début. Les poser 
 | 365 | `brume_trouee_b` | Brume trouée, variante | Dessus | aucune |
 | 366 | `brume_sol_a` | Brume rasante au sol (Decor, semi-transparente) | Decor | aucune |
 | 367 | `brume_sol_b` | Brume rasante au sol, variante | Decor | aucune |
+
+## 25. Décor de fête (épilogue : la fête de Brumeval)
+
+Ajouté en fin de planche (ids 368 à 375), sans collision, tout sur `Dessus`. Guirlande : g + m (répétable) + d, accrochée entre deux façades ; banderole : g + m (répétable) + d ; le fanion se répète à l’horizontale ; le lampion est seul.
+
+| N° | Nom | Rôle | Calque | Collision |
+| --- | --- | --- | --- | --- |
+| 368 | `guirlande_g` | Guirlande de fanions, bout gauche (accrochée au mur) | Dessus | aucune |
+| 369 | `guirlande_m` | Guirlande de fanions, milieu (répétable) | Dessus | aucune |
+| 370 | `guirlande_d` | Guirlande de fanions, bout droit | Dessus | aucune |
+| 371 | `lampion` | Lampion de papier suspendu | Dessus | aucune |
+| 372 | `fanion` | Fanions tendus (se répètent à l’horizontale) | Dessus | aucune |
+| 373 | `banderole_g` | Banderole de fête, bout gauche (tige de bois) | Dessus | aucune |
+| 374 | `banderole_m` | Banderole de fête, milieu (losange doré, répétable) | Dessus | aucune |
+| 375 | `banderole_d` | Banderole de fête, bout droit (tige de bois) | Dessus | aucune |
 
 ## Assemblages (pinceau « tampon » dans Tiled)
 
