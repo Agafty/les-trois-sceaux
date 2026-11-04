@@ -343,6 +343,66 @@
    <object id="1" x="0" y="0" width="32" height="32"/>
   </objectgroup>
  </tile>
+ <tile id="136">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="0" width="32" height="26"/>
+  </objectgroup>
+ </tile>
+ <tile id="137">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="0" width="32" height="26"/>
+  </objectgroup>
+ </tile>
+ <tile id="138">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="5" y="0" width="27" height="26"/>
+  </objectgroup>
+ </tile>
+ <tile id="139">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="0" width="27" height="26"/>
+  </objectgroup>
+ </tile>
+ <tile id="140">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="6" width="32" height="26"/>
+  </objectgroup>
+ </tile>
+ <tile id="141">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="6" width="32" height="26"/>
+  </objectgroup>
+ </tile>
+ <tile id="142">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="5" y="6" width="27" height="26"/>
+  </objectgroup>
+ </tile>
+ <tile id="143">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="6" width="27" height="26"/>
+  </objectgroup>
+ </tile>
+ <tile id="144">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="5" y="0" width="27" height="32"/>
+  </objectgroup>
+ </tile>
+ <tile id="145">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="5" y="0" width="27" height="32"/>
+  </objectgroup>
+ </tile>
+ <tile id="146">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="0" width="27" height="32"/>
+  </objectgroup>
+ </tile>
+ <tile id="147">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="0" width="27" height="32"/>
+  </objectgroup>
+ </tile>
  <wangsets>
   <wangset name="Chemin" type="corner" tile="23">
    <wangcolor name="herbe" color="#5a8a3c" tile="-1" probability="1"/>

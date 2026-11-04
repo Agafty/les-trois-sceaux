@@ -155,29 +155,57 @@ BARK_PAL = (P['b_lt'], P['b_md'], P['b_dk'], P['O'])
 
 
 # ---------------------------------------------------------------- textures périodiques 32x32
-def grass(seed, kind='plain'):
-    nseed = seed if kind == 'dark' else 1          # même fond pour toutes les variantes : pas de raccord visible
+BAYER = ((0, 8, 2, 10), (12, 4, 14, 6), (3, 11, 1, 9), (15, 7, 13, 5))
+
+
+def dth(x, y, k):
+    """Seuil de tramage ordonné 4x4 dans [0,1) (k = décalage pour éviter la même trame partout)."""
+    return (BAYER[(y + k) % 4][(x + k * 2) % 4] + 0.5) / 16.0
+
+
+def grass_base():
+    """Fond d'herbe commun à TOUTES les variantes : faible contraste, tramage fin, sans structure alignée sur la tuile."""
     t = [[P['g_md']] * T for _ in range(T)]
-    lo, hi_ = (0.30, 0.64) if kind != 'dark' else (0.45, 0.80)
     for y in range(T):
         for x in range(T):
-            n = vnoise(x, y, 4, nseed) * 0.7 + vnoise(x, y, 8, nseed + 5) * 0.3
-            if kind == 'dark':
-                t[y][x] = P['g_dk'] if n < 0.62 else P['g_md']
+            n = vnoise(x, y, 16, 1) * 0.45 + vnoise(x, y, 8, 6) * 0.35 + vnoise(x, y, 32, 9) * 0.20
+            if n > 0.64:
+                c = P['g_lt']
+            elif n > 0.55:
+                c = P['g_lt'] if dth(x, y, 0) < (n - 0.55) / 0.09 else P['g_md']
+            elif n < 0.34:
+                c = P['g_dk']
+            elif n < 0.43:
+                c = P['g_dk'] if dth(x, y, 1) < (0.43 - n) / 0.09 else P['g_md']
             else:
-                t[y][x] = P['g_lt'] if n > hi_ else P['g_dk'] if n < lo else P['g_md']
-    r = random.Random(seed * 31 + 7)
-    nblades = {'plain': 8, 'tufts': 16, 'clover': 7, 'stones': 6, 'dark': 10}.get(kind, 8)
-    for _ in range(nblades):
+                c = P['g_md']
+            t[y][x] = c
+    r = random.Random(77)
+    for _ in range(14):                     # brins d'herbe (communs à toutes les tuiles)
         x, y = r.randrange(T), r.randrange(T)
         wset(t, x, y, P['g_dk'])
-        wset(t, x - 1, y - 1, P['g_hi'])
-        wset(t, x + 1, y - 1, P['g_hi'])
+        wset(t, x, y - 1, P['g_lt'])
+        if r.random() < 0.5:
+            wset(t, x + (1 if r.random() < 0.5 else -1), y - 1, P['g_hi'])
+    return t
+
+
+def grass(seed, kind='plain'):
+    t = grass_base()
+    r = random.Random(seed * 31 + 7)
+    if kind == 'tufts':
+        for _ in range(7):
+            x, y = r.randrange(T), r.randrange(T)
+            wset(t, x, y, P['g_dk'])
+            wset(t, x - 1, y - 1, P['g_hi'])
+            wset(t, x + 1, y - 1, P['g_hi'])
+            wset(t, x, y - 1, P['g_lt'])
     if kind == 'clover':
         for _ in range(6):
             x, y = r.randrange(T), r.randrange(T)
             for dx, dy in ((0, 0), (1, 0), (0, 1), (1, 1)):
-                wset(t, x + dx, y + dy, P['g_hi'] if (dx + dy) % 2 == 0 else P['g_lt'])
+                wset(t, x + dx, y + dy, P['g_lt'] if (dx + dy) % 2 == 0 else P['g_dk'])
+            wset(t, x, y, P['g_hi'])
     if kind == 'stones':
         for _ in range(4):
             x, y = r.randrange(T), r.randrange(T)
@@ -191,6 +219,17 @@ def grass(seed, kind='plain'):
             for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
                 wset(t, x + dx, y + dy, col)
             wset(t, x, y, P['f_yel'] if kind != 'fl_yel' else P['orange'])
+    if kind == 'dark':
+        # même fond que herbe_a, assombri de façon diffuse vers le centre (0 sur le bord : raccord invisible)
+        dark_of = {P['g_hi']: P['g_lt'], P['g_lt']: P['g_md'], P['g_md']: P['g_dk'], P['g_dk']: P['g_dk']}
+        for y in range(T):
+            for x in range(T):
+                d = math.hypot(x + 0.5 - 16, y + 0.5 - 16) / 16.0
+                s = max(0.0, 1.0 - d)
+                s = s * s * (3 - 2 * s) * 0.85
+                s *= 0.7 + 0.6 * vnoise(x, y, 8, 12)
+                if dth(x, y, 2) < s:
+                    t[y][x] = dark_of.get(t[y][x], t[y][x])
     return t
 
 
@@ -198,10 +237,20 @@ def path_tex(seed=11):
     t = [[P['t_md']] * T for _ in range(T)]
     for y in range(T):
         for x in range(T):
-            n = vnoise(x, y, 4, seed) * 0.7 + vnoise(x, y, 8, seed + 3) * 0.3
-            t[y][x] = P['t_lt'] if n > 0.62 else P['t_dk'] if n < 0.26 else P['t_md']
+            n = vnoise(x, y, 16, seed) * 0.45 + vnoise(x, y, 8, seed + 3) * 0.35 + vnoise(x, y, 32, seed + 8) * 0.2
+            if n > 0.63:
+                c = P['t_lt']
+            elif n > 0.55:
+                c = P['t_lt'] if dth(x, y, 0) < (n - 0.55) / 0.08 else P['t_md']
+            elif n < 0.33:
+                c = P['t_dk']
+            elif n < 0.42:
+                c = P['t_dk'] if dth(x, y, 1) < (0.42 - n) / 0.09 else P['t_md']
+            else:
+                c = P['t_md']
+            t[y][x] = c
     r = random.Random(seed)
-    for _ in range(6):                      # petits cailloux
+    for _ in range(5):                      # petits cailloux
         x, y = r.randrange(T), r.randrange(T)
         wset(t, x, y, P['k_lt'])
         wset(t, x + 1, y, P['k_md'])
@@ -216,8 +265,8 @@ def water_tex(deep, seed=21):
     t = [[base] * T for _ in range(T)]
     for y in range(T):
         for x in range(T):
-            n = vnoise(x, y, 4, seed)
-            if n < 0.3 and (x + y) % 2 == 0:
+            n = vnoise(x, y, 8, seed) * 0.6 + vnoise(x, y, 16, seed + 2) * 0.4
+            if n < 0.3 and dth(x, y, 0) < (0.3 - n) / 0.12:
                 t[y][x] = dk
     r = random.Random(seed)
     for _ in range(5 if deep else 7):       # petites vagues claires
@@ -242,29 +291,72 @@ def corners(b):
     return (b >> 3) & 1, (b >> 2) & 1, (b >> 1) & 1, b & 1
 
 
-def terrain_tile(b, A, B, rimA, rimB, seed, amp=0.085, pb=0.85):
-    """Renvoie (image, masque) : masque True = terrain secondaire (B)."""
+def terrain_tile(b, A, B, rimA, rimB, seed, amp=0.085, pb=0.85, style='path'):
+    """Renvoie (image, masque) : masque True = terrain secondaire (B). Bords irréguliers et tramés (voir `style`)."""
     hg, hd, bg, bd = corners(b)
-    m = [[False] * T for _ in range(T)]
-    for y in range(T):
-        for x in range(T):
-            u, v = (x + 0.5) / T, (y + 0.5) / T
-            f = (hg * (1 - u) + hd * u) * (1 - v) + (bg * (1 - u) + bd * u) * v
-            f += (vnoise(x, y, 8, seed) - 0.5) * amp * 2 + (vnoise(x, y, 16, seed + 1) - 0.5) * amp
-            m[y][x] = f > 0.5
+
+    def fval(x, y):                       # x,y peuvent sortir de la tuile (extrapolation, bruit périodique)
+        u, v = (x + 0.5) / T, (y + 0.5) / T
+        f = (hg * (1 - u) + hd * u) * (1 - v) + (bg * (1 - u) + bd * u) * v
+        return (f + (vnoise(x % T, y % T, 8, seed) - 0.5) * amp * 2 + (vnoise(x % T, y % T, 16, seed + 1) - 0.5) * amp
+                + (vnoise(x % T, y % T, 4, seed + 2) - 0.5) * amp * 1.4)
+
+    def mk(x, y):
+        return fval(x, y) > 0.5
+    m = [[mk(x, y) for x in range(T)] for y in range(T)]
+    n1 = ((1, 0), (-1, 0), (0, 1), (0, -1))
+    n2 = ((2, 0), (-2, 0), (0, 2), (0, -2), (1, 1), (-1, -1), (1, -1), (-1, 1))
+
+    def dist(x, y):
+        s = mk(x, y)
+        if any(mk(x + dx, y + dy) != s for dx, dy in n1):
+            return 1
+        if any(mk(x + dx, y + dy) != s for dx, dy in n2):
+            return 2
+        return 9
     img = [[None] * T for _ in range(T)]
     for y in range(T):
         for x in range(T):
-            near = any(0 <= x + dx < T and 0 <= y + dy < T and m[y + dy][x + dx] != m[y][x]
-                       for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+            d = dist(x, y)
+            r1, r2 = rnd(x % T, y % T, seed + 9), rnd(x % T, y % T, seed + 17)
+            chk = (x + y) % 2 == 0
+            clump = vnoise(x, y, 16, seed + 5)
             if m[y][x]:
                 c = B[y][x]
-                if near and rimB:
-                    c = rimB if (rimB and (rimA is None or rnd(x, y, seed) < pb)) else c
+                if style == 'path':
+                    if d == 1:
+                        c = P['t_dk'] if r1 < 0.8 else c
+                        if r2 < 0.22:                     # brin d'herbe qui déborde
+                            c = P['g_md'] if r1 < 0.4 else P['g_lt']
+                    elif d == 2 and chk and r2 < 0.7:
+                        c = P['t_dk']
+                elif style == 'shore':
+                    if d == 1:
+                        c = P['foam'] if clump > 0.38 and r1 < pb + 0.15 else P['w_hi'] if r1 < 0.8 else c
+                    elif d == 2 and (r2 < 0.22 or (chk and clump > 0.6)):
+                        c = P['w_hi']
+                else:  # deep
+                    if d == 1:
+                        c = P['d_dk'] if (chk or r1 < 0.45) else P['d_md']
+                    elif d == 2 and chk and r2 < 0.6:
+                        c = P['d_dk']
             else:
                 c = A[y][x]
-                if near and rimA and rnd(x, y, seed + 9) < 0.55:
-                    c = rimA
+                if style == 'path':
+                    if d == 1 and (chk or r1 < 0.3):
+                        c = P['g_dk']
+                    elif d == 2 and r2 < 0.2:
+                        c = P['g_dk']
+                elif style == 'shore':
+                    if d == 1 and (chk or r1 < 0.35):
+                        c = P['g_dk']
+                    elif d == 2 and r2 < 0.18:
+                        c = P['g_dk']
+                else:
+                    if d == 1 and (chk or r1 < 0.35):
+                        c = P['w_dk']
+                    elif d == 2 and r2 < 0.2:
+                        c = P['w_dk']
             img[y][x] = c
     ms = [[False] * T for _ in range(T)]            # masque lisse pour le plan
     for y in range(T):
@@ -313,29 +405,114 @@ def tree_small(v):
     return cv.p
 
 
-def tree_dense(v):
-    cv = Cv(fill=P['g_dp'])
-    r = random.Random(100 + v)
-    circles = []
-    for _ in range(7):
-        cx, cy, rad = r.uniform(0, 32), r.uniform(0, 32), r.uniform(6, 9)
+CROWN_R = 8.5
+# Cimes partagées par 74 et 75 (et par toutes les lisières) : elles touchent les bords, donc tous les raccords sont identiques.
+SHARED_CROWNS = [(1, 7, 9.0), (30, 24, 9.5), (13, 1, 8.5), (22, 31, 9.0), (31, 12, 7.5), (4, 20, 7.0)]
+# Cimes intérieures propres à chaque variante (boîte englobante dans [2, 29] : aucun pixel de bord ne change).
+INNER_CROWNS = {0: [(15, 14, 7.5), (22, 24, 5.0), (8, 9, 4.5)], 1: [(11, 16, 7.0), (22, 9, 6.0), (19, 24, 4.5)]}
+# Cimes de bord (lisières) : 3 par côté, régulièrement espacées ; seule la cime du milieu varie (A/B).
+EDGE_STEP = 32 / 3.0
+
+
+def _crown_pixel(circles, x, y, seed):
+    """Couleur du pixel (x, y) vu de dessus : cime la plus basse (devant) qui le recouvre, sinon None."""
+    best = None
+    for (cx, cy, r) in circles:
         for ox in (-32, 0, 32):
             for oy in (-32, 0, 32):
-                circles.append((cx + ox, cy + oy, rad, rad * 0.85))
+                nx, ny = (x + 0.5 - (cx + ox)) / r, (y + 0.5 - (cy + oy)) / r
+                d = nx * nx + ny * ny
+                if d <= 1 and (best is None or cy + oy > best[0]):
+                    best = (cy + oy, d, nx, ny)
+    if best is None:
+        return None
+    _, d, nx, ny = best
+    v = -(nx + ny) * 0.6 + (rnd(x, y, seed) - 0.5) * 0.35 - d * 0.1 + 0.08
+    if d > 0.78:                                    # contour feuillu sombre, plus net en bas à droite
+        if nx + ny > -0.2 or rnd(x, y, seed + 3) < 0.55:
+            return P['g_dp']
+    if v > 0.5:
+        return P['g_hi']
+    return P['g_lt'] if v > 0.18 else P['g_md'] if v > -0.25 else P['g_dk']
+
+
+def _gap(x, y):
+    return P['g_dk'] if (x + y) % 2 == 0 and rnd(x, y, 41) < 0.45 else P['g_dp']
+
+
+def _dense_pixel(x, y, v):
+    c = _crown_pixel(SHARED_CROWNS + INNER_CROWNS[v], x, y, 5)
+    return c if c is not None else _gap(x, y)
+
+
+def tree_dense(v):
+    return [[_dense_pixel(x, y, v) for x in range(T)] for y in range(T)]
+
+
+def _edge_crowns(side, v):
+    r = CROWN_R
+    s = EDGE_STEP
+    ca, cb, cc = s * 0.5, s * 1.5, s * 2.5
+    mid = {0: 0, 1: 2}[v]
+    if side == 'B':
+        return [(ca, 17, r), (cb, 17 + mid, r), (cc, 17, r)]
+    if side == 'T':
+        return [(ca, 15, r), (cb, 15 - mid, r), (cc, 15, r)]
+    if side == 'L':
+        return [(15, ca, r), (15 + mid, cb, r), (15, cc, r)]
+    return [(17, ca, r), (17 - mid, cb, r), (17, cc, r)]
+
+
+ZONE = {'B': lambda x, y: y >= 10, 'T': lambda x, y: y < 22, 'L': lambda x, y: x < 22, 'R': lambda x, y: x >= 10}
+
+
+NEAR = {'B': lambda x, y: y < 14, 'T': lambda x, y: y > 17, 'L': lambda x, y: x > 17, 'R': lambda x, y: x < 14}
+
+
+def lisiere(sides, v):
+    """Bord de massif : `sides` parmi B, T, L, R. Hors cimes de bord = transparent (l'herbe du calque Sol se voit)."""
+    own = {s: _edge_crowns(s, v) for s in sides}
+    cv = Cv()
     for y in range(T):
         for x in range(T):
-            best = None
-            for (cx, cy, rx, ry) in circles:
-                nx, ny = (x + 0.5 - cx) / rx, (y + 0.5 - cy) / ry
-                d = nx * nx + ny * ny
-                if d <= 1 and (best is None or d < best[0]):
-                    best = (d, nx, ny)
-            if best:
-                d, nx, ny = best
-                val = -(nx + ny) * 0.55 + (rnd(x, y, 5 + v) - 0.5) * 0.3 - d * 0.1
-                cv.p[y][x] = P['g_lt'] if val > 0.45 else P['g_md'] if val > 0.0 else P['g_dk']
-            elif (x + y) % 3 == 0:
-                cv.p[y][x] = P['g_dk']
+            cols, inown, ok = [], False, True
+            for s in sides:
+                if ZONE[s](x, y):
+                    inown = True
+                    c = _crown_pixel(own[s], x, y, 5 + 11 * v)
+                    if c is None:
+                        if NEAR[s](x, y):                       # près de la jonction avec le feuillage dense : creux sombre, pas de coupure
+                            c = _gap(x, y)
+                        else:
+                            ok = False
+                    cols.append(c)
+            if not inown:
+                cv.p[y][x] = _dense_pixel(x, y, v)
+            elif ok:
+                cv.p[y][x] = next(c for c in cols if c is not None)
+    if 'B' in sides:                                # ombre portée tramée + troncs sous le bord bas
+        for y in range(24, T):
+            for x in range(T):
+                if cv.p[y][x] is not None:
+                    continue
+                if any(s in sides and ZONE[s](x, y) and _crown_pixel(own[s], x, y, 0) is None for s in 'LR'):
+                    continue
+                for (cx, _, _) in own['B']:
+                    for ox in (-32, 0, 32):
+                        if ((x + 0.5 - cx - ox) / 11.5) ** 2 + ((y + 0.5 - 27.5) / 4.2) ** 2 <= 1 and (x + y) % 2 == 0:
+                            cv.p[y][x] = P['g_dk']
+        for (cx, _, _) in own['B']:
+            for ox in (-32, 0, 32):
+                x0 = int(round(cx + ox)) - 2
+                if v == 1 and abs(cx - EDGE_STEP * 1.5) < 1:
+                    continue
+                for y in range(25, 31):
+                    for x in range(x0, x0 + 4):
+                        if 0 <= x < T and (cv.p[y][x] is None or y >= 26 and cv.p[y][x] in (P['g_dk'], None)):
+                            cv.p[y][x] = P['b_lt'] if x == x0 else P['O'] if x == x0 + 3 else P['b_md']
+                for x in range(x0 - 1, x0 + 5):
+                    if 0 <= x < T and cv.p[30][x] is None:
+                        cv.p[30][x] = P['b_dk']
     return cv.p
 
 
@@ -986,7 +1163,7 @@ def build_blocks():
     # Eau peu profonde
     group('3. Eau peu profonde (rivière, mare)', 24, 39)
     for b in range(16):
-        img, m = terrain_tile(b, GRASS['plain'], SHALLOW, P['g_dk'], P['foam'], 21, pb=0.55)
+        img, m = terrain_tile(b, GRASS['plain'], SHALLOW, P['g_dk'], P['foam'], 21, pb=0.55, style='shore')
         add(24 + b, 'herbe_rive' if b == 0 else 'eau' if b == 15 else f'eau_{NAME_SUFFIX(b)}',
             'Herbe (base du terrain Eau)' if b == 0 else 'Eau peu profonde, case entière (Brann la traverse)' if b == 15
             else 'Rive : ' + describe(b, 'eau'),
@@ -994,7 +1171,7 @@ def build_blocks():
     # Eau profonde
     group('4. Eau profonde (infranchissable)', 40, 55)
     for b in range(16):
-        img, m = terrain_tile(b, SHALLOW, DEEP, P['foam'], P['d_dk'], 31, 0.07, pb=1.0)
+        img, m = terrain_tile(b, SHALLOW, DEEP, P['foam'], P['d_dk'], 31, 0.13, pb=1.0, style='deep')
         add(40 + b, 'eau_pour_profonde' if b == 0 else 'eau_profonde' if b == 15 else f'eau_profonde_{NAME_SUFFIX(b)}',
             'Eau peu profonde (base du terrain Eau profonde)' if b == 0 else 'Eau profonde, case entière (infranchissable)'
             if b == 15 else 'Eau profonde : ' + describe(b, 'eau profonde'),
@@ -1097,6 +1274,22 @@ def build_objects():
     add(133, 'champignons', 'Champignons rouges', 'Decor', None, mushrooms(), 'decor')
     add(134, 'cailloux', 'Petits cailloux', 'Decor', None, pebbles(), 'decor')
     add(135, 'feuilles_mortes', 'Feuilles mortes', 'Decor', None, dead_leaves(), 'decor')
+    # Lisières de massif d'arbres (calque Murs, fond transparent : l’herbe du calque Sol se voit)
+    group('11. Lisières de massif (bords des cases 74/75, calque Murs)', 136, 147)
+    lis = [(136, 'lisiere_bas_a', 'B', 0, 'Bord BAS d’un massif : bas des cimes arrondi, troncs, ombre sur l’herbe (rangée la plus basse)', [(0, 0, 32, 26)]),
+           (137, 'lisiere_bas_b', 'B', 1, 'Bord BAS, variante (alterner avec 136)', [(0, 0, 32, 26)]),
+           (138, 'lisiere_bas_g', 'BL', 0, 'Coin bas-gauche d’un massif (extrémité gauche du bord bas)', [(5, 0, 27, 26)]),
+           (139, 'lisiere_bas_d', 'BR', 0, 'Coin bas-droite d’un massif (extrémité droite du bord bas)', [(0, 0, 27, 26)]),
+           (140, 'lisiere_haut_a', 'T', 0, 'Bord HAUT d’un massif : cimes arrondies qui dépassent sur l’herbe', [(0, 6, 32, 26)]),
+           (141, 'lisiere_haut_b', 'T', 1, 'Bord HAUT, variante (alterner avec 140)', [(0, 6, 32, 26)]),
+           (142, 'lisiere_haut_g', 'TL', 0, 'Coin haut-gauche d’un massif', [(5, 6, 27, 26)]),
+           (143, 'lisiere_haut_d', 'TR', 0, 'Coin haut-droite d’un massif', [(0, 6, 27, 26)]),
+           (144, 'lisiere_gauche_a', 'L', 0, 'Bord GAUCHE d’un massif', [(5, 0, 27, 32)]),
+           (145, 'lisiere_gauche_b', 'L', 1, 'Bord GAUCHE, variante (alterner avec 144)', [(5, 0, 27, 32)]),
+           (146, 'lisiere_droite_a', 'R', 0, 'Bord DROIT d’un massif', [(0, 0, 27, 32)]),
+           (147, 'lisiere_droite_b', 'R', 1, 'Bord DROIT, variante (alterner avec 146)', [(0, 0, 27, 32)])]
+    for (i_, nom, sides, v, role, col) in lis:
+        add(i_, nom, role, 'Murs', col, lisiere(sides, v), 'arbre')
 
 
 # ---------------------------------------------------------------- export PNG
@@ -1338,6 +1531,56 @@ def preview():
     return px_
 
 
+def preview_massif():
+    """Massif d'arbres avec sa lisière sur fond d'herbe (contrôle des raccords 74/75 + 136-147)."""
+    W, H = 20, 9
+    g = [[[0, 1, 0, 2, 0, 3, 0][(x * 5 + y * 3) % 7] for x in range(W)] for y in range(H)]
+    px_ = [[None] * (W * T) for _ in range(H * T)]
+
+    def blit(i, gx, gy):
+        d = TILES[i]['img']
+        for y in range(T):
+            for x in range(T):
+                if d[y][x] is not None:
+                    px_[gy * T + y][gx * T + x] = d[y][x]
+    for y in range(H):
+        for x in range(W):
+            blit(g[y][x], x, y)
+    # massif : (x 2..9, y 0..4) puis une avancée (x 11..17, y 1..6) avec coin rentrant laissé à l'herbe
+    cells = set()
+    for y in range(0, 5):
+        for x in range(2, 10):
+            cells.add((x, y))
+    for y in range(2, 7):
+        for x in range(11, 18):
+            cells.add((x, y))
+    for (x, y) in sorted(cells):
+        up, dn, lf, rt = (x, y - 1) in cells, (x, y + 1) in cells, (x - 1, y) in cells, (x + 1, y) in cells
+        alt = (x * 3 + y * 5) % 2
+        if not up and not lf:
+            i = 142
+        elif not up and not rt:
+            i = 143
+        elif not dn and not lf:
+            i = 138
+        elif not dn and not rt:
+            i = 139
+        elif not up:
+            i = 140 + alt
+        elif not dn:
+            i = 136 + alt
+        elif not lf:
+            i = 144 + alt
+        elif not rt:
+            i = 146 + alt
+        else:
+            i = 74 + alt
+        blit(i, x, y)
+    for (x, y) in ((11, 0), (12, 0), (11, 1)):
+        blit(74 + (x + y) % 2, x, y)
+    return px_
+
+
 def main():
     build_blocks()
     build_objects()
@@ -1350,6 +1593,7 @@ def main():
     with open(os.path.join(out_t, f'{NAME}_plan.md'), 'w', encoding='utf-8', newline='\n') as f:
         f.write(build_md())
     pv = preview()
+    save_png(os.path.join(out_t, f'{NAME}_apercu_massif.png'), preview_massif(), scale=3)
     save_png(os.path.join(out_t, f'{NAME}_apercu.png'), pv, scale=3)
     print(f'{sum(1 for d in TILES.values() if d["img"] is not None)} tuiles ({"plan" if PLAN else "final"}) sur {COLS * ROWS} cases.')
 

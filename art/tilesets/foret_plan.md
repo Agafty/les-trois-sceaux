@@ -190,6 +190,23 @@
 | 134 | `cailloux` | Petits cailloux | Decor | aucune |
 | 135 | `feuilles_mortes` | Feuilles mortes | Decor | aucune |
 
+## 11. Lisières de massif (bords des cases 74/75, calque Murs)
+
+| N° | Nom | Rôle | Calque | Collision |
+| --- | --- | --- | --- | --- |
+| 136 | `lisiere_bas_a` | Bord BAS d’un massif : bas des cimes arrondi, troncs, ombre sur l’herbe (rangée la plus basse) | Murs | partielle : 0,0 32×26 |
+| 137 | `lisiere_bas_b` | Bord BAS, variante (alterner avec 136) | Murs | partielle : 0,0 32×26 |
+| 138 | `lisiere_bas_g` | Coin bas-gauche d’un massif (extrémité gauche du bord bas) | Murs | partielle : 5,0 27×26 |
+| 139 | `lisiere_bas_d` | Coin bas-droite d’un massif (extrémité droite du bord bas) | Murs | partielle : 0,0 27×26 |
+| 140 | `lisiere_haut_a` | Bord HAUT d’un massif : cimes arrondies qui dépassent sur l’herbe | Murs | partielle : 0,6 32×26 |
+| 141 | `lisiere_haut_b` | Bord HAUT, variante (alterner avec 140) | Murs | partielle : 0,6 32×26 |
+| 142 | `lisiere_haut_g` | Coin haut-gauche d’un massif | Murs | partielle : 5,6 27×26 |
+| 143 | `lisiere_haut_d` | Coin haut-droite d’un massif | Murs | partielle : 0,6 27×26 |
+| 144 | `lisiere_gauche_a` | Bord GAUCHE d’un massif | Murs | partielle : 5,0 27×32 |
+| 145 | `lisiere_gauche_b` | Bord GAUCHE, variante (alterner avec 144) | Murs | partielle : 5,0 27×32 |
+| 146 | `lisiere_droite_a` | Bord DROIT d’un massif | Murs | partielle : 0,0 27×32 |
+| 147 | `lisiere_droite_b` | Bord DROIT, variante (alterner avec 146) | Murs | partielle : 0,0 27×32 |
+
 ## Assemblages à connaître (à poser avec le pinceau « tampon »)
 
 | Assemblage | Tuiles (ligne par ligne) | Calques |
