@@ -27,10 +27,11 @@ SHOW = "--show" in sys.argv
 TERRAINS = {
     "village": {"Paves": range(8, 15), "Terre": range(96, 102), "Rive": [64]},
     "foret": {"Eau": [40], "Chemin": []},
+    "route_chateau": {"Paves": range(0, 4)},
     "montagne": {"Sentier": [], "HerbeM": [], "Neige": [], "Ruisseau": [96]},
 }
 # tuiles de base (herbe / roche) par tileset : couleur 1 de tous les terrains ci-dessus
-BASE = {"village": range(0, 8), "foret": list(range(0, 9)) + [24], "montagne": range(0, 14),
+BASE = {"route_chateau": range(5, 8), "village": range(0, 8), "foret": list(range(0, 9)) + [24], "montagne": range(0, 14),
         "lac": [64, 65]}   # lac : herbe d'ilot
 # variantes « eau peu profonde » d'autres tilesets, pleines pour les terrains Rive / Eau
 WATER_EXTRA = {"lac": [7, 70]}
