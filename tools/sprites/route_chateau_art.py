@@ -22,7 +22,7 @@ PAL['rim_re'] = pal('#b6a8d2', '#9a8cba', '#7a6c9e', '#5c5082', '#403662')
 PAL['pierre_roc'] = pal('#a89a8a', '#8c8074', '#6e645c', '#524a46', '#3a3434')
 PAL['stalag'] = pal('#9a8272', '#7a6458', '#5e4c44', '#463a36', '#322a2a')
 
-FAL = Wall(PAL['cap_fa'], PAL['rim_fa'], strata(PAL['falaise'], 5), seed=15, cap_kind='rock')
+FAL = Wall(PAL['cap_fa'], PAL['rim_fa'], strata(PAL['falaise'], 5), seed=15, cap_kind='crag')
 ROC = Wall(PAL['cap_ro'], PAL['rim_ro'], strata(PAL['roche'], 9), seed=25, cap_kind='rock')
 REM = Wall(PAL['cap_cr'], PAL['rim_re'], masonry(PAL['fac_cr'], 3), seed=35)
 FC = PAL['fac_cr']
@@ -127,6 +127,11 @@ def cave_floor(kind):
 
 for _i, _n in enumerate(('grotte_sol_a', 'grotte_sol_b', 'grotte_sol_cailloux')):
     REG[_n] = (lambda k: (lambda n, d: cave_floor(k)))(_i)
+
+# transitions pavés / herbe (160 à 175) : 160 = herbe, 175 = pavés ; les 14 autres sont des repères redessinés par fondus.py
+for _b in range(16):
+    _n = 'paves_herbe_base' if _b == 0 else 'paves_herbe_plein' if _b == 15 else 'paves_herbe_%d%d%d%d' % ((_b >> 3) & 1, (_b >> 2) & 1, (_b >> 1) & 1, _b & 1)
+    REG[_n] = (lambda b: (lambda n, d: eclipse_grass(1, 'plain') if b == 0 else cobbles(PAL['pave'], 'a')))(_b)
 
 # ------------------------------------------------------------------ 2. murs (falaise, roche, rempart)
 for _prefix, _w in (('falaise', FAL), ('grotte', ROC), ('rempart', REM)):

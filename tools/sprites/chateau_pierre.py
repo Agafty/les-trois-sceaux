@@ -150,15 +150,41 @@ def grain(p, seed, lo=0.34, hi=0.63):
     return t
 
 
-def bond(t, p, offsets=(0, 16), seed=3):
-    """Dalles en appareil décalé : joints sombres, arête éclairée en haut et à gauche (pas de contour)."""
+SLAB_H = (5, 15, 26)                                                # joints horizontaux (jamais sur le bord de la tuile)
+SLAB_V = {'a': ((7, 22), (14, 28), (3, 20)), 'c': ((11, 26), (4, 19), (9, 24))}
+
+
+def bond(t, p, offsets=None, seed=3, layout='a'):
+    """Dalles en appareil irrégulier : trois rangées de hauteur inégale, joints décalés d'une rangée à l'autre, joints un peu
+    ondulés, ton légèrement différent d'une dalle à l'autre. Aucun joint sur le bord de la tuile (pas de quadrillage) et motif
+    périodique sur 32 px : les tuiles se raccordent sans coupure, quelle que soit la variante."""
+    V = SLAB_V[layout]
+    hj = [[SLAB_H[k] + (1 if rnd(x // 3, k, seed) < 0.28 else 0) for k in range(3)] for x in range(T)]
+    base = [row[:] for row in t]
     for y in range(T):
-        jx = offsets[(y // 16) % 2]
+        band = 2 if (y < SLAB_H[0] or y > SLAB_H[2]) else 0 if y < SLAB_H[1] else 1
+        vs = V[band]
         for x in range(T):
-            if y % 16 == 0 or x == jx % 32 or x == (jx + 16) % 32:
-                t[y][x] = p[DP]
-            elif (y % 16 == 1 or x == (jx + 1) % 32 or x == (jx + 17) % 32) and rnd(x, y, seed) < 0.7:
-                t[y][x] = p[HI]
+            vj = [vs[i] + (1 if rnd(y // 3, band * 2 + i + 7, seed) < 0.28 else 0) for i in range(2)]
+            seg = 0 if vj[0] < x <= vj[1] else 1
+            tone = rnd(band, seg, seed + 21)
+            col = base[y][x]
+            if band != 2 and col == p[MD]:                           # ton propre à chaque dalle (la rangée qui boucle reste neutre)
+                if tone < 0.3 and rnd(x, y, seed + 3) < 0.3:
+                    col = p[DK]
+                elif tone > 0.7 and rnd(x, y, seed + 4) < 0.3:
+                    col = p[LT]
+            below = any(y == hj[x][k] + 1 for k in range(3))
+            above = any(y == hj[x][k] - 1 for k in range(3))
+            if any(y == hj[x][k] for k in range(3)) or x in vj:
+                col = p[DP] if rnd(x, y, seed + 5) < 0.35 else p[DK]
+            elif below or x - 1 in vj:                                # arête éclairée (haut et gauche de la dalle)
+                if rnd(x, y, seed + 6) < 0.4:
+                    col = p[LT]
+            elif above or x + 1 in vj:                                # bord dans l'ombre (bas et droite)
+                if rnd(x, y, seed + 8) < 0.4:
+                    col = p[DK]
+            t[y][x] = col
 
 
 def crack(t, p, pts, brambles=None):
@@ -177,21 +203,7 @@ def crack(t, p, pts, brambles=None):
 
 def slab_floor(p, kind='a', seed=1, brambles=None):
     t = grain(p, seed)
-    if kind in ('a', 'b', 'f', 'e'):
-        bond(t, p, (0, 16), seed + 2)
-    if kind == 'c':                                                  # joints irréguliers
-        bands = ((0, 10, (6, 22)), (10, 22, (14, 30)), (22, 32, (3, 19)))
-        for y0, y1, xs in bands:
-            for y in range(y0, y1):
-                for x in range(T):
-                    if y == y0:
-                        t[y][x] = p[DP]
-                    elif y == y0 + 1 and rnd(x, y, 2 + seed) < 0.65:
-                        t[y][x] = p[HI]
-                    if x in xs:
-                        t[y][x] = p[DP]
-                    elif x in ((xs[0] + 1) % 32, (xs[1] + 1) % 32) and rnd(x, y, 4 + seed) < 0.6 and y > y0:
-                        t[y][x] = p[HI]
+    bond(t, p, None, seed + 2, 'c' if kind == 'c' else 'a')
     if kind == 'b':                                                  # reflets
         r = random.Random(11 + seed)
         for _ in range(6):
@@ -212,34 +224,47 @@ def slab_floor(p, kind='a', seed=1, brambles=None):
     return t
 
 
+_STONES = None
+
+
+def _stones():
+    """Pierres de la route : 5×5 points jittés (périodique sur 32 px), rayons inégaux -> pierres de tailles et de formes variées."""
+    global _STONES
+    if _STONES is None:
+        n, cell = 5, 32 / 5
+        _STONES = [((i + 0.5 + (rnd(i, j, 61) - 0.5) * 1.1) * cell, (j + 0.5 + (rnd(i, j, 62) - 0.5) * 1.1) * cell,
+                    (rnd(i, j, 63) - 0.5) * 2.6, rnd(i, j, 64), i * n + j) for j in range(n) for i in range(n)]
+    return _STONES
+
+
 def cobbles(p, kind='a'):
-    """Pavés ronds de la route : rangées de 8 px décalées, joints sombres, lumière en haut à gauche."""
+    """Pavés de la route : pierres irrégulières (cellules de Voronoï décalées, tailles inégales), joints fins sombres, arête éclairée
+    en haut à gauche, ombre en bas à droite, ton propre à chaque pierre. Le motif est le même pour toutes les variantes et périodique
+    sur 32 px : les tuiles se raccordent sans couture."""
     t = blank()
-    rows = [[0, 10, 22, 32], [0, 13, 21, 32], [0, 9, 19, 32], [0, 12, 24, 32]]
-    offs = (0, 6, 3, 9)
-    hs = (8, 8, 8, 8)
-    for ry in range(4):
-        cuts = rows[ry]
-        for y in range(8):
-            Y = ry * 8 + y
-            for x in range(T):
-                xs = (x - offs[ry]) % 32
-                k = 0
-                while not (cuts[k] <= xs < cuts[k + 1]):
-                    k += 1
-                xl, w = xs - cuts[k], cuts[k + 1] - cuts[k] - 1
-                if y == 0 or xl == 0 or (y in (1, 7) and xl in (1, w)):
-                    col = p[DP]                                    # joint (coins arrondis)
-                elif y == 1 or xl == 1:
-                    col = p[HI] if rnd(x, Y, 5) < 0.7 else p[LT]
-                elif y == 7 or xl == w:
-                    col = p[DK]
-                else:
-                    n = vnoise(x, Y, 8, 14)
-                    col = p[LT] if n > 0.68 else p[DK] if n < 0.24 else p[MD]
-                    if rnd(x, Y, 6) < 0.05:
-                        col = p[LT]
-                t[Y][x] = col
+    st = _stones()
+    for Y in range(T):
+        for x in range(T):
+            best = []
+            for sx, sy, w, tone, k in st:
+                dx = (x + 0.5 - sx + 16) % 32 - 16
+                dy = (Y + 0.5 - sy + 16) % 32 - 16
+                best.append(((dx * dx + dy * dy) ** 0.5 - w, dx, dy, tone, k))
+            best.sort()
+            (s1, dx, dy, tone, k), s2 = best[0], best[1][0]
+            e = s2 - s1
+            if e < 1.15:
+                col = p[DP] if rnd(x, Y, 5) < 0.7 else p[DK]
+            elif e < 2.3:
+                col = (p[HI] if rnd(x, Y, 5) < 0.3 else p[LT]) if dx + dy < 0 else p[DK]
+            else:
+                n = vnoise(x, Y, 8, 14)
+                lit = -(dx + dy) / 8.0
+                lo, hi = 0.24 + (0.12 if tone < 0.3 else -0.1 if tone > 0.75 else 0), 0.68 + (0.12 if tone < 0.3 else -0.1 if tone > 0.75 else 0)
+                col = p[LT] if (n > hi or lit > 0.5 and rnd(x, Y, 6) < 0.6) else p[DK] if (n < lo or lit < -0.55 and rnd(x, Y, 7) < 0.6) else p[MD]
+                if rnd(x, Y, 6) < 0.04:
+                    col = p[LT]
+            t[Y][x] = col
     if kind == 'b':                                                  # joints usés
         for _ in range(10):
             x, y = int(rnd(_, 1, 41) * 32), int(rnd(_, 2, 42) * 32)
@@ -282,6 +307,8 @@ class Wall:
                 return p[DK]
             if (y % 16 == 1 or (x - jx) % 16 == 1) and rnd(x, y, self.seed + 1) < 0.5:
                 return p[LT]
+        elif self.cap_kind == 'crag':                                # roche en blocs anguleux : facettes, fissures, éclats (pas de courbes de niveau)
+            return self.crag(x % 32, y % 32)
         else:                                                        # roche brute : paliers de relief (courbes de niveau claires/sombres)
             def q(xx, yy):
                 return int((vnoise(xx % 32, yy % 32, 8, self.seed + 3) * 0.6 + vnoise(xx % 32, yy % 32, 16, self.seed + 4) * 0.4) * 5.2)
@@ -296,6 +323,38 @@ class Wall:
             return col
         if rnd(x, y, self.seed + 2) < 0.02:
             return p[LT]
+        return col
+
+    def crag(self, x, y):
+        k = (x, y)
+        cc = self.__dict__.setdefault('_crag', {})
+        if k in cc:
+            return cc[k]
+        p, sd = self.cp, self.seed
+        pts = [((i + 0.5 + (rnd(i, j, sd + 31) - 0.5) * 1.0) * 32 / 3, (j + 0.5 + (rnd(i, j, sd + 32) - 0.5) * 1.0) * 32 / 3,
+                rnd(i, j, sd + 33)) for j in range(3) for i in range(3)]
+        best = []
+        for sx, sy, tn in pts:
+            dx, dy = (x + 0.5 - sx + 16) % 32 - 16, (y + 0.5 - sy + 16) % 32 - 16
+            best.append(((dx * dx + dy * dy) ** 0.5, dx, dy, tn))
+        best.sort()
+        (d1, dx, dy, tn), d2 = best[0], best[1][0]
+        e = d2 - d1
+        n = vnoise(x, y, 4, sd + 7)
+        if e < 0.9 and rnd(x, y, sd + 8) < 0.85:
+            col = p[DP]
+        elif e < 2.0:
+            col = (p[LT] if rnd(x, y, sd + 9) < 0.7 else p[MD]) if dx + dy < 0 else (p[DK] if rnd(x, y, sd + 9) < 0.7 else p[MD])
+        else:
+            base = p[LT] if tn > 0.72 else p[DK] if tn < 0.22 else p[MD]
+            col = base
+            if n > 0.72 and base != p[LT]:
+                col = p[LT]
+            elif n < 0.22 and base != p[DK]:
+                col = p[DK]
+            if rnd(x, y, sd + 2) < 0.05:
+                col = p[LT] if rnd(x, y, sd + 4) < 0.5 else p[DK]
+        cc[k] = col
         return col
 
     def th(self, v, seed):

@@ -466,5 +466,31 @@
    <wangtile tileid="149" wangid="0,0,0,1,0,0,0,1"/>
    <wangtile tileid="150" wangid="0,1,0,0,0,1,0,0"/>
   </wangset>
+  <wangset name="Paves" type="corner" tile="175">
+   <wangcolor name="herbe" color="#5a7a5a" tile="-1" probability="1"/>
+   <wangcolor name="paves" color="#9a96a8" tile="-1" probability="1"/>
+   <wangtile tileid="5" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="6" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="7" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="160" wangid="0,1,0,1,0,1,0,1"/>
+   <wangtile tileid="161" wangid="0,1,0,2,0,1,0,1"/>
+   <wangtile tileid="162" wangid="0,1,0,1,0,2,0,1"/>
+   <wangtile tileid="163" wangid="0,1,0,2,0,2,0,1"/>
+   <wangtile tileid="164" wangid="0,2,0,1,0,1,0,1"/>
+   <wangtile tileid="165" wangid="0,2,0,2,0,1,0,1"/>
+   <wangtile tileid="166" wangid="0,2,0,1,0,2,0,1"/>
+   <wangtile tileid="167" wangid="0,2,0,2,0,2,0,1"/>
+   <wangtile tileid="168" wangid="0,1,0,1,0,1,0,2"/>
+   <wangtile tileid="169" wangid="0,1,0,2,0,1,0,2"/>
+   <wangtile tileid="170" wangid="0,1,0,1,0,2,0,2"/>
+   <wangtile tileid="171" wangid="0,1,0,2,0,2,0,2"/>
+   <wangtile tileid="172" wangid="0,2,0,1,0,1,0,2"/>
+   <wangtile tileid="173" wangid="0,2,0,2,0,1,0,2"/>
+   <wangtile tileid="174" wangid="0,2,0,1,0,2,0,2"/>
+   <wangtile tileid="175" wangid="0,2,0,2,0,2,0,2"/>
+   <wangtile tileid="0" wangid="0,2,0,2,0,2,0,2"/>
+   <wangtile tileid="1" wangid="0,2,0,2,0,2,0,2"/>
+   <wangtile tileid="2" wangid="0,2,0,2,0,2,0,2"/>
+  </wangset>
  </wangsets>
 </tileset>

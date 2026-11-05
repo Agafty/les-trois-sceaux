@@ -70,6 +70,7 @@ STYLES = {
     'montagne': {'Sentier': sentier, 'HerbeM': lambda a, b: herbe_sur(a, b, False),
                  'Neige': neige, 'Ruisseau': lambda a, b: eau_rive(a, b, True),
                  'Ravin': ravin, 'Torrent': eau_profonde},
+    'route_chateau': {'Paves': paves},
 }
 
 

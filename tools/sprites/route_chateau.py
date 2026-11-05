@@ -39,6 +39,8 @@ Tileset `route_chateau` : 8 colonnes, id local Tiled = ligne × 8 + colonne. Un 
 | **Braseros** | 48 (route), 49 (grotte) | `Decor` | Socle décoratif sans collision, **sous** l'objet `Torche` (`permanente`) qui porte le vrai brasero et sa collision. |
 | **Portail scellé** 2×3 | 120 à 125 | `Murs` | Décor solide (symbole de l'Œil), voir assemblage. |
 
+| **Transitions pavés / herbe** (terrain Wang `Paves`, par coins) | 160 à 175 | `Sol` | Comme `Paves` de `village` : id = 160 + HG×8 + HD×4 + BG×2 + BD (1 = pavés). Ajoutées après coup, sans collision, bords fondus par `fondus.py`. Pinceau Terrains de Tiled ou `maps/autotile_wang.py`. |
+
 Tout le reste est géré par les collisions du `.tsx` (murs 16-30, 96-111, 136-151, façade 112-127, rochers 67-70, statues 152-155, 40-43, 47, 55, 71, 128) : aucun code.
 """
 
@@ -51,6 +53,7 @@ Dans Tiled : panneau **Terrains**, choisir le terrain puis le pinceau de terrain
 | `Falaise` | falaise | 16 à 30 | `route_falaise` : bords nord et sud de la route (face de falaise brun clair) |
 | `Roche de la grotte` | roche | 96 à 110 (111 = variante pleine) | `passage_falaise` : parois |
 | `Rempart` | rempart | 136 à 150 (151 = variante pleine) | `chateau` : murs gauche, droit et bas de la cour |
+| `Paves` (2 couleurs : herbe, paves) | herbe d'éclipse / pavés de la route | **160 à 175** (160 = herbe, 175 = pavés, 161 à 174 = transitions ; herbe 5 à 7 et pavés 0 à 2 sont des variantes pleines du même terrain) | `route_falaise` : bords de la route, calque `Sol` (sans collision) |
 
 """
 
@@ -65,7 +68,7 @@ S = PSheet('route_chateau', 8, 'La route de la falaise, la grotte noire et la co
             '`Murs` : tout ce qui bloque (falaise, roche, rempart, façade, portail, rochers, stalagmites, statues, murs fissurés fermés). Collisions dans le tileset',
             '`Objets` : Sortie, Spawn, Ennemi, Porte, MurFissure, StatueCorbeau, Torche, Marqueur, Scenario… (objets Tiled, pas des tuiles)',
             '`Dessus` : passe devant Brann (arches, haut des statues, bannières)'])
-S.reserve = 4
+S.reserve = 2          # le PNG reste à 24 lignes : les transitions pavés/herbe occupent les ids 160 à 175 (176 à 191 libres)
 S.dev, S.terrains_txt = DEV, TERRAINS_NOTE
 A = Adder(S)
 
@@ -217,6 +220,13 @@ S.notes += [
     'Teinte d\'éclipse (étape 3) : appliquée par le code sur toute la salle, il n\'y a pas de variante de couleur dans le PNG.',
     'Aperçu : `art/tilesets/route_chateau_apercu.png` reconstitue les trois cartes ASCII de `maps/chateau/plan.md` avec les aplats (carrés colorés = objets Tiled).']
 
+# ------------------------------------------------------------------ 13. transitions pavés / herbe (ajout)
+A.grp(160, 'Transitions pavés de la route / herbe d\'éclipse (terrain `Paves`, 160 à 175)',
+      'Jeu complet de 16 tuiles « coins » (comme `Paves` de `village`) : id = 160 + HG×8 + HD×4 + BG×2 + BD (1 = pavés). 160 = herbe pleine, 175 = pavés pleins, '
+      '161 à 174 = transitions aux bords fondus (`fondus.py`, style `paves`). Sans collision ; elles se peignent sur le calque `Sol`.')
+S.terrain('Paves', 'paves_herbe', 'herbe', 'pave', 'herbe', 'paves', False, 'Herbe d\'éclipse pleine (terrain de base)',
+          'Pavés de la route pleins', 'pavés/herbe')
+
 # ------------------------------------------------------------------ aperçus
 MARK = {'P': '#40ff40', 'X': '#ffff40', 'R': '#40d0ff', 'Y': '#ff8030', 'r': '#e04040', 's': '#e04040', 'c': '#c0a060', 'u': '#6080ff',
         'k': '#ff40ff', 'o': '#ff40ff', 'f': '#ffffff', 'Z': '#ff8030'}
@@ -317,6 +327,10 @@ def main_final():
     px = final_lib.render(S, route_chateau_art.REG)
     out_t = os.path.join(ROOT, 'art', 'tilesets')
     save_png(os.path.join(out_t, 'route_chateau.png'), px)
+    import fondus
+    import fondus_lib
+    fondus.patch('route_chateau')                      # bords fondus des transitions 161 à 174 (lit le wangset du .tsx)
+    px = [[None if p[3] == 0 else tuple(p) for p in row] for row in fondus_lib.read_png(os.path.join(out_t, 'route_chateau.png'))]
     save_png(os.path.join(out_t, 'route_chateau_numeros.png'), final_lib.numbered(S, px))
     with open(os.path.join(out_t, 'route_chateau_plan.md'), 'w', encoding='utf-8', newline=chr(10)) as f:
         f.write(final_md(S.md('route_chateau.py')))

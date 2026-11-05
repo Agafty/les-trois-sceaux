@@ -3,7 +3,7 @@
 > Fichier généré par `tools/sprites/route_chateau.py` : modifier le script, pas ce fichier. **État : FINAL** (dessin final de toutes les tuiles ; les numéros sont ceux du plan, aucune tuile n'a bougé).
 
 - Image : `art/tilesets/route_chateau.png`, 256×768 px, 8 colonnes × 24 lignes de tuiles 32×32, sans marge ni espacement (192 cases). Tileset Tiled : `maps/tilesets/route_chateau.tsx` (collisions et terrains définis). `art/tilesets/route_chateau_numeros.png` = la planche ×2 avec les numéros.
-- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 21 à 24 (ids 160 à 191) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
+- **Numéro = id local Tiled** (ligne × 8 + colonne, en partant de 0). Une tuile ne change jamais de numéro. Lignes 23 à 24 (ids 176 à 191) : réserve vide, pour les ajouts. Les cases vides au bout d'une ligne sont aussi libres.
 - Collisions en pixels dans la tuile (x,y largeur×hauteur, origine en haut à gauche). Les terrains (Wang par coins) sont dans le panneau Terrains de Tiled.
 - Vue de dessus 3/4, lumière en haut à gauche, contour sombre d'1 px sur les objets (pas sur les sols). Palette : pavés gris-violet, herbe d'éclipse vert froid éteint, falaise brun clair, grotte brun très sombre, façade et cour pierre violette, runes cyan, ronces noires ; les mêmes tuiles servent le jour (route, étapes 0 à 2) et sous la teinte d'éclipse (code). Dessin : `tools/sprites/route_chateau_art.py` (+ `chateau_art.py`, `chateau_objets.py`, `chateau_pierre.py`).
 - Les collisions sont dans le tileset (colonne Collision de chaque tableau).
@@ -23,6 +23,8 @@ Tileset `route_chateau` : 8 colonnes, id local Tiled = ligne × 8 + colonne. Un 
 | **Mur à rune** (`Porte` `apparence=mur_rune`, type `lanterne`) | tuile dessous : 46 `alcove_sol_rune` | `Sol` | L'image `art/puzzles/porte_mur_rune.png` (64×32) est posée par la `Porte` sur 2 cases de 46. Mur autour : 47 `mur_rune_grave` (solide, indice discret). |
 | **Braseros** | 48 (route), 49 (grotte) | `Decor` | Socle décoratif sans collision, **sous** l'objet `Torche` (`permanente`) qui porte le vrai brasero et sa collision. |
 | **Portail scellé** 2×3 | 120 à 125 | `Murs` | Décor solide (symbole de l'Œil), voir assemblage. |
+
+| **Transitions pavés / herbe** (terrain Wang `Paves`, par coins) | 160 à 175 | `Sol` | Comme `Paves` de `village` : id = 160 + HG×8 + HD×4 + BG×2 + BD (1 = pavés). Ajoutées après coup, sans collision, bords fondus par `fondus.py`. Pinceau Terrains de Tiled ou `maps/autotile_wang.py`. |
 
 Tout le reste est géré par les collisions du `.tsx` (murs 16-30, 96-111, 136-151, façade 112-127, rochers 67-70, statues 152-155, 40-43, 47, 55, 71, 128) : aucun code.
 
@@ -245,6 +247,29 @@ Statue de chevalier (`O` de la cour) : `statue_chevalier_base` (Murs, solide) + 
 | 157 | `banniere_morvath` | Bannière noire à l'Œil doré plaquée sur un mur (Dessus) | Dessus | aucune |
 | 158 | `banniere_dechiree` | Bannière déchirée plaquée sur un mur (Dessus) | Dessus | aucune |
 
+## 16. Transitions pavés de la route / herbe d'éclipse (terrain `Paves`, 160 à 175)
+
+Jeu complet de 16 tuiles « coins » (comme `Paves` de `village`) : id = 160 + HG×8 + HD×4 + BG×2 + BD (1 = pavés). 160 = herbe pleine, 175 = pavés pleins, 161 à 174 = transitions aux bords fondus (`fondus.py`, style `paves`). Sans collision ; elles se peignent sur le calque `Sol`.
+
+| N° | Nom | Rôle | Calque | Collision |
+| --- | --- | --- | --- | --- |
+| 160 | `paves_herbe_base` | Herbe d'éclipse pleine (terrain de base) | Sol | aucune |
+| 161 | `paves_herbe_0001` | pavés/herbe : coin bas-droite seulement (paves dans ce coin) | Sol | aucune |
+| 162 | `paves_herbe_0010` | pavés/herbe : coin bas-gauche seulement (paves dans ce coin) | Sol | aucune |
+| 163 | `paves_herbe_0011` | pavés/herbe : paves en bas (bord bas) | Sol | aucune |
+| 164 | `paves_herbe_0100` | pavés/herbe : coin haut-droite seulement (paves dans ce coin) | Sol | aucune |
+| 165 | `paves_herbe_0101` | pavés/herbe : paves à droite (bord droit) | Sol | aucune |
+| 166 | `paves_herbe_0110` | pavés/herbe : deux coins opposés (haut-droite et bas-gauche) | Sol | aucune |
+| 167 | `paves_herbe_0111` | pavés/herbe : paves partout sauf le coin haut-gauche (coin rentrant) | Sol | aucune |
+| 168 | `paves_herbe_1000` | pavés/herbe : coin haut-gauche seulement (paves dans ce coin) | Sol | aucune |
+| 169 | `paves_herbe_1001` | pavés/herbe : deux coins opposés (haut-gauche et bas-droite) | Sol | aucune |
+| 170 | `paves_herbe_1010` | pavés/herbe : paves à gauche (bord gauche) | Sol | aucune |
+| 171 | `paves_herbe_1011` | pavés/herbe : paves partout sauf le coin haut-droite (coin rentrant) | Sol | aucune |
+| 172 | `paves_herbe_1100` | pavés/herbe : paves en haut (bord haut) | Sol | aucune |
+| 173 | `paves_herbe_1101` | pavés/herbe : paves partout sauf le coin bas-gauche (coin rentrant) | Sol | aucune |
+| 174 | `paves_herbe_1110` | pavés/herbe : paves partout sauf le coin bas-droite (coin rentrant) | Sol | aucune |
+| 175 | `paves_herbe_plein` | Pavés de la route pleins | Sol | aucune |
+
 ## Assemblages (pinceau « tampon » dans Tiled)
 
 | Assemblage | Tuiles (ligne par ligne) | Calques / usage |
@@ -262,6 +287,7 @@ Dans Tiled : panneau **Terrains**, choisir le terrain puis le pinceau de terrain
 | `Falaise` | falaise | 16 à 30 | `route_falaise` : bords nord et sud de la route (face de falaise brun clair) |
 | `Roche de la grotte` | roche | 96 à 110 (111 = variante pleine) | `passage_falaise` : parois |
 | `Rempart` | rempart | 136 à 150 (151 = variante pleine) | `chateau` : murs gauche, droit et bas de la cour |
+| `Paves` (2 couleurs : herbe, paves) | herbe d'éclipse / pavés de la route | **160 à 175** (160 = herbe, 175 = pavés, 161 à 174 = transitions ; herbe 5 à 7 et pavés 0 à 2 sont des variantes pleines du même terrain) | `route_falaise` : bords de la route, calque `Sol` (sans collision) |
 
 ## Notes
 
