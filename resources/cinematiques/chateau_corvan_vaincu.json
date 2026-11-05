@@ -3,6 +3,7 @@
   "drapeau_fin": "morvath_vaincu",
   "passable": true,
   "etapes": [
+    { "action": "musique", "piste": "stop", "duree": 0.5 },
     { "action": "secousse", "force": 3, "duree": 1.0 },
     { "action": "apparaitre", "cible": "pnj", "id": "corvan", "sprite": "corvan_vieux", "a": "corvan_defi", "direction": "up" },
     { "action": "regarder", "acteur": "brann", "vers": "corvan_defi" },
@@ -21,6 +22,7 @@
     { "action": "drapeau", "nom": "morvath_vaincu" },
     { "action": "sauvegarder" },
     { "action": "fondu", "vers": "noir", "duree": 1.2 },
+    { "action": "musique", "piste": "stop", "duree": 0 },
     { "action": "aller_a", "carte": "res://scenes/rooms/forge_room.tscn", "spawn": "depuis_chateau" }
   ]
 }

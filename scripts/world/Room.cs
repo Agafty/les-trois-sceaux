@@ -55,6 +55,13 @@ public partial class Room : Node2D
     [Export]
     public string DeathRespawnSpawn { get; set; } = "";
 
+    /// <summary>
+    /// Piste de fond forcée pour cette salle (nom d'un fichier de audio/musique/ sans extension : « donjon », « village »...).
+    /// Vide = choisie d'après la zone (<see cref="MusicRules.ForRoom"/>). La propriété de carte Tiled « musique » la remplace si elle existe.
+    /// </summary>
+    [Export]
+    public string MusicTrack { get; set; } = "";
+
     [ExportGroup("Variante rouge")]
     /// <summary>Multiplicateur de points de vie d'un ennemi de variante « rouge ».</summary>
     [Export(PropertyHint.Range, "1,5,0.5")]
@@ -273,6 +280,7 @@ public partial class Room : Node2D
         }
 
         ReadMapProperties();
+        AudioManager.Instance?.EnterRoom(MusicRules.ForRoom(Zone, RoomStem, MusicTrack)); // même piste que la salle précédente = la musique continue
         ApplyStageTint();
         if (HasMapPosition && !string.IsNullOrEmpty(SceneFilePath))
             GetNode<GameState>("/root/GameState").MarkRoomVisited(Zone, System.IO.Path.GetFileNameWithoutExtension(SceneFilePath));
@@ -675,9 +683,17 @@ public partial class Room : Node2D
         boss.EntryPoint = EntryPosition;
         boss.Position = _entities.ToLocal(spot);
         _entities.AddChild(boss);
-        boss.EncounterStarted += () => _hud?.ShowBossBar(boss.NameKey);
+        boss.EncounterStarted += () =>
+        {
+            _hud?.ShowBossBar(boss.NameKey);
+            AudioManager.Instance?.BeginBossMusic(boss.EncounterMusic);
+        };
         boss.ProgressChanged += fraction => _hud?.SetBossBar(fraction);
-        boss.EncounterEnded += () => _hud?.HideBossBar();
+        boss.EncounterEnded += () =>
+        {
+            _hud?.HideBossBar();
+            AudioManager.Instance?.EndBossMusic();
+        };
         boss.HintRequested += (key, seconds) =>
         {
             if (_hintBox == null)
@@ -723,6 +739,9 @@ public partial class Room : Node2D
 
     private void OnBossDefeated(Boss boss, Vector2 center)
     {
+        // Jingle de victoire puis retour à la musique de la salle ; un boss suivi d'une cinématique (Corvan) coupe la musique.
+        if (boss.VictoryJingle) AudioManager.Instance?.PlayJingle(MusicRules.Victory);
+        else AudioManager.Instance?.SilenceMusic(1f);
         if (!string.IsNullOrEmpty(boss.FarewellKey))
             DialogueBox.Open(this, boss.NameKey, boss.FarewellKey);
         SpawnBossRewards(boss.BossId, boss.DropsHeartContainer, boss.SealPickupName, center, true);
@@ -1310,7 +1329,7 @@ public partial class Room : Node2D
     {
         Node source = null;
         foreach (var child in GetChildren())
-            if (child.HasMeta("etage") || child.HasMeta("carte_x") || child.HasMeta("carte_y") || child.HasMeta("camera") || child.HasMeta("obscurite"))
+            if (child.HasMeta("etage") || child.HasMeta("carte_x") || child.HasMeta("carte_y") || child.HasMeta("camera") || child.HasMeta("obscurite") || child.HasMeta("musique"))
             {
                 source = child;
                 break;
@@ -1322,6 +1341,13 @@ public partial class Room : Node2D
             CameraMode = camera;
         else if (camera != "")
             WarnOnce("camera:" + camera, $"Carte {Name} : camera inconnue « {camera} » (ecran ou suivre), « suivre » utilisé.");
+
+        string music = GetString(source, "musique").Trim();
+        if (music != "")
+        {
+            if (MusicRules.IsValidName(music)) MusicTrack = music;
+            else WarnOnce("musique:" + music, $"Carte {Name} : musique invalide « {music} » (nom d'un fichier de audio/musique/ sans extension), ignorée.");
+        }
 
         string darkness = GetString(source, "obscurite");
         if (!LanternRules.TryParseDarkness(darkness, out bool dark))

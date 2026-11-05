@@ -5,6 +5,7 @@
   "etapes": [
     { "action": "fondu", "vers": "noir", "duree": 0 },
     { "action": "teinte", "couleur": "normal", "duree": 0 },
+    { "action": "musique", "piste": "fin_generique", "duree": 0.5 },
     { "action": "camera", "vers": "fete_place", "duree": 0 },
     { "action": "placer", "acteur": "brann", "vers": "depuis_lac" },
     { "action": "regarder", "acteur": "brann", "direction": "up" },

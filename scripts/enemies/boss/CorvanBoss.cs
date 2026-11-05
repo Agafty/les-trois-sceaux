@@ -1050,6 +1050,10 @@ public partial class CorvanBoss : Boss, IBombDestructible
         StartCinematic(CineVaincu, true);
     }
 
+    public override string EncounterMusic => MusicRules.FinalBattle;
+
+    public override bool VictoryJingle => false; // la cinématique de fin (chateau_corvan_vaincu) enchaîne
+
     public override string PendingCinematicWhenDefeated(GameState state) =>
         state.IsCollected(DefeatedFlag) ? "" : CineVaincu;
 

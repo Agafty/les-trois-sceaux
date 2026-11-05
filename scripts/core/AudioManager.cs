@@ -8,7 +8,8 @@ using Godot;
 ///   entre deux déclenchements du même son, et le lecteur le plus ancien est réutilisé si tout est occupé.
 /// - Un son manquant ou inconnu ne plante jamais : un seul avertissement par nom.
 /// - Les sons continuent pendant la pause (ProcessMode Always réglé dans la scène) : menus, coffre qui s'ouvre...
-/// - <see cref="PlayMusic"/> / <see cref="StopMusic"/> sont prêts (aucune musique pour l'instant).
+/// - Musique : pistes de audio/musique/ (noms dans <see cref="MusicRules"/>), piste de salle (<see cref="EnterRoom"/>), de boss,
+///   jingles, musique d'une cinématique ; fondus de 0,5 s, jamais de redémarrage si c'est déjà la piste en cours.
 /// - Volumes par bus en valeur linéaire 0..1 (<see cref="SetSfxVolume"/>, <see cref="SetMusicVolume"/>), réglés par le menu options (GameOptions).
 /// Le reste du code appelle les méthodes statiques <see cref="Play"/> / <see cref="PlayAt"/> : sans AudioManager (scène lancée
 /// hors du jeu, test), elles ne font rien.
@@ -59,6 +60,20 @@ public partial class AudioManager : Node
     private Tween _musicTween;
     private AudioStream _musicStream;
 
+    // État de la musique (voir EnterRoom, BeginBossMusic, PlayJingle, PlayScriptedMusic).
+    private const string MusicFolder = "res://audio/musique/";
+    private static readonly string[] MusicExtensions = { ".ogg", ".mp3", ".wav" }; // une composition .ogg l'emporte sur la piste générée
+    private readonly Dictionary<string, AudioStream> _tracks = new();
+    private readonly HashSet<string> _preloading = new();
+    private string _currentTrack;   // piste qui joue (ou vient d'être lancée)
+    private string _zoneTrack;      // fond de la salle courante
+    private string _bossTrack;      // piste de combat, prioritaire sur la salle
+    private string _scriptedTrack;  // piste imposée par une cinématique (null = silence voulu)
+    private bool _scripted;
+    private bool _keepScripted;     // la cinématique part par « aller_a » : sa musique survit à la prochaine salle seulement
+    private int _jingleId;          // numéro du jingle en cours (le minuteur de secours d'un jingle périmé est ignoré)
+    private bool _jingle;           // un jingle joue : la suite reprend à sa fin
+
     private SceneManager _sceneManager;
     private SaveSystem _saveSystem;
 
@@ -80,6 +95,8 @@ public partial class AudioManager : Node
         }
         _music = new AudioStreamPlayer { Name = "Musique", Bus = MusicBus };
         AddChild(_music);
+        _music.Finished += OnMusicFinished;
+        PreloadTracks();
 
         foreach (var name in Sfx.All)
         {
@@ -109,6 +126,7 @@ public partial class AudioManager : Node
     {
         if (_sceneManager != null && IsInstanceValid(_sceneManager)) _sceneManager.TransitionStarted -= OnTransitionStarted;
         if (_saveSystem != null && IsInstanceValid(_saveSystem)) _saveSystem.GameSaved -= OnGameSaved;
+        if (_music != null && IsInstanceValid(_music)) _music.Finished -= OnMusicFinished;
         if (Instance == this) Instance = null;
     }
 
@@ -260,6 +278,198 @@ public partial class AudioManager : Node
         _musicTween = CreateTween();
         _musicTween.TweenProperty(_music, "volume_db", -60f, fadeSeconds);
         _musicTween.TweenCallback(Callable.From(_music.Stop));
+    }
+
+    // --- Pistes du jeu -----------------------------------------------------------------------------
+
+    /// <summary>Chemin du fichier d'une piste (.ogg, puis .mp3, puis .wav), ou null s'il n'existe pas.</summary>
+    public static string ResolveMusicPath(string track)
+    {
+        if (!MusicRules.IsValidName(track)) return null;
+        foreach (var ext in MusicExtensions)
+        {
+            var path = MusicFolder + track.Trim() + ext;
+            if (ResourceLoader.Exists(path)) return path;
+        }
+        return null;
+    }
+
+    // Chargement en tâche de fond au démarrage : changer de salle ne fige jamais le jeu pour lire un fichier.
+    private void PreloadTracks()
+    {
+        foreach (var track in MusicRules.All)
+        {
+            var path = ResolveMusicPath(track);
+            if (path != null && ResourceLoader.LoadThreadedRequest(path) == Error.Ok) _preloading.Add(track);
+        }
+    }
+
+    private AudioStream LoadTrack(string track)
+    {
+        if (_tracks.TryGetValue(track, out var cached)) return cached;
+        AudioStream stream = null;
+        var path = ResolveMusicPath(track);
+        if (path == null)
+            WarnOnce("musique:" + track, $"AudioManager : piste « {track} » introuvable dans {MusicFolder} (relancer tools/audio/musique.py ?).");
+        else
+        {
+            stream = (_preloading.Remove(track) ? ResourceLoader.LoadThreadedGet(path) : ResourceLoader.Load(path)) as AudioStream;
+            if (stream == null) WarnOnce("musique:" + track, $"AudioManager : {path} n'a pas pu être chargé.");
+        }
+        _tracks[track] = stream;
+        return stream;
+    }
+
+    /// <summary>Joue une piste par son nom, avec fondu. Sans effet si c'est déjà elle qui joue.</summary>
+    private void PlayTrack(string track, float fadeSeconds)
+    {
+        if (string.IsNullOrEmpty(track)) return;
+        if (track == _currentTrack && _music.Playing) return;
+        var stream = LoadTrack(track);
+        if (stream == null)
+        {
+            SilenceTrack(fadeSeconds); // piste absente : silence plutôt que l'ancienne piste qui ne correspond plus (avertissement déjà émis)
+            return;
+        }
+        _currentTrack = track;
+        PlayMusic(stream, fadeSeconds);
+    }
+
+    private void SilenceTrack(float fadeSeconds)
+    {
+        _currentTrack = null;
+        StopMusic(fadeSeconds);
+    }
+
+    // Ce qui doit jouer maintenant, par ordre de priorité : combat, musique de cinématique, fond de la salle.
+    private void ResumeMusic(float fadeSeconds)
+    {
+        if (_jingle) return;
+        string wanted = _bossTrack ?? (_scripted ? _scriptedTrack : _zoneTrack);
+        if (wanted == null) SilenceTrack(fadeSeconds);
+        else PlayTrack(wanted, fadeSeconds);
+    }
+
+    /// <summary>
+    /// Appelé par chaque Room à son chargement avec la piste de sa zone (<see cref="MusicRules.ForRoom"/>, null = pas d'avis).
+    /// Si c'est déjà la piste en cours (changement de salle dans la même zone), elle continue sans coupure.
+    /// </summary>
+    public void EnterRoom(string track)
+    {
+        _bossTrack = null; // une salle qui se charge n'est jamais au milieu d'un combat
+        // Une musique de cinématique ne survit qu'au changement de salle voulu par la cinématique (« aller_a ») ;
+        // toute autre arrivée (sortie à pied, rechargement après une mort) revient à la musique de la zone.
+        if (_scripted)
+        {
+            if (!_keepScripted) _scripted = false;
+            _keepScripted = false;
+        }
+        if (track != null) _zoneTrack = track;
+        ResumeMusic(0.5f);
+    }
+
+    /// <summary>Le combat d'un boss commence : sa piste remplace celle de la salle.</summary>
+    public void BeginBossMusic(string track)
+    {
+        _bossTrack = string.IsNullOrEmpty(track) ? null : track;
+        _scripted = false;
+        _jingle = false;
+        ResumeMusic(0.4f);
+    }
+
+    /// <summary>Le combat est fini (victoire ou mort) : la piste de combat n'est plus prioritaire. Le son qui suit est choisi par l'appelant (jingle).</summary>
+    public void EndBossMusic() => _bossTrack = null;
+
+    /// <summary>
+    /// Joue un jingle (non bouclé) tout de suite ; à sa fin, la musique de la salle reprend. Le flux est forcé sans boucle, et un minuteur
+    /// de secours rend la main si le signal de fin n'arrive pas : la musique ne reste jamais muette.
+    /// </summary>
+    public void PlayJingle(string track)
+    {
+        if (!MusicRules.IsJingle(track))
+        {
+            WarnOnce("jingle:" + track, $"AudioManager : « {track} » n'est pas un jingle (MusicRules.IsJingle).");
+            return;
+        }
+        var stream = LoadTrack(track);
+        if (stream == null) return;
+        switch (stream)
+        {
+            case AudioStreamWav wav: wav.LoopMode = AudioStreamWav.LoopModeEnum.Disabled; break;
+            case AudioStreamOggVorbis ogg: ogg.Loop = false; break;
+            case AudioStreamMP3 mp3: mp3.Loop = false; break;
+        }
+        _musicTween?.Kill();
+        _jingle = true;
+        int id = ++_jingleId;
+        _currentTrack = track;
+        _musicStream = stream;
+        _music.Stream = stream;
+        _music.VolumeDb = 0f;
+        _music.Play();
+        double length = stream.GetLength();
+        GetTree().CreateTimer((length > 0 ? length : 8.0) + 0.5, true, false, true).Timeout += () => EndJingle(id);
+    }
+
+    private void EndJingle(int id)
+    {
+        if (!_jingle || id != _jingleId) return;
+        _jingle = false;
+        _currentTrack = null;
+        ResumeMusic(0.5f);
+    }
+
+    /// <summary>Coupe la musique (fondu) jusqu'au prochain changement de salle ; utile quand une cinématique enchaîne.</summary>
+    public void SilenceMusic(float fadeSeconds = 1f)
+    {
+        _jingle = false;
+        SilenceTrack(fadeSeconds);
+    }
+
+    /// <summary>
+    /// Écran qui impose sa piste (titre, générique) : tout le reste est oublié, la piste démarre (ou continue si c'est déjà elle).
+    /// </summary>
+    public void PlayScreenTrack(string track)
+    {
+        _bossTrack = null;
+        _scripted = false;
+        _jingle = false;
+        _zoneTrack = track;
+        PlayTrack(track, 0.5f);
+    }
+
+    /// <summary>
+    /// À appeler juste avant qu'une cinématique parte par « aller_a » : la musique qu'elle a posée (piste ou silence) continue dans la salle
+    /// d'arrivée, jusqu'à ce qu'une autre cinématique la remplace ou pose « zone ». Sans effet si la cinématique n'a posé aucune musique.
+    /// </summary>
+    public void KeepScriptedMusicForNextRoom(bool keep = true) => _keepScripted = keep && _scripted;
+
+    /// <summary>
+    /// Action « musique » des cinématiques : une piste, « stop » (silence) ou « zone » (retour à la musique de la salle).
+    /// Elle ne dure que dans la salle courante, sauf départ par « aller_a » (<see cref="KeepScriptedMusicForNextRoom"/>).
+    /// </summary>
+    public void PlayScriptedMusic(string track, float fadeSeconds)
+    {
+        _jingle = false;
+        if (track == "zone")
+        {
+            _scripted = false;
+            ResumeMusic(fadeSeconds);
+            return;
+        }
+        _scripted = true;
+        _keepScripted = false;
+        _scriptedTrack = track == "stop" ? null : track;
+        ResumeMusic(fadeSeconds);
+    }
+
+    private void OnMusicFinished()
+    {
+        if (_jingle) EndJingle(_jingleId);
+        else if (_currentTrack != null && _musicStream != null)
+        {
+            _music.Play(); // filet de sécurité : une piste importée sans boucle recommence au lieu de se taire
+        }
     }
 
     // --- Volumes (menu options) ------------------------------------------------------------------

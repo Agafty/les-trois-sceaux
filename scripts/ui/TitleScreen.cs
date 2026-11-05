@@ -69,6 +69,7 @@ public partial class TitleScreen : Control
         _saveSystem = GetNode<SaveSystem>("/root/SaveSystem");
         _sceneManager = GetNode<SceneManager>("/root/SceneManager");
 
+        AudioManager.Instance?.PlayScreenTrack(MusicRules.Title);
         BuildUi();
         AddOptionsMenu();
         LoadSlotCache();

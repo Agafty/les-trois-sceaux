@@ -162,6 +162,11 @@
       "acteur": "hulda"
     },
     {
+      "action": "musique",
+      "piste": "zone",
+      "duree": 1.5
+    },
+    {
       "action": "sauvegarder"
     }
   ]

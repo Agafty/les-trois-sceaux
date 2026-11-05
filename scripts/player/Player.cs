@@ -170,6 +170,7 @@ public partial class Player : CharacterBody2D
         _sprite.Visible = true;
         _sprite.Play(DeathAnim);
         AudioManager.Play(Sfx.BrannMort);
+        AudioManager.Instance?.PlayJingle(MusicRules.GameOver);
         // Filet de sécurité si AnimationFinished n'arrive jamais (animation absente).
         _respawnTimer = RespawnDelay + 2f;
         GD.Print("Brann est mort");

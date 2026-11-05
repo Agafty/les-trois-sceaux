@@ -4,6 +4,7 @@
   "passable": true,
   "etapes": [
     { "action": "teinte", "couleur": "normal", "duree": 0 },
+    { "action": "musique", "piste": "fin_generique", "duree": 1.5 },
     { "action": "deplacer", "acteur": "brann", "vers": "corvan_forge", "decalage": [0, 36], "vitesse": 90 },
     { "action": "regarder", "acteur": "brann", "direction": "up" },
     { "action": "dialogue", "orateur": "PNJ_BRANN", "lignes": ["DLG_FORGE_FIN_1"] },

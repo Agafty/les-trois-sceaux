@@ -68,6 +68,7 @@ public partial class CreditsScreen : Control
         var theme = GD.Load<Theme>(ThemePath);
         if (theme != null) Theme = theme;
         Engine.TimeScale = 1f;
+        AudioManager.Instance?.PlayScreenTrack(MusicRules.Credits); // continue sans coupure si la fête jouait déjà ce thème
 
         var back = new ColorRect { Color = new Color(0.03f, 0.03f, 0.09f), MouseFilter = MouseFilterEnum.Ignore };
         back.SetAnchorsPreset(LayoutPreset.FullRect);

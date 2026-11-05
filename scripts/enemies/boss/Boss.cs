@@ -40,6 +40,12 @@ public abstract partial class Boss : CharacterBody2D
     /// <summary>Un réceptacle de cœur apparaît à la victoire.</summary>
     [Export] public bool DropsHeartContainer { get; set; } = true;
 
+    /// <summary>Piste jouée pendant le combat (nom dans audio/musique/).</summary>
+    public virtual string EncounterMusic => MusicRules.Boss;
+
+    /// <summary>Faux si une cinématique enchaîne sur la victoire : pas de jingle, la musique se coupe.</summary>
+    public virtual bool VictoryJingle => true;
+
     /// <summary>Identifiant mémorisé dans GameState à la victoire (réglé par la Room : « &lt;zone&gt;_boss_&lt;nom&gt; »).</summary>
     public string BossId { get; set; } = "";
 

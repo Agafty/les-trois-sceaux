@@ -40,6 +40,11 @@
       ]
     },
     {
+      "action": "musique",
+      "piste": "stop",
+      "duree": 1.0
+    },
+    {
       "action": "aller_a",
       "carte": "res://scenes/rooms/forge_room.tscn",
       "spawn": "depuis_village"

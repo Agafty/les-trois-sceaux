@@ -290,8 +290,8 @@ public partial class CinematicPlayer : Node
                 else if (CinematicColors.TryParse(step.Value, out float r, out float g, out float b)) _room.SetTint(new Color(r, g, b));
                 break;
             case "musique":
-                if (step.Name == "stop") AudioManager.Instance?.StopMusic(announce ? step.Seconds : 0f);
-                else AudioManager.Instance?.PlayMusicFile($"res://audio/musique/{step.Name}.ogg", announce ? step.Seconds : 0f);
+                // « stop » = silence, « zone » = retour à la musique de la salle, sinon une piste de audio/musique/ (sans extension).
+                AudioManager.Instance?.PlayScriptedMusic(step.Name, announce ? step.Seconds : 0f);
                 break;
             case "camera":
                 if (step.Target == "brann") ReleaseCamera();
@@ -588,6 +588,7 @@ public partial class CinematicPlayer : Node
     private async Task GoToScene(CinematicStep step)
     {
         _leaving = true;
+        AudioManager.Instance?.KeepScriptedMusicForNextRoom(); // la musique posée par la cinématique suit Brann dans la salle d'arrivée
         try
         {
             for (int tries = 0; tries < 180; tries++)
@@ -596,6 +597,7 @@ public partial class CinematicPlayer : Node
                 await NextFrame(); // un fondu est déjà en cours : on réessaie
             }
             GD.PushError($"Cinématique : impossible d'aller à {step.Scene}.");
+            AudioManager.Instance?.KeepScriptedMusicForNextRoom(false);
             _leaving = false;
             if (!IsPlaying && IsInstanceValid(this) && IsInsideTree())
             {
