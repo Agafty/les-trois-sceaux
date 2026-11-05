@@ -10,7 +10,7 @@ public class OptionsData
     public int Version { get; set; } = CurrentVersion;
 
     /// <summary>Volume de la musique, 0 à 100 par pas de 10.</summary>
-    public int MusicVolume { get; set; } = 100;
+    public int MusicVolume { get; set; } = 70; // la musique générée est aussi forte que les bruitages : 70 laisse de la place aux sons et à la voix
 
     /// <summary>Volume des bruitages, 0 à 100 par pas de 10.</summary>
     public int SfxVolume { get; set; } = 100;

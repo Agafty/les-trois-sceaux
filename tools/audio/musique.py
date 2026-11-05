@@ -334,15 +334,19 @@ def render_track(spec, drums):
         out = fold(mix, n)
         # très léger adoucissement circulaire (moyenne avec l'échantillon précédent, y compris au raccord)
         out = [0.62 * out[i] + 0.38 * out[i - 1] for i in range(n)]
+        # Le raccord est déjà continu (queue repliée) ; on décale en plus le point de départ de 10 ms au plus, là où le
+        # signal est le plus calme entre deux échantillons, pour que la jonction fin -> début ne soit jamais un saut.
+        best = min(range(int(0.010 * RATE)), key=lambda k: abs(out[k] - out[k - 1]))
+        out = out[best:] + out[:best]
     else:
         out = mix
         out = [0.62 * out[i] + 0.38 * out[i - 1] if i else out[0] * 0.62 for i in range(len(out))]
         # on garde 0,8 s de queue (écho, relâchement) puis fondu de sortie
-        out = out[:min(len(out), n + int(0.8 * RATE))]
+        out = out[:min(len(out), n + int(0.5 * RATE))]
         fade_in = int(0.003 * RATE)
         for i in range(fade_in):
             out[i] *= i / fade_in
-        fade_out = int(0.6 * RATE)
+        fade_out = int(0.4 * RATE)
         for i in range(fade_out):
             out[len(out) - 1 - i] *= i / fade_out
     return out
@@ -536,9 +540,9 @@ track("victoire", 140, False, [
     ("drums", ["k.k.k.k.kkkkkkkk", "k...s...k...s...", "k...............s"][:2] + ["k..............."], 0.9),
 ], "jingle de victoire, court et triomphant, non bouclé")
 
-# --- 8. GAME OVER : jingle la mineur, 80 bpm, 2 mesures (~6 s), non bouclé --------------------
+# --- 8. GAME OVER : jingle la mineur, 150 bpm, 2 mesures (~3,7 s), non bouclé --------------------
 _c = ["F", "Am"]
-track("game_over", 80, False, [
+track("game_over", 150, False, [
     ("sombre", ["A5:4 G5:4 F5:4 E5:4", "D5:4 C5:4 A4:8"], 1.1, "sombre"),
     ("arp_soft", arp_tokens(_c, ["0:4 1:4 2:4 1:4"], 3), 0.9, "arp_soft"),
     ("bass_long", bass_tokens(_c, ["r:16", "r:16"])),

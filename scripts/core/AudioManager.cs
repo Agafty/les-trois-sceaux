@@ -416,7 +416,8 @@ public partial class AudioManager : Node
         if (!_jingle || id != _jingleId) return;
         _jingle = false;
         _currentTrack = null;
-        ResumeMusic(0.5f);
+        _music.Stop(); // flux fini (ou minuteur de secours) : rien à fondre en sortie, la musique de la salle repart franchement
+        ResumeMusic(0.15f);
     }
 
     /// <summary>Coupe la musique (fondu) jusqu'au prochain changement de salle ; utile quand une cinématique enchaîne.</summary>
