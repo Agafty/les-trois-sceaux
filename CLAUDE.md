@@ -14,7 +14,7 @@ La conception complète (scénario, personnages, carte, bestiaire, économie, ph
 
 ## Phase en cours
 
-**Phase 6 — Production du contenu** : tout le contenu est jouable de bout en bout (2026-11-04) ; restent le décor de fête par étape, la musique, le dessin final des tuiles du château, puis le test complet par l'utilisatrice avant la phase 7 (finitions). (Mettre à jour cette ligne à chaque changement de phase.)
+**Phase 6 — Production du contenu** : tout le contenu est jouable de bout en bout (2026-11-04) ; tous les tilesets sont dessinés (2026-11-05) ; restent le décor de fête par étape, la musique, les retouches de tuiles (transitions route/cour), puis le test complet par l'utilisatrice avant la phase 7 (finitions). (Mettre à jour cette ligne à chaque changement de phase.)
 
 ## Comment travailler avec moi
 
@@ -74,6 +74,8 @@ Les cartes sont faites dans l'éditeur **Tiled** et importées dans Godot par un
 **Réglage d'import YATI important** : dans le panneau Import de Godot, l'option **« Add Class As Metadata »** doit être cochée (et enregistrée comme valeur par défaut pour le type « Tiled Map ») pour que la classe Tiled d'un objet (`Spawn`, `Sortie`, `Ennemi`...) soit lisible en jeu via les metadata du nœud (`node.GetMeta("class")`). Sans ça, seules les propriétés personnalisées (comme `id`) sont importées, pas la classe elle-même.
 
 **Objets rectangle qui doivent être une zone de détection (`Sortie`, futurs interrupteurs...)** : par défaut, YATI transforme un objet rectangle sans type Godot reconnu en `StaticBody2D` (solide, bloque le joueur), pas en zone traversable. Pour obtenir une `Area2D` (qui détecte le passage sans bloquer), ajouter une propriété personnalisée **string** nommée `godot_node_type` avec la valeur `area` sur l'objet, en plus de sa `class` Tiled (`Sortie`). La `class` sert à nos metadata de gameplay, `godot_node_type` ne sert qu'à dire à YATI quel nœud Godot générer — les deux coexistent sans conflit.
+
+**Tuiles posées par le code** : l'import YATI ne crée dans l'atlas d'une carte qu'une partie des tuiles d'un tileset ; un `SetCell` à l'exécution sur une tuile absente est invisible (trou). Tester `atlas.HasTile(coords)` et `CreateTile` si besoin (fait dans `CrackedWall`). Transitions de terrain : script `maps/autotile_wang.py` (pinceau Terrains en ligne de commande) ; bords fondus : `tools/sprites/fondus.py` ; `village.py` sans `--patch` écraserait les retouches de `village.png`.
 
 **Cache d'import à surveiller** : modifier un `.tsx` externe ne déclenche pas toujours le réimport des `.tmx` qui le référencent (bug de cache observé avec YATI). Si un changement du tileset (nouvelle collision, etc.) ne se reflète pas en jeu malgré un rechargement du projet, supprimer les fichiers correspondants dans `.godot/imported/` force une réimportation complète.
 
